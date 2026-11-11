@@ -2,7 +2,7 @@
 
 Source for the ZBRoux Wiki: method guides and complete, machine-checked algorithm lists for ZBRoux (EODFDB, ZBLL) and LEOR (EOStripe).
 
-The site is built from `web/` and deployed to GitHub Pages by `.github/workflows/deploy.yml` on every push to `main`.
+The site is built from `web/` (`npm run build`, output in `web/dist`).
 
 Goal: complete, verified algorithm sets for under-documented speedsolving methods.
 
