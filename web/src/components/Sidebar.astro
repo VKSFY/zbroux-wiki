@@ -1,0 +1,37 @@
+---
+import { SIDEBAR, pagePath } from "../lib/site";
+const path = pagePath(Astro.url);
+const isCurrent = (href: string) => href === path;
+const inSet = (href: string) => path.startsWith("/algs/zbll/") && path !== "/algs/zbll/" && href === "/algs/zbll/t/";
+---
+<nav class="sidebar" aria-label="Contents">
+  {SIDEBAR.map((s) => (
+    <div class="sec">
+      <div class="st">{s.title}</div>
+      <ul>
+        {s.items.map((i) => (
+          <li>
+            <a href={i.href} aria-current={isCurrent(i.href) && !i.children ? "page" : undefined} class:list={{ open: inSet(i.href) }}>{i.label}</a>
+            {i.children && inSet(i.href) && (
+              <ul class="sub">
+                {i.children.map((c) => <li><a href={c.href} aria-current={isCurrent(c.href) ? "page" : undefined}>{c.label}</a></li>)}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+</nav>
+<style>
+  .sidebar{font-size:.92rem}
+  .sec{margin-bottom:18px}
+  .st{font-size:.78rem;font-weight:650;color:var(--mute);margin:0 0 4px 10px;letter-spacing:.02em}
+  ul{list-style:none;margin:0;padding:0}
+  a{display:block;padding:4px 10px;border-radius:6px;color:var(--ink-2)}
+  a:hover{background:var(--surface-2);text-decoration:none;color:var(--ink)}
+  a[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+  a.open{color:var(--ink);font-weight:600}
+  .sub{margin:2px 0 4px 12px;padding-left:6px;border-left:1px solid var(--line)}
+  .sub a{padding:2px 10px;font-size:.88rem}
+</style>

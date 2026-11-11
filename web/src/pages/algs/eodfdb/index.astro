@@ -1,0 +1,172 @@
+---
+import Base from "../../../layouts/Base.astro";
+import { cases } from "../../../lib/eodfdb";
+
+const ORDER = ["UF", "UR", "UB", "UL", "DF", "DB"] as const;
+const data = cases.map((c) => {
+  const up = ORDER.filter((n) => n[0] === "U" && c.slots[n].piece !== "LL");
+  return {
+    i: c.id, k: c.key, c: c.u_centre, g: c.group, b: c.bad_edges, m: c.optimal_moves,
+    a: c.algs, r: c.mirror_of,
+    s: ORDER.map((n) => { const v = c.slots[n]; const ch = v.piece === "LL" ? "L" : v.piece === "DF" ? "F" : "B"; return v.flip ? ch.toLowerCase() : ch; }).join(""),
+    t: up.length, u: up.filter((n) => !c.slots[n].flip).length,
+  };
+});
+---
+<Base title="EODFDB: find your case" description="Find your ZBRoux EODFDB case: answer a few questions about your cube or paste your scramble. All 992 cases with the shortest M/U algorithms." crumbs={[{ href: "/methods/zbroux/", label: "ZBRoux" }, { href: "/methods/zbroux/eodfdb/", label: "EODFDB" }]}>
+  <h1>EODFDB: find your case</h1>
+  <p class="lede">You've built both blocks. Answer the questions below about what you see on your cube, and the list narrows down as you go. Or paste your scramble to go straight to your case.</p>
+
+  <details class="paste">
+    <summary>Paste a scramble instead</summary>
+    <form id="pf">
+      <label for="scr">Scramble</label>
+      <textarea id="scr" rows="2" spellcheck="false" placeholder="D B' L D' B' D' L' ..."></textarea>
+      <label for="blk">Your moves for both blocks</label>
+      <textarea id="blk" rows="2" spellcheck="false" placeholder="U L B' L F D M B R U2 r U' ..."></textarea>
+      <div class="row"><button class="btn primary" type="submit">Find my case</button><span id="pmsg" role="status"></span></div>
+    </form>
+  </details>
+
+  <section class="q" id="q1">
+    <h2>1. What colour is the centre on top?</h2>
+    <p class="hint">If it isn't your top colour, your centres are turned. These cases fix that too.</p>
+    <div class="choices">
+      <button type="button" data-v="U"><i style="background:var(--yel)"></i>My top colour</button>
+      <button type="button" data-v="F"><i style="background:var(--grn)"></i>Green (front colour)</button>
+      <button type="button" data-v="B"><i style="background:var(--blu)"></i>Blue (back colour)</button>
+      <button type="button" data-v="D"><i style="background:var(--wht)"></i>My bottom colour</button>
+    </div>
+  </section>
+
+  <section class="q" id="q2">
+    <h2>2. Where are your two bottom edges?</h2>
+    <p class="hint">The two edges that still belong at the bottom, front and back. Each has your bottom colour and green or blue.</p>
+    <div class="choices">
+      <button type="button" data-v="both-in-U-opposite">Both on top, across from each other</button>
+      <button type="button" data-v="both-in-U-adjacent">Both on top, next to each other</button>
+      <button type="button" data-v="one-in-U">One on top, one at the bottom</button>
+      <button type="button" data-v="none-in-U">Both at the bottom</button>
+    </div>
+  </section>
+
+  <section class="q" id="q3" hidden>
+    <h2>3. Which way does their bottom colour face?</h2>
+    <p class="hint">Only for the bottom edges that are on top: is their bottom-colour sticker facing up, or out to the side?</p>
+    <div class="choices" id="q3opts"></div>
+  </section>
+
+  <section class="q" id="q4">
+    <h2 id="q4h">3. How many edges are flipped?</h2>
+    <p class="hint">Count all six unsolved edges. An edge is flipped when its top or bottom colour faces sideways. The answer is always even.</p>
+    <div class="choices" id="q4opts">
+      <button type="button" data-v="0">0</button><button type="button" data-v="2">2</button><button type="button" data-v="4">4</button><button type="button" data-v="6">6</button>
+    </div>
+  </section>
+
+  <div class="rhead">
+    <p><b id="count"></b> <span id="countlbl"></span></p>
+    <button type="button" class="btn" id="reset">Clear answers</button>
+  </div>
+  <p class="hint">Pictures show the top of the cube with green in front. The thin bars are the side stickers, and the two small squares underneath show what's in the bottom-front (DF) and bottom-back (DB) slots. Turn the top layer until it matches, then do the algorithm.</p>
+  <div class="cases" id="list"></div>
+  <p class="small muted">All 992 cases, 248 of them with aligned centres. Each algorithm is the shortest possible with M and U. <a href="/about/">How these were made</a>.</p>
+</Base>
+
+<script type="application/json" id="eodfdb-data" set:html={JSON.stringify(data)} />
+
+<script>
+  import { lseSvg, type LseSlots } from "../../../lib/lse-diagram.ts";
+  import { findEodfdb } from "../../../lib/eodfdb-engine.ts";
+
+  type C = { i: string; k: string; c: string; g: string; b: number; m: number; a: string[]; r: string; s: string; t: number; u: number };
+  const DATA: C[] = JSON.parse(document.getElementById("eodfdb-data")!.textContent!);
+  const byId = new Map(DATA.map((c) => [c.i, c]));
+  const byKey = new Map(DATA.map((c) => [c.k, c]));
+  const NAMES = ["UF", "UR", "UB", "UL", "DF", "DB"] as const;
+  const slotsOf = (s: string) => Object.fromEntries(NAMES.map((n, j) => {
+    const ch = s[j]; const P = ch.toUpperCase();
+    return [n, { piece: P === "L" ? "LL" : P === "F" ? "DF" : "DB", flip: ch !== P }];
+  })) as LseSlots;
+
+  const st: { c: string | null; g: string | null; u: number | null; b: number | null } = { c: "U", g: null, u: null, b: null };
+  let highlight: string | null = null;
+  const $ = (id: string) => document.getElementById(id)!;
+  const Q3 = { 1: [[1, "Facing up"], [0, "Facing sideways"]], 2: [[2, "Both facing up"], [1, "One up, one sideways"], [0, "Both facing sideways"]] } as const;
+
+  const fits = (c: C, skipB = false) =>
+    (st.c === null || c.c === st.c) && (st.g === null || c.g === st.g) && (st.u === null || c.u === st.u) && (skipB || st.b === null || c.b === st.b);
+  function pressed(box: string, v: string | null) {
+    $(box).querySelectorAll<HTMLButtonElement>("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === v)));
+  }
+  function render() {
+    pressed("q1", st.c); pressed("q2", st.g);
+    const nTop = st.g === "one-in-U" ? 1 : st.g?.startsWith("both-in-U") ? 2 : 0;
+    $("q3").hidden = nTop === 0;
+    $("q4h").textContent = (nTop ? "4" : "3") + ". How many edges are flipped?";
+    if (nTop) {
+      $("q3opts").innerHTML = Q3[nTop as 1 | 2].map(([v, l]) => `<button type="button" data-v="${v}">${l}</button>`).join("");
+      pressed("q3", st.u === null ? null : String(st.u));
+    } else st.u = null;
+    pressed("q4", st.b === null ? null : String(st.b));
+    $("q4opts").querySelectorAll<HTMLButtonElement>("button").forEach((b) => {
+      b.disabled = !DATA.some((c) => fits(c, true) && c.b === Number(b.dataset.v));
+    });
+    const list = DATA.filter((c) => fits(c)).sort((x, y) => x.b - y.b || x.m - y.m);
+    $("count").textContent = String(list.length);
+    $("countlbl").textContent = list.length === 1 ? "case matches" : list.length > 40 ? "cases match. Answer more questions to narrow it down." : "cases match";
+    $("list").innerHTML = list.map((c) => {
+      const [best, ...alts] = c.a;
+      return `<div class="case-row${c.i === highlight ? " hl" : ""}" id="${c.i}">
+        ${lseSvg(slotsOf(c.s), c.c, 78, "Case " + c.i)}
+        <div><div class="cid">${c.i}${c.r !== c.i ? ` <span class="muted small">mirror of <a href="#${c.r}">${c.r}</a></span>` : ""}</div>
+        <div class="alg">${best || "Already solved"}</div>${alts.length ? `<div class="alts">${alts.join("<br>")}</div>` : ""}</div>
+        <div class="mv">${c.m} moves</div></div>`;
+    }).join("");
+  }
+  function show(id: string, note?: string) {
+    const c = byId.get(id); if (!c) return;
+    st.c = c.c; st.g = c.g; st.u = c.t ? c.u : null; st.b = c.b; highlight = id;
+    render();
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (note) $("pmsg").textContent = note;
+  }
+  for (const [box, key] of [["q1", "c"], ["q2", "g"], ["q3", "u"], ["q4", "b"]] as const) {
+    $(box).addEventListener("click", (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>("button"); if (!b || b.disabled) return;
+      const v = key === "u" || key === "b" ? Number(b.dataset.v) : b.dataset.v!;
+      (st as any)[key] = (st as any)[key] === v ? null : v;
+      if (key === "g") st.u = null;
+      highlight = null; render();
+    });
+  }
+  $("reset").addEventListener("click", () => { st.c = "U"; st.g = null; st.u = null; st.b = null; highlight = null; history.replaceState(null, "", location.pathname); render(); });
+  $("pf").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const r = findEodfdb(($("scr") as HTMLTextAreaElement).value, ($("blk") as HTMLTextAreaElement).value);
+    if (!r.ok) { $("pmsg").textContent = r.error ?? "Couldn't read that."; return; }
+    const c = byKey.get(r.key!);
+    if (!c) { $("pmsg").textContent = "That isn't an EODFDB position. Check the moves."; return; }
+    show(c.i, `Case ${c.i}, ${c.m} moves. ${r.preAuf ? `Do ${r.preAuf} first, then the algorithm.` : "No need to turn the top first."}`);
+    history.replaceState(null, "", "#" + c.i);
+  });
+  window.addEventListener("hashchange", () => { const id = location.hash.slice(1); if (byId.has(id)) show(id); });
+  const initial = location.hash.slice(1);
+  if (byId.has(initial)) show(initial); else render();
+</script>
+
+<style>
+  .paste{border:1px solid var(--line);border-radius:8px;padding:0 14px;margin:0 0 8px;max-width:var(--content)}
+  .paste summary{cursor:pointer;padding:10px 0;font-weight:600}
+  .paste form{display:grid;gap:6px;padding:0 0 14px}
+  .paste label{font-size:.9rem;font-weight:600;margin-top:6px}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:8px}
+  #pmsg{font-weight:550;color:var(--ink-2)}
+  .q{margin-top:22px}
+  .q h2{font-size:1.08rem;margin:0 0 2px}
+  .hint{color:var(--mute);font-size:.9rem;margin:0 0 10px;max-width:var(--content)}
+  .choices i{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid #0007}
+  .rhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:30px;padding-top:14px;border-top:1px solid var(--line)}
+  .rhead p{margin:0}
+  #count{font-size:1.3rem}
+</style>

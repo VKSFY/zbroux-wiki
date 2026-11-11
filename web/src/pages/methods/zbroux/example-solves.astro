@@ -1,0 +1,79 @@
+---
+import Base from "../../../layouts/Base.astro";
+import LseDiagram from "../../../components/LseDiagram.astro";
+import { cases } from "../../../lib/eodfdb";
+import raw from "../../../../../data/solves/zbroux.json";
+
+const count = (alg: string) => alg.trim().split(/\s+/).filter(Boolean).length;
+const solves = raw.solves.map((sv: any) => {
+  const steps = sv.steps.map((s: any) => {
+    const n = count(s.moves);
+    const c = s.case ? cases.find((x) => x.id === s.case) : undefined;
+    return { ...s, n, tps: s.time ? n / s.time : undefined, caseData: c, caseHref: c ? `/algs/eodfdb/#${c.id}` : undefined };
+  });
+  const moves = steps.reduce((a: number, s: any) => a + s.n, 0);
+  const time = steps.reduce((a: number, s: any) => a + (s.time ?? 0), 0);
+  const full = steps.map((s: any) => s.moves).join(" ");
+  const enc = (a: string) => encodeURIComponent(a.replace(/'/g, "-").replace(/\s+/g, "_"));
+  const viewer = `https://alg.cubing.net/?setup=${enc(sv.scramble)}&alg=${enc(full)}`;
+  return { ...sv, steps, moves, time, full, viewer };
+});
+---
+<Base title="Example solves" description="ZBRoux example solves, broken down step by step." crumbs={[{ href: "/methods/zbroux/", label: "ZBRoux" }]}>
+  <article class="prose">
+    <h1>Example solves</h1>
+    <p class="lede">Real solves broken down step by step. Each one was replayed on a simulated cube to make sure every step ends where it says it does.</p>
+  </article>
+
+  {solves.map((sv: any, i: number) => (
+    <section class="solve" id={sv.id}>
+      <h2>Solve {i + 1} <span class="muted small">{sv.moves} moves{sv.time > 0 && ` · about ${sv.time.toFixed(1)} s${sv.time_is_estimate ? " (estimated)" : ""}`}</span></h2>
+      <p><b>Scramble:</b> <span class="alg">{sv.scramble}</span></p>
+      <p class="muted">{sv.orientation}. {sv.inspection}</p>
+
+      <table class="table">
+        <thead><tr><th>Step</th><th>Moves</th><th class="num">Moves</th>{sv.time > 0 && <th class="num">Time</th>}</tr></thead>
+        <tbody>
+          {sv.steps.map((s: any) => (
+            <tr>
+              <td class="step">{s.step}</td>
+              <td><span class="alg">{s.moves}</span>{s.note && <div class="note2">{s.note}</div>}</td>
+              <td class="num">{s.n}</td>
+              {sv.time > 0 && <td class="num">{s.time?.toFixed(1)} s</td>}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {sv.steps.filter((s: any) => s.caseData).map((s: any) => (
+        <p class="caselink"><LseDiagram c={s.caseData} size={56} /><span>The {s.step} case was <a href={s.caseHref}>{s.caseData.id}</a>, and the solution used is one of the shortest ({s.caseData.optimal_moves} moves).</span></p>
+      ))}
+
+      <p><b>Full solution:</b> <span class="alg">{sv.full}</span></p>
+      <p class="no-print"><button class="btn copy" type="button" data-copy={sv.full}>Copy solution</button> <a class="btn" href={sv.viewer} target="_blank" rel="noopener">Replay on alg.cubing.net</a></p>
+      <p class="small muted">Moves counted with M and r as one move each.{sv.time_is_estimate && " Step times are estimates, not timer splits."}</p>
+    </section>
+  ))}
+</Base>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>("button.copy").forEach((b) => {
+    b.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(b.dataset.copy ?? ""); b.textContent = "Copied"; }
+      catch { b.textContent = "Copy failed"; }
+      setTimeout(() => (b.textContent = "Copy solution"), 1500);
+    });
+  });
+</script>
+
+<style>
+  .solve{max-width:var(--content);margin-top:8px}
+  .solve h2{font-size:1.35rem;padding-bottom:.3em;border-bottom:1px solid var(--line)}
+  .solve h2 span{font-weight:400;margin-left:6px}
+  .alg{overflow-wrap:anywhere}
+  .num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .step{white-space:nowrap;font-weight:600}
+  .note2{font-size:.85rem;color:var(--mute);margin-top:3px}
+  .caselink{display:flex;align-items:center;gap:12px}
+  .caselink :global(svg){color:var(--ink);flex:0 0 auto}
+</style>

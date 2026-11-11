@@ -1,0 +1,39 @@
+---
+import Base from "../../../layouts/Base.astro";
+import ZbllCard from "../../../components/ZbllCard.astro";
+import { zbll, SHAPES, slug, stats } from "../../../lib/zbll.ts";
+
+export function getStaticPaths() {
+  return SHAPES.map((s) => ({ params: { shape: slug(s.key) }, props: { shape: s } }));
+}
+const NAMES: Record<string, string> = { S: "Sune", AS: "Antisune" };
+const { shape } = Astro.props;
+const name = NAMES[shape.key] ?? shape.key;
+const list = zbll.filter((c) => c.shape === shape.key);
+const groups = [...new Set(list.map((c) => c.group))].sort((a, b) => a - b);
+const s = stats(list);
+---
+<Base title={`ZBLL ${name}`} description={`All ${s.n} ZBLL ${name} cases with algorithms.`} crumbs={[{ href: "/methods/zbroux/zbll/", label: "ZBLL" }, { href: "/algs/zbll/", label: "Find your case" }]}>
+  <h1>ZBLL {name}</h1>
+  <p class="lede">{shape.blurb} {s.n} cases{shape.key !== "PLL" ? `, in ${groups.length} groups of corners` : ""}. Average {s.avg.toFixed(1)} moves.</p>
+  <p class="tools no-print">
+    <span>Other sets: {SHAPES.filter((x) => x.key !== shape.key).map((x, i) => <>{i > 0 && " · "}<a href={`/algs/zbll/${slug(x.key)}/`}>{NAMES[x.key] ?? x.key}</a></>)}</span>
+    <button class="btn" type="button" id="print">Print / save as PDF</button>
+  </p>
+  <p class="small muted no-print">Found by a solver and ordered by a simple rule, not picked by hand yet. Try the alternatives under each algorithm. <a href="/about/">How these were made</a>.</p>
+  {groups.map((g) => {
+    const gl = list.filter((c) => c.group === g);
+    return (
+      <section>
+        <h2>{shape.key === "PLL" ? `Group ${g}` : `${name} ${g}`}</h2>
+        <div class="cases">{gl.map((c) => <ZbllCard c={c} />)}</div>
+      </section>
+    );
+  })}
+</Base>
+<script>document.getElementById("print")?.addEventListener("click", () => window.print());</script>
+<style>
+  .tools{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin:0 0 6px}
+  h2{font-size:1.2rem;margin:30px 0 4px}
+  @media print{ h2{break-after:avoid} }
+</style>

@@ -1,0 +1,22 @@
+---
+import Base from "../../../layouts/Base.astro";
+import EsCaseCard from "../../../components/EsCaseCard.astro";
+import EsLegend from "../../../components/EsLegend.astro";
+import { eoCases, stats } from "../../../lib/eostripe.ts";
+const s = stats(eoCases);
+const groups = [...new Set(eoCases.map((c) => c.bad_edges))].sort((a, b) => a - b);
+---
+<Base title="EOStripe: orienting the edges" description={`All ${s.n} LEOR EOStripe cases where DF, DB and the centres are already solved and only edge orientation is left.`} crumbs={[{ href: "/methods/leor/", label: "LEOR" }, { href: "/methods/leor/eostripe/", label: "EOStripe" }]}>
+  <h1>EOStripe: orienting the edges</h1>
+  <p class="lede">DF, DB and the centres are already solved, and only the edges need orienting. These are all {s.n} cases, with the shortest solutions in R, r, M and U (average {s.avg.toFixed(1)} moves). For any other EOStripe position, use the <a href="/tools/eostripe-solver/">solver</a>.</p>
+  <p class="no-print"><button class="btn" type="button" onclick="window.print()">Print / save as PDF</button> <a class="btn" href="/algs/eostripe/stripe/">Cases for placing DF and DB</a></p>
+  <EsLegend />
+  {groups.map((b) => (
+    <section>
+      <h2>{b} flipped edges</h2>
+      <div class="cases">{eoCases.filter((c) => c.bad_edges === b).map((c) => <EsCaseCard c={c} />)}</div>
+    </section>
+  ))}
+  <p class="small muted">Cases are counted up to turning the top layer first. When several shortest solutions exist, the one with the fewest M moves is listed first, since M is awkward one-handed.</p>
+</Base>
+<style>h2{font-size:1.2rem;margin:28px 0 4px}</style>

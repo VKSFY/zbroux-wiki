@@ -1,0 +1,16 @@
+---
+import { eostripeSvg } from "../lib/eostripe-diagram.ts";
+import type { EsCase } from "../lib/eostripe.ts";
+interface Props { c: EsCase }
+const { c } = Astro.props;
+const [best, ...alts] = c.algs;
+---
+<div class="case-row" id={c.id}>
+  <Fragment set:html={eostripeSvg(c.slots, c.u_centre, c.f_centre, 132, `Case ${c.id}`)} />
+  <div>
+    <div class="cid">{c.id} <span class="muted small">{c.bad_edges} flipped</span></div>
+    <div class="alg">{best}</div>
+    {alts.length > 0 && <div class="alts" set:html={alts.join("<br>")} />}
+  </div>
+  <div class="mv">{c.optimal_moves} moves</div>
+</div>

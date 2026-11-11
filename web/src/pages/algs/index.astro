@@ -1,0 +1,32 @@
+---
+import Base from "../../layouts/Base.astro";
+import { cases } from "../../lib/eodfdb";
+import { eoCases, stripeCases } from "../../lib/eostripe.ts";
+const nE = cases.filter((c) => c.centres === "solved").length;
+---
+<Base title="Algorithms" description="Algorithm lists for ZBRoux (EODFDB, ZBLL) and LEOR (EOStripe).">
+  <article class="prose">
+    <h1>Algorithms</h1>
+    <p class="lede">Every list covers all cases of its step. For the two ZBRoux algorithm steps there's also a case finder: answer a few questions about your cube, or paste a scramble.</p>
+
+    <h2>ZBRoux</h2>
+    <table>
+      <thead><tr><th>Step</th><th>Cases</th><th>Where</th></tr></thead>
+      <tbody>
+        <tr><td>EODFDB</td><td>{nE} with centres aligned, {cases.length} in total</td><td><a href="/algs/eodfdb/">Case finder</a></td></tr>
+        <tr><td>ZBLL</td><td>493</td><td><a href="/algs/zbll/">Case finder</a> · lists: <a href="/algs/zbll/t/">T</a>, <a href="/algs/zbll/u/">U</a>, <a href="/algs/zbll/l/">L</a>, <a href="/algs/zbll/h/">H</a>, <a href="/algs/zbll/pi/">Pi</a>, <a href="/algs/zbll/s/">Sune</a>, <a href="/algs/zbll/as/">Antisune</a>, <a href="/algs/zbll/pll/">PLL</a></td></tr>
+      </tbody>
+    </table>
+
+    <h2>LEOR</h2>
+    <table>
+      <thead><tr><th>Step</th><th>Cases</th><th>Where</th></tr></thead>
+      <tbody>
+        <tr><td>EOStripe, any position</td><td>73,728 positions</td><td><a href="/tools/eostripe-solver/">Solver</a></td></tr>
+        <tr><td>EOStripe, edges left to orient</td><td>{eoCases.length}</td><td><a href="/algs/eostripe/eo/">List</a></td></tr>
+        <tr><td>EOStripe, DF/DB left to place</td><td>{stripeCases.length}</td><td><a href="/algs/eostripe/stripe/">List</a></td></tr>
+      </tbody>
+    </table>
+    <p class="small muted">Where the algorithms come from: <a href="/about/">how the algorithms are made</a>.</p>
+  </article>
+</Base>

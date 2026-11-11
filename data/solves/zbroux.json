@@ -1,0 +1,19 @@
+{
+  "method": "ZBRoux",
+  "solves": [
+    {
+      "id": "zbroux-1",
+      "scramble": "D B' L D' B' D' L' D' B L2 B D B' F2 D2 R B' L R B' F' L' F2 L2 U'",
+      "orientation": "White top, green front (no rotation)",
+      "inspection": "Build the orange block on the left with yellow on the bottom.",
+      "steps": [
+        { "step": "First block", "moves": "U L B' L F D M B", "time": 3.0 },
+        { "step": "Second block", "moves": "R U2 r U' r U' r2 U' R2 U' R", "time": 2.4 },
+        { "step": "EODFDB", "moves": "U M U M' U M2 U' M", "time": 1.7, "case": "pO7", "note": "Centres were off by M' after second block. This 8-mover is optimal: 6 optimal solutions exist for the case." },
+        { "step": "ZBLL", "moves": "R' U2 R2 U R U R U' R' U' R2 U R U", "time": 2.1, "note": "Time includes recognition." }
+      ],
+      "time_is_estimate": true,
+      "metric": "STM (M and r count as 1)"
+    }
+  ]
+}

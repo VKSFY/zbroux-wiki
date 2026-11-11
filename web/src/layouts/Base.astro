@@ -1,0 +1,93 @@
+---
+import "../styles/global.css";
+import { SITE_NAME, TOP, pagePath } from "../lib/site";
+import TopColour from "../components/TopColour.astro";
+import Sidebar from "../components/Sidebar.astro";
+interface Props { title?: string; description?: string; sidebar?: boolean; crumbs?: { href: string; label: string }[] }
+const { title, description = "Guides and full algorithm lists for the ZBRoux speedsolving method.", sidebar = true, crumbs = [] } = Astro.props;
+const full = title ? `${title} · ${SITE_NAME}` : SITE_NAME;
+const path = pagePath(Astro.url);
+const active = (m: string[]) => m.some((p) => (p.endsWith("$") ? path === p.slice(0, -1) : path.startsWith(p)));
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{full}</title>
+  <meta name="description" content={description} />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <script is:inline>try{if(localStorage.getItem("topColour")==="white")document.documentElement.dataset.top="white"}catch(e){}</script>
+</head>
+<body>
+  <header class="top no-print">
+    <div class="bar">
+      <a href="/" class="name">{SITE_NAME}</a>
+      <nav class="links" aria-label="Main">
+        {TOP.map((n) => <a href={n.href} aria-current={active(n.match) ? "page" : undefined}>{n.label}</a>)}
+      </nav>
+      <div class="right"><TopColour compact /></div>
+    </div>
+  </header>
+
+  <div class:list={["page", { withside: sidebar }]}>
+    {sidebar && <aside class="side no-print"><Sidebar /></aside>}
+    <main>
+      {sidebar && (
+        <details class="mobile-nav no-print">
+          <summary>Contents</summary>
+          <Sidebar />
+        </details>
+      )}
+      {crumbs.length > 0 && (
+        <nav class="crumbs no-print" aria-label="Breadcrumb">
+          {crumbs.map((c) => <><a href={c.href}>{c.label}</a><span aria-hidden="true">›</span></>)}
+          <span aria-current="page">{title}</span>
+        </nav>
+      )}
+      <slot />
+    </main>
+  </div>
+
+  <footer class="foot no-print">
+    <div>
+      <span>{SITE_NAME}</span>
+      <a href="/about/">How the algorithms are made</a>
+    </div>
+  </footer>
+</body>
+</html>
+<style>
+  .top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+  .bar{max-width:var(--maxw);margin:0 auto;padding:0 16px;height:56px;display:flex;align-items:center;gap:24px}
+  .name{font-weight:700;font-size:1.05rem;color:var(--ink);white-space:nowrap}
+  .name:hover{text-decoration:none}
+  .links{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+  .links a{padding:6px 10px;border-radius:6px;color:var(--ink-2);font-size:.95rem;white-space:nowrap}
+  .links a:hover{background:var(--surface-2);text-decoration:none}
+  .links a[aria-current="page"]{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--accent);border-radius:0}
+  .right{margin-left:auto}
+  .page{max-width:var(--maxw);margin:0 auto;padding:28px 16px 64px}
+  .page.withside{display:grid;grid-template-columns:230px minmax(0,1fr);gap:40px}
+  .side{position:sticky;top:76px;align-self:start;max-height:calc(100vh - 92px);overflow-y:auto;padding-right:4px}
+  main{min-width:0}
+  .mobile-nav{display:none}
+  .crumbs{display:flex;flex-wrap:wrap;gap:6px;font-size:.88rem;color:var(--mute);margin-bottom:14px}
+  .crumbs a{color:var(--mute)}
+  .foot{border-top:1px solid var(--line);color:var(--mute);font-size:.88rem}
+  .foot div{max-width:var(--maxw);margin:0 auto;padding:18px 16px 30px;display:flex;flex-wrap:wrap;gap:8px 20px}
+  .foot a{color:var(--mute)}
+  @media (max-width:900px){
+    .page.withside{display:block}
+    .side{display:none}
+    .mobile-nav{display:block;margin:-8px 0 18px;border:1px solid var(--line);border-radius:8px;padding:0 12px}
+    .mobile-nav summary{cursor:pointer;padding:10px 2px;font-weight:600}
+    .mobile-nav[open]{padding-bottom:8px}
+  }
+  @media (max-width:600px){
+    .bar{flex-wrap:wrap;height:auto;padding-top:8px;gap:0 12px}
+    .links{order:3;width:100%;margin:2px -8px 0}
+    .links a{padding:8px 8px;font-size:.92rem}
+    .side{top:100px}
+  }
+</style>

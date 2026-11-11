@@ -1,0 +1,32 @@
+---
+interface Props { compact?: boolean }
+const { compact = false } = Astro.props;
+---
+<div class:list={["topc", { compact }]} role="group" aria-label="Top colour used in diagrams">
+  <span class="lbl">{compact ? "Top colour" : "Diagrams show"}</span>
+  <button type="button" data-top="yellow" title="Yellow on top"><i style="background:#fcd535"></i>{!compact && "Yellow top"}</button>
+  <button type="button" data-top="white" title="White on top"><i style="background:#ffffff"></i>{!compact && "White top"}</button>
+</div>
+<script>
+  function sync() {
+    const cur = document.documentElement.dataset.top === "white" ? "white" : "yellow";
+    document.querySelectorAll<HTMLButtonElement>(".topc button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.top === cur)));
+  }
+  document.addEventListener("click", (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>(".topc button");
+    if (!b) return;
+    const v = b.dataset.top === "white" ? "white" : "yellow";
+    document.documentElement.dataset.top = v;
+    try { localStorage.setItem("topColour", v); } catch {}
+    sync();
+  });
+  sync();
+</script>
+<style>
+  .topc{display:inline-flex;align-items:center;gap:2px;font-size:.85rem}
+  .lbl{color:var(--mute);margin-right:6px;white-space:nowrap}
+  button{display:inline-flex;align-items:center;gap:6px;border:1px solid transparent;background:transparent;color:var(--ink-2);font:inherit;padding:3px 7px;border-radius:6px;cursor:pointer}
+  button[aria-pressed="true"]{border-color:var(--line);background:var(--surface);color:var(--ink)}
+  i{display:inline-block;width:13px;height:13px;border-radius:3px;border:1px solid #0007}
+  @media (max-width:760px){ .compact .lbl{display:none} }
+</style>

@@ -1,0 +1,60 @@
+---
+import Base from "../layouts/Base.astro";
+import { cases } from "../lib/eodfdb";
+const nEodfdb = cases.filter((c) => c.centres === "solved").length;
+---
+<Base description="Guides and full algorithm lists for the ZBRoux (LLOB) speedsolving method: first block, second block, EODFDB and ZBLL.">
+  <div class="intro">
+    <h1>ZBRoux</h1>
+    <p class="lede">ZBRoux (also called LLOB) is a 3x3 speedsolving method. You build two Roux blocks, orient the remaining edges while placing the last two bottom edges (EODFDB), and finish the last layer in one algorithm (ZBLL). This wiki explains each step and has complete algorithm lists for both algorithm steps.</p>
+  </div>
+
+  <div class="doors">
+    <section class="door">
+      <h2>New to ZBRoux</h2>
+      <p>Start with what the method is, then follow the steps in order.</p>
+      <ol>
+        <li><a href="/methods/zbroux/">What is ZBRoux?</a></li>
+        <li><a href="/methods/zbroux/learning-path/">Learning path</a>: what to learn first, and what can wait</li>
+        <li><a href="/methods/zbroux/first-block/">First block</a> → <a href="/methods/zbroux/second-block/">second block</a> → <a href="/methods/zbroux/eodfdb/">EODFDB</a> → <a href="/methods/zbroux/zbll/">ZBLL</a></li>
+        <li><a href="/methods/zbroux/example-solves/">Example solves</a></li>
+      </ol>
+    </section>
+    <section class="door">
+      <h2>Already solving it</h2>
+      <p>Go straight to your case. Answer a couple of questions about your cube, or paste a scramble.</p>
+      <ul>
+        <li><a href="/algs/eodfdb/">EODFDB: find your case</a> ({nEodfdb} cases with centres aligned)</li>
+        <li><a href="/algs/zbll/">ZBLL: find your case</a> (493 cases)</li>
+        <li>ZBLL lists by set: <a href="/algs/zbll/t/">T</a>, <a href="/algs/zbll/u/">U</a>, <a href="/algs/zbll/l/">L</a>, <a href="/algs/zbll/h/">H</a>, <a href="/algs/zbll/pi/">Pi</a>, <a href="/algs/zbll/s/">Sune</a>, <a href="/algs/zbll/as/">Antisune</a>, <a href="/algs/zbll/pll/">PLL</a></li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="prose">
+    <h2>The steps at a glance</h2>
+    <table>
+      <thead><tr><th>Step</th><th>What you do</th><th>Moves</th><th>Algorithms</th></tr></thead>
+      <tbody>
+        <tr><td><a href="/methods/zbroux/first-block/">1. First block</a></td><td>1x2x3 block on the left</td><td>~7</td><td>None, intuitive</td></tr>
+        <tr><td><a href="/methods/zbroux/second-block/">2. Second block</a></td><td>Matching block on the right, with R, r, U and M</td><td>~14–16</td><td>None, intuitive</td></tr>
+        <tr><td><a href="/methods/zbroux/eodfdb/">3. EODFDB</a></td><td>Orient all edges, place DF and DB</td><td>~8</td><td>Intuitive or <a href="/algs/eodfdb/">algorithms</a></td></tr>
+        <tr><td><a href="/methods/zbroux/zbll/">4. ZBLL</a></td><td>Whole last layer in one algorithm</td><td>~13</td><td><a href="/algs/zbll/">493 cases</a></td></tr>
+      </tbody>
+    </table>
+
+    <h2>Other methods</h2>
+    <p><a href="/methods/leor/">LEOR</a> starts with the same left block, then does EOStripe and a right block, and also finishes with ZBLL. Its hardest step, EOStripe, has a <a href="/tools/eostripe-solver/">solver</a> and case lists here.</p>
+  </section>
+</Base>
+<style>
+  .intro{max-width:var(--content)}
+  h1{font-size:2.3rem;margin-bottom:.3em}
+  .doors{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:8px 0 12px}
+  .door{border:1px solid var(--line);border-radius:8px;padding:16px 20px}
+  .door h2{font-size:1.15rem;margin:0 0 4px}
+  .door p{margin:0 0 8px;color:var(--ink-2);font-size:.95rem}
+  .door ol,.door ul{margin:0;padding-left:1.3em}
+  .door li{margin:5px 0}
+  @media (max-width:760px){ .doors{grid-template-columns:1fr} }
+</style>

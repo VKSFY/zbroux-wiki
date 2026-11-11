@@ -1,0 +1,145 @@
+---
+import Base from "../../../layouts/Base.astro";
+import { zbll, SHAPES } from "../../../lib/zbll.ts";
+import { llSvg } from "../../../lib/ll-diagram.ts";
+
+const NAMES: Record<string, string> = { T: "T", U: "U", L: "L", H: "H", Pi: "Pi", S: "Sune", AS: "Antisune", PLL: "PLL" };
+const shapes = SHAPES.map((s) => ({ key: s.key, name: NAMES[s.key], blurb: s.blurb, n: zbll.filter((c) => c.shape === s.key).length, pic: zbll.find((c) => c.shape === s.key)!.state }));
+const data = zbll.map((c) => ({ i: c.id, k: c.key, sh: c.shape, g: c.group, st: c.state, a: c.algs.map((x) => [x.alg, x.moves]) }));
+---
+<Base title="ZBLL: find your case" description="Find your ZBLL case in two looks (the shape of the top colour, then the corner pattern) or paste a scramble. All 493 cases." crumbs={[{ href: "/methods/zbroux/", label: "ZBRoux" }, { href: "/methods/zbroux/zbll/", label: "ZBLL" }]}>
+  <h1>ZBLL: find your case</h1>
+  <p class="lede">The first two layers are done and every top edge is oriented. Find your case in two looks: first the shape the top colour makes, then the corner pattern. Or paste your scramble.</p>
+
+  <details class="paste">
+    <summary>Paste a scramble instead</summary>
+    <form id="pf">
+      <label for="scr">Scramble</label>
+      <textarea id="scr" rows="2" spellcheck="false" placeholder="D B' L D' B' D' L' ..."></textarea>
+      <label for="mv">Your moves so far (blocks and EODFDB)</label>
+      <textarea id="mv" rows="2" spellcheck="false" placeholder="U L B' L F D M B R U2 r ..."></textarea>
+      <div class="row"><button class="btn primary" type="submit">Find my case</button><span id="pmsg" role="status"></span></div>
+    </form>
+  </details>
+
+  <section class="q" id="q1">
+    <h2>1. Which shape does your top colour make?</h2>
+    <p class="hint">Look only at the top colour, on the top face and on the sides of the corners.</p>
+    <div class="pics">
+      {shapes.map((s) => (
+        <button type="button" class="choice" data-v={s.key} title={s.blurb}>
+          <Fragment set:html={llSvg(s.pic, 52, s.name, "oll")} />
+          <span><b>{s.name}</b><small>{s.n} cases</small></span>
+        </button>
+      ))}
+    </div>
+  </section>
+
+  <section class="q" id="q2" hidden>
+    <h2>2. Which corner pattern matches?</h2>
+    <p class="hint">Now look at the corner colours only. Turn the top layer until one of these matches; the edges don't matter yet.</p>
+    <div class="pics" id="groups"></div>
+  </section>
+
+  <section id="res" hidden>
+    <div class="rhead">
+      <p><b id="count"></b> cases. Turn the top layer until your cube matches one of these exactly, then do the algorithm.</p>
+      <button type="button" class="btn" id="reset">Start over</button>
+    </div>
+    <div class="cases" id="list"></div>
+  </section>
+
+  <p class="small muted more">Full lists by set: <a href="/algs/zbll/t/">T</a> · <a href="/algs/zbll/u/">U</a> · <a href="/algs/zbll/l/">L</a> · <a href="/algs/zbll/h/">H</a> · <a href="/algs/zbll/pi/">Pi</a> · <a href="/algs/zbll/s/">Sune</a> · <a href="/algs/zbll/as/">Antisune</a> · <a href="/algs/zbll/pll/">PLL</a>. The algorithms were found by a solver and aren't hand-picked yet, so try the alternatives too. <a href="/about/">How these were made</a>.</p>
+</Base>
+
+<script type="application/json" id="zbll-data" set:html={JSON.stringify(data)} />
+
+<script>
+  import { llSvg } from "../../../lib/ll-diagram.ts";
+  import { findZbll, preAufFor } from "../../../lib/zbll-engine.ts";
+
+  type C = { i: string; k: string; sh: string; g: number; st: string; a: [string, number][] };
+  const DATA: C[] = JSON.parse(document.getElementById("zbll-data")!.textContent!);
+  const byId = new Map(DATA.map((c) => [c.i, c]));
+  const byKey = new Map(DATA.map((c) => [c.k, c]));
+  const NAME: Record<string, string> = { S: "Sune ", AS: "Antisune ", PLL: "Group " };
+  const $ = (id: string) => document.getElementById(id)!;
+  const st: { sh: string | null; g: number | null } = { sh: null, g: null };
+  let highlight: string | null = null;
+
+  const pressed = (box: HTMLElement, v: string | null) =>
+    box.querySelectorAll<HTMLButtonElement>("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === v)));
+  function render() {
+    pressed($("q1"), st.sh);
+    $("q2").hidden = !st.sh;
+    if (st.sh) {
+      const groups = [...new Set(DATA.filter((c) => c.sh === st.sh).map((c) => c.g))].sort((a, b) => a - b);
+      $("groups").innerHTML = groups.map((g) => {
+        const rep = DATA.find((c) => c.sh === st.sh && c.g === g)!;
+        return `<button type="button" class="choice col" data-v="${g}">${llSvg(rep.st, 64, `${st.sh}${g} corners`, "corners")}<small>${NAME[st.sh!] ?? st.sh}${g}</small></button>`;
+      }).join("");
+      pressed($("groups"), st.g === null ? null : String(st.g));
+    }
+    const list = st.sh && st.g !== null ? DATA.filter((c) => c.sh === st.sh && c.g === st.g) : [];
+    $("res").hidden = list.length === 0;
+    $("count").textContent = String(list.length);
+    $("list").innerHTML = list.map((c) => {
+      const [best, ...alts] = c.a;
+      return `<div class="case-row${c.i === highlight ? " hl" : ""}" id="${c.i}">${llSvg(c.st, 78, "ZBLL " + c.i)}
+        <div><div class="cid">${c.i}</div><div class="alg">${best[0]}</div>${alts.length ? `<div class="alts">${alts.map((x) => x[0]).join("<br>")}</div>` : ""}</div>
+        <div class="mv">${best[1]} moves</div></div>`;
+    }).join("");
+  }
+  function show(id: string, note?: string) {
+    const c = byId.get(id); if (!c) return;
+    st.sh = c.sh; st.g = c.g; highlight = id; render();
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (note) $("pmsg").textContent = note;
+  }
+  $("q1").addEventListener("click", (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>("button"); if (!b) return;
+    st.sh = st.sh === b.dataset.v ? null : b.dataset.v!; st.g = null; highlight = null; render();
+  });
+  $("groups").addEventListener("click", (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>("button"); if (!b) return;
+    const g = Number(b.dataset.v); st.g = st.g === g ? null : g; highlight = null; render();
+    if (st.g !== null) $("res").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  $("reset").addEventListener("click", () => { st.sh = null; st.g = null; highlight = null; history.replaceState(null, "", location.pathname); render(); scrollTo({ top: 0, behavior: "smooth" }); });
+  $("pf").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const r = findZbll(($("scr") as HTMLTextAreaElement).value, ($("mv") as HTMLTextAreaElement).value);
+    if (!r.ok) { $("pmsg").textContent = r.error ?? "Couldn't read that."; return; }
+    if (r.solved) { $("pmsg").textContent = "The last layer is already solved, apart from maybe one U turn."; return; }
+    const c = byKey.get(r.key!);
+    if (!c) { $("pmsg").textContent = "Couldn't match that to a ZBLL case."; return; }
+    const pre = preAufFor(r.state!, c.st);
+    show(c.i, `Case ${c.i}, ${c.a[0][1]} moves. ${pre ? `Do ${pre} first, then the algorithm.` : "No need to turn the top first."}`);
+    history.replaceState(null, "", "#" + c.i);
+  });
+  window.addEventListener("hashchange", () => { const id = location.hash.slice(1); if (byId.has(id)) show(id); });
+  const initial = location.hash.slice(1);
+  if (byId.has(initial)) show(initial); else render();
+</script>
+
+<style>
+  .paste{border:1px solid var(--line);border-radius:8px;padding:0 14px;margin:0 0 8px;max-width:var(--content)}
+  .paste summary{cursor:pointer;padding:10px 0;font-weight:600}
+  .paste form{display:grid;gap:6px;padding:0 0 14px}
+  .paste label{font-size:.9rem;font-weight:600;margin-top:6px}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:8px}
+  #pmsg{font-weight:550;color:var(--ink-2)}
+  .q{margin-top:22px;scroll-margin-top:80px}
+  .q h2{font-size:1.08rem;margin:0 0 2px}
+  .hint{color:var(--mute);font-size:.9rem;margin:0 0 10px;max-width:var(--content)}
+  .pics{display:flex;flex-wrap:wrap;gap:6px}
+  .pics :global(.choice){padding:6px 12px 6px 6px}
+  .pics :global(.choice span){display:flex;flex-direction:column;line-height:1.3}
+  .pics :global(.choice small),.pics :global(.col small){color:var(--mute);font-size:.8rem}
+  .pics :global(.col){flex-direction:column;gap:4px;padding:6px 8px}
+  .pics :global(svg){color:var(--ink);flex:0 0 auto}
+  #res{scroll-margin-top:80px}
+  .rhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:30px;padding-top:14px;border-top:1px solid var(--line)}
+  .rhead p{margin:0;max-width:var(--content)}
+  .more{margin-top:32px}
+</style>

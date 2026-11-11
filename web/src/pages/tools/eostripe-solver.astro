@@ -1,0 +1,96 @@
+---
+import Base from "../../layouts/Base.astro";
+import EsLegend from "../../components/EsLegend.astro";
+---
+<Base title="EOStripe solver" description="Every shortest LEOR EOStripe solution for your own scramble. Paste a scramble and your left block moves." crumbs={[{ href: "/methods/leor/", label: "LEOR" }, { href: "/methods/leor/eostripe/", label: "EOStripe" }]}>
+  <h1>EOStripe solver</h1>
+  <p class="lede">Paste a scramble and the moves you used for your left block, and you get every shortest EOStripe solution using R, r, M and U.</p>
+
+  <form id="f" class="form">
+    <label for="scr">Scramble</label>
+    <textarea id="scr" rows="2" spellcheck="false" placeholder="R' U2 F2 D' L2 ..."></textarea>
+    <label for="lb">Your left block moves <span class="muted small">(include rotations; the block has to end on the left, at the bottom)</span></label>
+    <textarea id="lb" rows="2" spellcheck="false" placeholder="x2 y r' U F2 ..."></textarea>
+    <div class="row">
+      <button class="btn primary" type="submit">Solve</button>
+      <button class="btn" type="button" id="rand">Random position</button>
+      <span id="status" class="muted small" role="status"></span>
+    </div>
+  </form>
+
+  <section id="result" hidden>
+    <div class="res">
+      <div id="diagram"></div>
+      <div>
+        <p class="big"><b id="opt"></b> moves at best</p>
+        <p id="facts" class="muted"></p>
+      </div>
+    </div>
+    <h2>Shortest solutions</h2>
+    <ol id="sols" class="sols"></ol>
+    <button class="btn" type="button" id="more" hidden>Show all</button>
+  </section>
+  <EsLegend />
+</Base>
+
+<script>
+  import { analyse, GEN } from "../../lib/eostripe-engine.ts";
+  import { slotsFromMasked, eostripeSvg } from "../../lib/eostripe-diagram.ts";
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const status = $("status"), result = $("result"), solsEl = $("sols"), more = $<HTMLButtonElement>("more");
+  let all: string[][] = [];
+  const TOP: Record<string, string> = { U: "your top colour", F: "green", D: "your bottom colour", B: "blue" };
+
+  function render(list: string[][], n: number) {
+    solsEl.innerHTML = list.slice(0, n).map((s) => `<li><span class="alg">${s.join(" ") || "(already solved)"}</span></li>`).join("");
+    more.hidden = list.length <= n;
+    more.textContent = `Show all ${list.length}`;
+  }
+  function run(scr: string, lb: string) {
+    status.textContent = "Solving…";
+    setTimeout(() => {
+      const a = analyse(scr, lb);
+      if (!a.ok) { status.textContent = a.error ?? "Something went wrong."; result.hidden = true; return; }
+      const { slots, u, f } = slotsFromMasked(a.masked!);
+      $("diagram").innerHTML = eostripeSvg(slots, u, f, 200, "Your EOStripe position");
+      $("opt").textContent = String(a.optimal);
+      const n = a.solutions!.length;
+      $("facts").textContent = `${n}${n >= 400 ? "+" : ""} shortest solutions · ${a.badEdges} flipped edges · top centre is ${TOP[u] ?? "?"}`;
+      all = a.solutions!;
+      render(all, 12);
+      result.hidden = false;
+      status.textContent = "";
+    }, 10);
+  }
+  $("f").addEventListener("submit", (e) => {
+    e.preventDefault();
+    run(($("scr") as HTMLTextAreaElement).value, ($("lb") as HTMLTextAreaElement).value);
+  });
+  $("rand").addEventListener("click", () => {
+    const seq: string[] = [];
+    while (seq.length < 25) {
+      const m = GEN[Math.floor(Math.random() * GEN.length)];
+      if (seq.length && seq[seq.length - 1][0] === m[0]) continue;
+      seq.push(m);
+    }
+    ($("scr") as HTMLTextAreaElement).value = seq.join(" ");
+    ($("lb") as HTMLTextAreaElement).value = "";
+    run(seq.join(" "), "");
+  });
+  more.addEventListener("click", () => render(all, all.length));
+</script>
+
+<style>
+  .form{display:grid;gap:6px;max-width:var(--content);margin:8px 0 0}
+  .form label{font-weight:600;font-size:.92rem;margin-top:8px}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:10px}
+  .res{display:flex;flex-wrap:wrap;gap:24px;align-items:center;margin-top:28px;padding-top:20px;border-top:1px solid var(--line)}
+  #diagram :global(svg){color:var(--ink)}
+  .big{margin:0;font-size:1.05rem}
+  .big b{font-size:2rem;margin-right:4px}
+  #facts{margin:4px 0 0}
+  h2{font-size:1.2rem;margin:24px 0 8px}
+  .sols{padding-left:1.6em;max-width:var(--content);margin:0 0 14px}
+  .sols :global(li){padding:5px 0;border-bottom:1px solid var(--line-2)}
+</style>

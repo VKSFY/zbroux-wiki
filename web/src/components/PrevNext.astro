@@ -1,0 +1,21 @@
+---
+import { SIDEBAR, SEQUENCE, pagePath } from "../lib/site";
+const path = pagePath(Astro.url);
+const i = SEQUENCE.indexOf(path);
+const label = (href: string) => SIDEBAR[0].items.find((x) => x.href === href)?.label ?? href;
+const prev = i > 0 ? SEQUENCE[i - 1] : null;
+const next = i >= 0 && i < SEQUENCE.length - 1 ? SEQUENCE[i + 1] : null;
+---
+{i >= 0 && (
+  <nav class="pn no-print" aria-label="Previous and next page">
+    {prev ? <a class="prev" href={prev}><span>Previous</span>{label(prev)}</a> : <span />}
+    {next ? <a class="next" href={next}><span>Next</span>{label(next)}</a> : <span />}
+  </nav>
+)}
+<style>
+  .pn{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:48px;padding-top:20px;border-top:1px solid var(--line);max-width:var(--content)}
+  a{display:flex;flex-direction:column;padding:10px 14px;border:1px solid var(--line);border-radius:8px;color:var(--ink);font-weight:600}
+  a:hover{border-color:var(--accent);text-decoration:none}
+  a span{font-size:.8rem;font-weight:400;color:var(--mute)}
+  .next{text-align:right}
+</style>
