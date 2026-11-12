@@ -49,7 +49,10 @@ export const SIDEBAR: NavSection[] = [
   },
   {
     title: "About",
-    items: [{ href: "/about/", label: "How the algorithms are made" }],
+    items: [
+      { href: "/about/", label: "How the algorithms are made" },
+      { href: "/changelog/", label: "Changelog" },
+    ],
   },
 ];
 

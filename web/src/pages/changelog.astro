@@ -1,0 +1,34 @@
+---
+import Base from "../layouts/Base.astro";
+const entries = [
+  {
+    date: "2026-11-12",
+    items: [
+      "Added a computed CMLL list (42 cases), generated with the same search as ZBLL, so the Roux comparison uses like-for-like numbers.",
+      "Roux comparison: turns of the top layer counted the same way on both sides; Roux about 21.4, ZBRoux about 22.9.",
+      "EODFDB cases are shown from the angle where their shortest solution starts, so no algorithm begins with a turn of the top layer. 422 cases got one move shorter.",
+      "Mirror pairs are shown from reflected angles; a mirror's algorithm is exactly the original with U and U' swapped.",
+      "Added the 46-case EODFDB set with its definition, the Burnside derivation of the case counts, and per-case and per-position averages.",
+      "Added downloadable JSON and CSV data, this changelog, and a who-should-use-it section.",
+    ],
+  },
+  {
+    date: "2026-11-11",
+    items: [
+      "First version: ZBRoux guide, EODFDB case finder (992 cases), ZBLL lists and finder (493 cases), LEOR EOStripe case lists and solver.",
+    ],
+  },
+];
+---
+<Base title="Changelog" description="What has changed on the ZBRoux Wiki and in its data.">
+  <article class="prose">
+    <h1>Changelog</h1>
+    <p class="lede">Changes to the pages and to the algorithm data, newest first. The full history is in the <a href="https://github.com/VKSFY/zbroux-wiki/commits/main">repository</a>.</p>
+    {entries.map((e) => (
+      <section>
+        <h2>{e.date}</h2>
+        <ul>{e.items.map((i) => <li>{i}</li>)}</ul>
+      </section>
+    ))}
+  </article>
+</Base>

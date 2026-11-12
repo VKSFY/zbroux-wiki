@@ -1,7 +1,8 @@
-import { MOVES, SOLVED } from "../web/src/lib/cube.ts";
+import { MOVES, SOLVED, STICKERS } from "../web/src/lib/cube.ts";
 import { readFileSync, writeFileSync } from "node:fs";
 
 const [setName, kAs, kBs, onlyFile, tag] = process.argv.slice(2);
+const MODE = process.env.LL_MODE === "cmll" ? "cmll" : "zbll";
 const only: number[] | null = onlyFile ? JSON.parse(readFileSync(onlyFile, "utf8")) : null;
 const kA = Number(kAs), kB = Number(kBs);
 const FACES = setName.split("");
@@ -23,7 +24,15 @@ function allowed(prev: string | undefined, m: string) {
 }
 
 const table = new Map<string, string[]>();
-const solved = enc(SOLVED.join(""));
+const nz = (p: number[]) => p.filter((c) => c !== 0).length;
+const goal = SOLVED.map((c, i) => {
+  if (MODE !== "cmll") return c;
+  const p = STICKERS[i].p;
+  if (nz(p) === 2 && (p[1] === 1 || p[0] === 0)) return "e";
+  if (nz(p) === 1 && p[0] === 0) return "c";
+  return c;
+});
+const solved = enc(goal.join(""));
 const bufs = Array.from({ length: Math.max(kA, kB) + 2 }, () => new Uint8Array(54));
 const path: string[] = [];
 function back(s: Uint8Array, depth: number) {
@@ -45,7 +54,7 @@ let t0 = performance.now();
 back(solved, 0);
 console.error(`[${setName}] table: ${table.size} states (depth ${kB}) in ${Math.round(performance.now() - t0)} ms`);
 
-const cases = JSON.parse(readFileSync("_zbll_cases.json", "utf8"));
+const cases = JSON.parse(readFileSync(`_${MODE}_cases.json`, "utf8"));
 const results: { i: number; sols: string[] }[] = [];
 const fb = Array.from({ length: kA + 2 }, () => new Uint8Array(54));
 t0 = performance.now();
@@ -79,6 +88,6 @@ for (let ci = 0; ci < cases.length; ci++) {
   results.push({ i: ci, sols: [...found] });
   if (ci % 50 === 0) console.error(`[${setName}] case ${ci}/${cases.length} ${Math.round(performance.now() - t0)} ms`);
 }
-writeFileSync(`_zbll_${setName}${tag ?? ""}.json`, JSON.stringify(results));
+writeFileSync(`_${MODE}_${setName}${tag ?? ""}.json`, JSON.stringify(results));
 const covered = results.filter((r) => r.sols.length).length;
 console.error(`[${setName}] done: ${covered}/${only ? only.length : cases.length} cases have solutions, ${Math.round(performance.now() - t0)} ms`);

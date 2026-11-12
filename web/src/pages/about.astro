@@ -46,13 +46,18 @@ const REPO = "https://github.com/VKSFY/zbroux-wiki";
     </ul>
 
     <h2>Data and source</h2>
-    <p>All the case data is plain JSON, so you can check it with your own tools:</p>
-    <ul>
-      <li><a href={`${REPO}/blob/main/data/eodfdb.json`}>eodfdb.json</a>: every EODFDB case, its algorithms and its mirror</li>
-      <li><a href={`${REPO}/blob/main/data/zbll.json`}>zbll.json</a>: every ZBLL case and its algorithms</li>
-      <li><a href={`${REPO}/blob/main/data/eostripe.json`}>eostripe.json</a>: EOStripe cases and the full move-count table</li>
-      <li><a href={`${REPO}/blob/main/data/stats.json`}>stats.json</a>: the averages and counts quoted on this wiki</li>
-    </ul>
-    <p>The generators, solvers and checkers are in the <a href={`${REPO}/tree/main/tools`}>tools folder</a> of the <a href={REPO}>repository</a>. If you find a mistake, or know a better algorithm for a case, open an issue there.</p>
+    <p>The algorithm lists are free to download, so you can check them with your own tools. Each file is built from the same data as the pages:</p>
+    <table>
+      <thead><tr><th>List</th><th>Downloads</th></tr></thead>
+      <tbody>
+        <tr><td>EODFDB, with mirror algorithms</td><td><a href="/data/eodfdb.csv">CSV</a> · <a href="/data/eodfdb.json">JSON</a></td></tr>
+        <tr><td>ZBLL</td><td><a href="/data/zbll.csv">CSV</a> · <a href="/data/zbll.json">JSON</a></td></tr>
+        <tr><td>CMLL (for the Roux comparison)</td><td><a href="/data/cmll.csv">CSV</a> · <a href="/data/cmll.json">JSON</a></td></tr>
+        <tr><td>EOStripe</td><td><a href="/data/eostripe.csv">CSV</a> · <a href="/data/eostripe.json">JSON</a></td></tr>
+        <tr><td>Averages and counts quoted on this wiki</td><td><a href="/data/stats.json">JSON</a></td></tr>
+      </tbody>
+    </table>
+    <p>The <a href="/data/index.json">data manifest</a> gives the current data version. Changes are listed in the <a href="/changelog/">changelog</a>. The generators, solvers and checkers are in the <a href={`${REPO}/tree/main/tools`}>tools folder</a> of the <a href={REPO}>repository</a>.</p>
+    <p><b>Found a wrong algorithm, or know a better one for a case?</b> <a href={`${REPO}/issues/new`}>Report it on GitHub</a>, with the case ID (for example pO7 or T1-03) and the algorithm.</p>
   </article>
 </Base>

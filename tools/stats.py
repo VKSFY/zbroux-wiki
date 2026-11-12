@@ -3,6 +3,8 @@ import heapq
 from collections import Counter, deque
 from cube import STICKERS, SOLVED, MOVES, apply
 from zbll_cases import all_states, canon, relabel_u
+from cmll_cases import corner_states, mask as cmll_mask, variants as cmll_variants
+from cmll_build import solved_up_to_auf as cmll_done
 
 MU = ["U", "U'", "U2", "M", "M'", "M2"]
 
@@ -108,30 +110,41 @@ moves = {c["key"]: c["algs"][0]["moves"] for c in zbll}
 ll_states = sum(weight.values())
 by_key = {c["key"]: c for c in zbll}
 AUF = ["", "U", "U2", "U'"]
-pre_turns = post_turns = 0
+
+
+def turns_needed(state, alg, done):
+    for p, pre in enumerate(AUF):
+        end = apply(tuple(state), (pre + " " + alg).strip())
+        for q, post in enumerate(AUF):
+            if done(apply(end, post) if post else end):
+                return p != 0, q != 0
+    raise AssertionError(alg)
+
+
+zb_pre = zb_post = 0
 for st in all_states():
     k = canon(st)
     if k not in by_key:
-        if tuple(st) != tuple(SOLVED):
-            post_turns += 1
+        zb_post += tuple(st) != tuple(SOLVED)
         continue
-    c = by_key[k]
-    a, found = st, None
-    for p in range(4):
-        b = a
-        for _ in range(4):
-            if b == c["state"]:
-                found = p
-                break
-            b = relabel_u(b)
-        if found is not None:
-            break
-        a = mv(a, "U")
-    assert found is not None
-    end = apply(tuple(st), (AUF[found] + " " + c["algs"][0]["alg"]).strip())
-    q = next(i for i in range(4) if (apply(end, AUF[i]) if i else end) == tuple(SOLVED))
-    pre_turns += found != 0
-    post_turns += q != 0
+    a, b = turns_needed(st, by_key[k]["algs"][0]["alg"], lambda x: x == tuple(SOLVED))
+    zb_pre += a
+    zb_post += b
+
+cmll = json.load(open("../data/cmll.json"))["cases"]
+cmll_by_key = {c["key"]: c for c in cmll}
+cm_states = 0
+cm_moves = cm_pre = 0
+for st in corner_states():
+    cm_states += 1
+    m = cmll_mask(st)
+    k = min(cmll_mask(v) for v in cmll_variants(st))
+    if k not in cmll_by_key:
+        continue
+    c = cmll_by_key[k]
+    cm_moves += c["algs"][0]["moves"]
+    a, _ = turns_needed(m, c["algs"][0]["alg"], cmll_done)
+    cm_pre += a
 
 case_moves = [c["optimal_moves"] for c in cases]
 case_moves_aligned = [c["optimal_moves"] for c in cases if c["centres"] == "solved"]
@@ -164,9 +177,16 @@ stats = {
     "zbll": {
         "ll_states": ll_states,
         "avg_moves_weighted": round(sum(weight[k] * moves.get(k, 0) for k in weight) / ll_states, 2),
-        "avg_pre_auf_turns": round(pre_turns / ll_states, 3),
-        "avg_post_auf_turns": round(post_turns / ll_states, 3),
+        "avg_pre_auf_turns": round(zb_pre / ll_states, 3),
+        "avg_post_auf_turns": round(zb_post / ll_states, 3),
     },
+}
+stats["cmll"] = {
+    "corner_states": cm_states,
+    "cases": len(cmll),
+    "avg_moves_per_case": round(sum(c["algs"][0]["moves"] for c in cmll) / len(cmll), 2),
+    "avg_moves_weighted": round(cm_moves / cm_states, 2),
+    "avg_pre_auf_turns": round(cm_pre / cm_states, 3),
 }
 json.dump(stats, open("../data/stats.json", "w"), indent=1)
 print(json.dumps(stats, indent=1))

@@ -36,5 +36,11 @@ export default defineConfig({
   site,
   base,
   trailingSlash: "ignore",
+  redirects: {
+    "/methods/llob": "/methods/zbroux/",
+    "/methods/fslz": "/methods/zbroux/",
+    "/llob": "/methods/zbroux/",
+    "/zbroux": "/methods/zbroux/",
+  },
   integrations: [prefixRootLinks()],
 });

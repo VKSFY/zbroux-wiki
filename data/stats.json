@@ -53,5 +53,12 @@
   "avg_moves_weighted": 13.05,
   "avg_pre_auf_turns": 0.746,
   "avg_post_auf_turns": 0.75
+ },
+ "cmll": {
+  "corner_states": 648,
+  "cases": 42,
+  "avg_moves_per_case": 9.71,
+  "avg_moves_weighted": 9.56,
+  "avg_pre_auf_turns": 0.735
  }
 }

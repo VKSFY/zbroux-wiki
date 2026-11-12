@@ -44,6 +44,16 @@ python crosscheck_zbll_lookup.py                          # browser case lookup 
 ```
 Ranking is a heuristic (move weights + half-turn penalty); human curation is still to do.
 
+## CMLL (for the Roux comparison)
+```
+cd tools
+python cmll_cases.py
+LL_MODE=cmll node --max-old-space-size=3000 zbll_gen.mts RUF 6 8
+python cmll_build.py
+node verify_cmll.mjs
+python stats.py
+```
+
 ## Website (`web/`)
 Astro static site. Pages read the verified data straight from `data/`.
 ```
