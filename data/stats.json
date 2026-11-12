@@ -60,5 +60,17 @@
   "avg_moves_per_case": 9.71,
   "avg_moves_weighted": 9.56,
   "avg_pre_auf_turns": 0.735
+ },
+ "step_by_step": {
+  "eodfdb": {
+   "positions": 3840,
+   "optimal": 8.31,
+   "step_by_step": 9.15
+  },
+  "lse": {
+   "positions": 184320,
+   "optimal": 11.14,
+   "step_by_step": 12.84
+  }
  }
 }

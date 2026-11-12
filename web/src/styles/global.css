@@ -55,6 +55,7 @@ h1{font-size:2rem;font-weight:700;letter-spacing:-.015em;margin:0 0 .4em}
 .btn:hover{background:var(--surface-2);text-decoration:none}
 .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .btn.primary:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
 .card{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius)}
 .alg{font:600 .95rem/1.45 var(--mono);word-spacing:1px}
 textarea,input[type=text]{font:.95rem/1.4 var(--mono);padding:8px 10px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%;resize:vertical}

@@ -29,6 +29,7 @@ export const SIDEBAR: NavSection[] = [
     items: [
       { href: "/algs/eodfdb/", label: "EODFDB: find your case" },
       { href: "/algs/zbll/", label: "ZBLL: find your case" },
+      { href: "/tools/trainer/", label: "Trainer" },
       {
         href: "/algs/zbll/t/", label: "ZBLL by set",
         children: [
