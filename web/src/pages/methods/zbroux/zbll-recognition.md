@@ -2,7 +2,7 @@
 layout: ../../../layouts/Article.astro
 title: ZBLL recognition
 description: How to recognise a ZBLL case quickly in three looks, how much of the cube you need to see, and how ZBRoux lets you do most of it during EODFDB.
-lede: ZBLL has 493 cases, but you never identify one from scratch. You narrow it down in three looks, shape, corners, then edges, and in ZBRoux you can do the first two before EODFDB is even finished.
+lede: ZBLL has 493 cases, but you never identify one from scratch. Three looks (shape, corners, then edges) narrow it down to a few cases, and then you read the colours to pick the exact one. In ZBRoux you can do the first two looks before EODFDB is even finished.
 crumbs:
   - { href: "/methods/zbroux/", label: "ZBRoux" }
   - { href: "/methods/zbroux/zbll/", label: "ZBLL" }
@@ -59,18 +59,18 @@ These words narrow things down, but they don't pick the exact case on their own.
 | plus where the top colour sits on the corners | 9% | 36 |
 | plus which neighbouring colour (left or right of it) | 25% | 18 |
 | plus comparing the front side with the right side | 45% | 6 |
-| the actual colours on both sides | 100% | 1 |
+| the actual colours on both sides (every sticker compared with every other) | 100% | 1 |
 
-So the last step is reading the actual colours on both sides, not just the patterns. The practical way is to learn each corner group's cases together, as pictures of the two sides you see, so you learn what tells them apart. The [ZBLL lists](/algs/zbll/) show every case as such a picture.
+The rows differ only in how much of the colour information they use. The last row compares every sticker you can see with every other one, which is the same relative-colour reading used for the visibility table above. So the last step is reading the actual colours on both sides, not just the patterns. The practical way is to learn each corner group's cases together, as pictures of the two sides you see, so you learn what tells them apart. The [ZBLL lists](/algs/zbll/) show every case as such a picture.
 
 ## Doing most of it during EODFDB
 
-During EODFDB, M moves never touch the corners and U moves turn all four together. So the shape and the corner pattern are already visible while you're still doing EODFDB, and they don't change. If you've done looks 1 and 2 by the time EODFDB ends, only the edges are left to read, and those are the pieces EODFDB has just been moving, so you've already been watching them.
+During EODFDB, M moves never touch the corners and U moves turn all four together. So the shape and the corner pattern are already visible while you're still doing EODFDB, and the corners' pattern relative to each other stays the same, even though U turns move them around. If you've done looks 1 and 2 by the time EODFDB ends, only the edges are left to read, and those are the pieces EODFDB has just been moving, so you've already been watching them.
 
 ## Practising
 
 - Use the [trainer](/tools/trainer/) with "Show the case picture before solving" turned **off**, so you have to recognise the case from the cube.
 - Start with one set and one corner group at a time, and learn the cases in a group together.
-- In real solves, say the shape and corner group to yourself before EODFDB ends. That habit is what makes the method's last step pauseless.
+- In real solves, say the shape and corner group to yourself before EODFDB ends. Once drilled, that should remove most of the pause before ZBLL, though there's no timing data on this wiki yet to show how much.
 
 <small>How the recognition numbers were computed: every case was looked at from all four angles, and the stickers on the top face and on the chosen sides were compared using relative colours (the same, opposite, or next to each other), since that's how recognition works. All the numbers on this page, including the pattern table, come from [zbll_recognition.py](https://github.com/VKSFY/zbroux-wiki/blob/main/tools/zbll_recognition.py).</small>
