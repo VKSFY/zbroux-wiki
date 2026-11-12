@@ -1,0 +1,64 @@
+---
+import Base from "../../../layouts/Base.astro";
+import LseDiagram from "../../../components/LseDiagram.astro";
+import { set46, stats } from "../../../lib/eodfdb";
+
+const { chosen, excluded, kept, list } = set46();
+const pairs = list.filter((c) => c.mirror_of !== c.id).length;
+const own = list.length - pairs;
+const s = stats(list);
+const groups = [
+  { title: "Top centre shows your top colour", items: list.filter((c) => c.centres === "solved") },
+  { title: "Top centre shows your bottom colour", items: list.filter((c) => c.centres === "off-M2") },
+];
+---
+<Base title="The 46-case EODFDB set" description="A 46-case EODFDB set: both bottom edges on top and opposite, centres aligned or off by M2, mirrors counted once. Definition, count and full list." crumbs={[{ href: "/methods/zbroux/eodfdb/", label: "EODFDB" }, { href: "/algs/eodfdb/", label: "All cases" }]}>
+  <article class="prose">
+    <h1>The 46-case EODFDB set</h1>
+    <p class="lede">The <a href="https://www.speedsolving.com/wiki/index.php/ZBRoux">ZBRoux page on the Speedsolving wiki</a> gives EODFDB as 46 algorithms (in the info box, under "No. Algs": "493 ZBLL, 46 EOFB or EODFDB"), but no list or definition has been published. This page gives a definition that produces exactly 46 cases, and the list.</p>
+
+    <h2>Definition</h2>
+    <p>You set the step up intuitively first, the same way as in the beginner approach, and then use one algorithm:</p>
+    <ul>
+      <li>both bottom edges (DF and DB) are on top, opposite each other;</li>
+      <li>the top centre shows your top colour or your bottom colour (centres aligned, or off by M2);</li>
+      <li>at least one edge still needs orienting, so cases that only need an M2-style insert are left out;</li>
+      <li>a case and its mirror image count as one algorithm, because the mirror is solved by the same algorithm with U and U' swapped.</li>
+    </ul>
+
+    <h2>How the count comes out</h2>
+    <table>
+      <tbody>
+        <tr><td>Cases with both bottom edges on top and opposite, centres aligned or off by M2</td><td>{chosen.length}</td></tr>
+        <tr><td>Minus cases with nothing to orient ({excluded.map((c) => `${c.id}: ${c.algs[0]}`).join(", ")})</td><td>{kept.length}</td></tr>
+        <tr><td>Mirror pairs counted once ({pairs} pairs, {own} cases that are their own mirror)</td><td><b>{list.length}</b></td></tr>
+      </tbody>
+    </table>
+    <p>Keeping the two pure-insert cases gives 48 instead, so that exclusion is the only difference between 46 and 48. This is a reconstruction: it matches the number, but nobody has confirmed it's the set the wiki meant.</p>
+
+    <h2>The list</h2>
+    <p>Each algorithm is a shortest solution in M and U, counted in STM (every M, M2, U and U2 is one move). Average {s.avg.toFixed(1)} moves. Where a case has a mirror, the mirror's algorithm is shown next to it. It's the same algorithm with U and U' swapped, plus a turn of the top layer where needed, because the mirror is shown from a different angle.</p>
+  </article>
+
+  {groups.map((g) => (
+    <section>
+      <h3>{g.title} <span class="muted small">({g.items.length})</span></h3>
+      <div class="cases">
+        {g.items.map((c) => (
+          <div class="case-row" id={c.id}>
+            <LseDiagram c={c} size={78} />
+            <div>
+              <div class="cid"><a href={`/algs/eodfdb/#${c.id}`}>{c.id}</a> {c.mirror_of !== c.id && <span class="muted small">and its mirror <a href={`/algs/eodfdb/#${c.mirror_of}`}>{c.mirror_of}</a>: {c.mirror_alg}</span>}</div>
+              <div class="alg">{c.algs[0]}</div>
+              {c.algs.length > 1 && <div class="alts" set:html={c.algs.slice(1).join("<br>")} />}
+            </div>
+            <div class="mv">{c.optimal_moves} moves</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  ))}
+</Base>
+<style>
+  h3{font-size:1.1rem;margin:28px 0 4px}
+</style>

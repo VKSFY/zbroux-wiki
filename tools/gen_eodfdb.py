@@ -153,8 +153,38 @@ def mirror_state(s):
         j = INDEX[((-p[0], p[1], p[2]), (-n[0], n[1], n[2]))]
         o[j] = {"R": "L", "L": "R"}.get(s[i], s[i])
     return "".join(o)
+QUARTER = {"U": 1, "U2": 2, "U'": 3}
+AUF_NAME = {1: "U", 2: "U2", 3: "U'"}
+
+
+def with_pre_auf(pre, alg):
+    moves = alg.split()
+    q = QUARTER.get(pre, 0)
+    while moves and moves[0] in QUARTER:
+        q += QUARTER[moves.pop(0)]
+    q %= 4
+    return " ".join(([AUF_NAME[q]] if q else []) + moves)
+
+
+def run(s, alg):
+    for m in alg.split():
+        s = mv(s, m)
+    return s
+
+
 for c, d in cases.items():
     d["mirror_of"] = ids[canon(mirror_state(c))]
+by_id = {d["id"]: (c, d) for c, d in cases.items()}
+for c, d in cases.items():
+    target, _ = by_id[d["mirror_of"]]
+    flipped = " ".join(mirror_alg(d["algs"][0].split())) if d["algs"][0] else ""
+    for pre in ["", "U", "U2", "U'"]:
+        cand = with_pre_auf(pre, flipped)
+        if dist[run(target, cand)] == 0:
+            d["mirror_alg"] = cand
+            break
+    else:
+        raise AssertionError(d["id"])
 
 os.makedirs("../data", exist_ok=True)
 meta = {

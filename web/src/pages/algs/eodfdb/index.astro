@@ -16,6 +16,7 @@ const data = cases.map((c) => {
 <Base title="EODFDB: find your case" description="Find your ZBRoux EODFDB case: answer a few questions about your cube or paste your scramble. All 992 cases with the shortest M/U algorithms." crumbs={[{ href: "/methods/zbroux/", label: "ZBRoux" }, { href: "/methods/zbroux/eodfdb/", label: "EODFDB" }]}>
   <h1>EODFDB: find your case</h1>
   <p class="lede">You've built both blocks. Answer the questions below about what you see on your cube, and the list narrows down as you go. Or paste your scramble to go straight to your case.</p>
+  <p class="notation">Notation: <b>U</b> is the top layer and <b>M</b> the middle slice between your two blocks (turned like L). <b>DF</b> and <b>DB</b> are the bottom-front and bottom-back edges. Moves are counted in STM: every M, M2, U and U2 is one move.</p>
 
   <details class="paste">
     <summary>Paste a scramble instead</summary>
@@ -30,12 +31,12 @@ const data = cases.map((c) => {
 
   <section class="q" id="q1">
     <h2>1. What colour is the centre on top?</h2>
-    <p class="hint">If it isn't your top colour, your centres are turned. These cases fix that too.</p>
+    <p class="hint">There are four possibilities. If it isn't your top colour, your centres are turned, and these cases fix that too. Colours assume green in front; switch between yellow and white on top with "Top colour" at the top of the page.</p>
     <div class="choices">
-      <button type="button" data-v="U"><i style="background:var(--yel)"></i>My top colour</button>
-      <button type="button" data-v="F"><i style="background:var(--grn)"></i>Green (front colour)</button>
-      <button type="button" data-v="B"><i style="background:var(--blu)"></i>Blue (back colour)</button>
-      <button type="button" data-v="D"><i style="background:var(--wht)"></i>My bottom colour</button>
+      <button type="button" data-v="U"><i style="background:var(--yel)"></i><span><span class="if-yellow">Yellow</span><span class="if-white">White</span> (your top colour)</span></button>
+      <button type="button" data-v="F"><i style="background:var(--grn)"></i>Green (your front colour)</button>
+      <button type="button" data-v="B"><i style="background:var(--blu)"></i>Blue (your back colour)</button>
+      <button type="button" data-v="D"><i style="background:var(--wht)"></i><span><span class="if-yellow">White</span><span class="if-white">Yellow</span> (your bottom colour)</span></button>
     </div>
   </section>
 
@@ -70,7 +71,7 @@ const data = cases.map((c) => {
   </div>
   <p class="hint">Pictures show the top of the cube with green in front. The thin bars are the side stickers, and the two small squares underneath show what's in the bottom-front (DF) and bottom-back (DB) slots. Turn the top layer until it matches, then do the algorithm.</p>
   <div class="cases" id="list"></div>
-  <p class="small muted">All 992 cases, 248 of them with aligned centres. Each algorithm is the shortest possible with M and U. <a href="/about/">How these were made</a>.</p>
+  <p class="small muted">All 992 cases, 248 of them with aligned centres (<a href="/methods/zbroux/eodfdb/#where-the-numbers-come-from">where these numbers come from</a>). Each algorithm is a shortest solution in M and U, counted in STM. For a smaller set, see <a href="/algs/eodfdb/46/">the 46-case set</a>. <a href="/about/">How these were made</a>.</p>
 </Base>
 
 <script type="application/json" id="eodfdb-data" set:html={JSON.stringify(data)} />
@@ -162,6 +163,7 @@ const data = cases.map((c) => {
   .paste label{font-size:.9rem;font-weight:600;margin-top:6px}
   .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:8px}
   #pmsg{font-weight:550;color:var(--ink-2)}
+  .notation{font-size:.9rem;color:var(--ink-2);max-width:var(--content);margin:-6px 0 16px}
   .q{margin-top:22px}
   .q h2{font-size:1.08rem;margin:0 0 2px}
   .hint{color:var(--mute);font-size:.9rem;margin:0 0 10px;max-width:var(--content)}

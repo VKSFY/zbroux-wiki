@@ -74,5 +74,12 @@ for (const c of data.cases) {
   }
   if (c.optimal_moves > 0 && isGoal(start)) { fails++; console.log("already solved but dist>0", c.id); }
 }
-console.log(`cases=${data.cases.length} algs checked=${algs} failures=${fails} length mismatches=${lenMismatch}`);
+const byId = new Map(data.cases.map((c) => [c.id, c]));
+let mirrors = 0;
+for (const c of data.cases) {
+  if (!c.algs[0]) continue;
+  mirrors++;
+  if (!isGoal(apply(buildState(byId.get(c.mirror_of)), c.mirror_alg))) { fails++; if (fails < 5) console.log("MIRROR FAIL", c.id, c.mirror_alg); }
+}
+console.log(`cases=${data.cases.length} algs checked=${algs} mirror algs checked=${mirrors} failures=${fails} length mismatches=${lenMismatch}`);
 process.exit(fails ? 1 : 0);

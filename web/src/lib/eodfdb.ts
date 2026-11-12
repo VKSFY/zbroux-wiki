@@ -16,6 +16,7 @@ export interface EodfdbCase {
   n_optimal: number;
   algs: string[];
   mirror_of: string;
+  mirror_alg: string;
 }
 
 export const meta = (raw as any).meta;
@@ -27,6 +28,21 @@ export const GROUPS: { key: EodfdbCase["group"]; label: string; blurb: string }[
   { key: "one-in-U", label: "One in U", blurb: "One of DF / DB is in the U layer, the other is in a D slot." },
   { key: "none-in-U", label: "Neither in U", blurb: "DF and DB both sit in the D slots (possibly swapped or flipped)." },
 ];
+
+export function set46() {
+  const chosen = cases.filter((c) => c.group === "both-in-U-opposite" && (c.centres === "solved" || c.centres === "off-M2"));
+  const excluded = chosen.filter((c) => c.bad_edges === 0);
+  const kept = chosen.filter((c) => c.bad_edges > 0)
+    .sort((a, b) => Number(a.centres !== "solved") - Number(b.centres !== "solved") || a.optimal_moves - b.optimal_moves || a.id.localeCompare(b.id));
+  const seen = new Set<string>();
+  const list: EodfdbCase[] = [];
+  for (const c of kept) {
+    if (seen.has(c.id)) continue;
+    seen.add(c.id); seen.add(c.mirror_of);
+    list.push(c);
+  }
+  return { chosen, excluded, kept, list };
+}
 
 export function stats(list: EodfdbCase[]) {
   const n = list.length;

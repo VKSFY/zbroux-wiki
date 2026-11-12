@@ -1,0 +1,46 @@
+{
+ "eodfdb": {
+  "states": 3840,
+  "fixed_by_u": [
+   3840,
+   32,
+   64,
+   32
+  ],
+  "aligned_states": 960,
+  "aligned_fixed_by_u": [
+   960,
+   8,
+   16,
+   8
+  ],
+  "avg_stm": 8.31,
+  "avg_stm_aligned": 8.36,
+  "avg_htm_listed_aligned": 12.83,
+  "distribution": {
+   "0": 1,
+   "1": 3,
+   "2": 9,
+   "3": 27,
+   "4": 66,
+   "5": 158,
+   "6": 304,
+   "7": 556,
+   "8": 797,
+   "9": 999,
+   "10": 550,
+   "11": 310,
+   "12": 30,
+   "13": 30
+  }
+ },
+ "lse": {
+  "states": 184320,
+  "avg_stm": 11.14,
+  "max_stm": 20
+ },
+ "zbll": {
+  "ll_states": 7776,
+  "avg_moves_weighted": 13.05
+ }
+}
