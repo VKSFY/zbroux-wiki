@@ -2,56 +2,92 @@
 import Base from "../../../layouts/Base.astro";
 import LseDiagram from "../../../components/LseDiagram.astro";
 import { cases } from "../../../lib/eodfdb";
+import { zbll } from "../../../lib/zbll.ts";
+import { llSvg } from "../../../lib/ll-diagram.ts";
 import raw from "../../../../../data/solves/zbroux.json";
 
 const count = (alg: string) => alg.trim().split(/\s+/).filter(Boolean).length;
-const solves = raw.solves.map((sv: any) => {
+const solves = raw.solves.map((sv: any, i: number) => {
   const steps = sv.steps.map((s: any) => {
     const n = count(s.moves);
-    const c = s.case ? cases.find((x) => x.id === s.case) : undefined;
-    return { ...s, n, tps: s.time ? n / s.time : undefined, caseData: c, caseHref: c ? `/algs/eodfdb/#${c.id}` : undefined };
+    const eod = s.case && s.set !== "zbll" ? cases.find((x) => x.id === s.case) : undefined;
+    const zb = s.case && s.set === "zbll" ? zbll.find((x) => x.id === s.case) : undefined;
+    return { ...s, n, eod, zb };
   });
   const moves = steps.reduce((a: number, s: any) => a + s.n, 0);
-  const time = steps.reduce((a: number, s: any) => a + (s.time ?? 0), 0);
+  const stepTimes = steps.every((s: any) => typeof s.time === "number");
+  const time = sv.time ?? (stepTimes ? steps.reduce((a: number, s: any) => a + s.time, 0) : 0);
   const full = steps.map((s: any) => s.moves).join(" ");
   const enc = (a: string) => encodeURIComponent(a.replace(/'/g, "-").replace(/\s+/g, "_"));
   const viewer = `https://alg.cubing.net/?setup=${enc(sv.scramble)}&alg=${enc(full)}`;
-  return { ...sv, steps, moves, time, full, viewer };
+  return { ...sv, n: i + 1, steps, moves, time, stepTimes, full, viewer };
 });
+const timed = solves.filter((s: any) => s.time > 0);
+const avg = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
+const stepAvg = (name: string) => avg(solves.map((sv: any) => sv.steps.find((s: any) => s.step === name)?.n ?? 0));
 ---
-<Base title="Example solves" description="ZBRoux example solves, broken down step by step." crumbs={[{ href: "/methods/zbroux/", label: "ZBRoux" }]}>
+<Base title="Example solves" description="ZBRoux example solves, broken down step by step, each replayed on a simulated cube." crumbs={[{ href: "/methods/zbroux/", label: "ZBRoux" }]}>
   <article class="prose">
     <h1>Example solves</h1>
-    <p class="lede">Real solves broken down step by step. Each one was replayed on a simulated cube to make sure every step ends where it says it does.</p>
+    <p class="lede">Real solves broken down step by step. Each one was replayed on a simulated cube to make sure every step ends where it says it does, and each EODFDB and ZBLL case is linked to its list.</p>
+
+    <h2>Summary</h2>
+    <table>
+      <thead><tr><th>Solve</th><th class="num">First block</th><th class="num">Second block</th><th class="num">EODFDB</th><th class="num">ZBLL</th><th class="num">Moves</th><th class="num">Time</th><th class="num">TPS</th></tr></thead>
+      <tbody>
+        {solves.map((sv: any) => (
+          <tr>
+            <td><a href={`#${sv.id}`}>Solve {sv.n}</a></td>
+            {["First block", "Second block", "EODFDB", "ZBLL"].map((name) => <td class="num">{sv.steps.find((s: any) => s.step === name)?.n}</td>)}
+            <td class="num">{sv.moves}</td>
+            <td class="num">{sv.time > 0 ? `${sv.time.toFixed(1)} s` : ""}</td>
+            <td class="num">{sv.time > 0 ? (sv.moves / sv.time).toFixed(1) : ""}</td>
+          </tr>
+        ))}
+        <tr class="avg">
+          <td>Average</td>
+          {["First block", "Second block", "EODFDB", "ZBLL"].map((name) => <td class="num">{stepAvg(name).toFixed(1)}</td>)}
+          <td class="num">{avg(solves.map((s: any) => s.moves)).toFixed(1)}</td>
+          <td class="num">{avg(timed.map((s: any) => s.time)).toFixed(2)} s</td>
+          <td class="num">{avg(timed.map((s: any) => s.moves / s.time)).toFixed(1)}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="small muted">Moves in STM, with M and r counting as one move each, and turns of the top layer included. Times are approximate totals, not timer splits per step.</p>
   </article>
 
-  {solves.map((sv: any, i: number) => (
+  {solves.map((sv: any) => (
     <section class="solve" id={sv.id}>
-      <h2>Solve {i + 1} <span class="muted small">{sv.moves} moves{sv.time > 0 && ` · about ${sv.time.toFixed(1)} s${sv.time_is_estimate ? " (estimated)" : ""}`}</span></h2>
+      <h2>Solve {sv.n} <span class="muted small">{sv.moves} moves{sv.time > 0 && ` · about ${sv.time.toFixed(1)} s · ${(sv.moves / sv.time).toFixed(1)} TPS`}</span></h2>
       <p><b>Scramble:</b> <span class="alg">{sv.scramble}</span></p>
       <p class="muted">{sv.orientation}. {sv.inspection}</p>
 
       <table class="table">
-        <thead><tr><th>Step</th><th>Moves</th><th class="num">Moves</th>{sv.time > 0 && <th class="num">Time</th>}</tr></thead>
+        <thead><tr><th>Step</th><th>Moves</th><th class="num">Count</th>{sv.stepTimes && <th class="num">Time</th>}</tr></thead>
         <tbody>
           {sv.steps.map((s: any) => (
             <tr>
               <td class="step">{s.step}</td>
               <td><span class="alg">{s.moves}</span>{s.note && <div class="note2">{s.note}</div>}</td>
               <td class="num">{s.n}</td>
-              {sv.time > 0 && <td class="num">{s.time?.toFixed(1)} s</td>}
+              {sv.stepTimes && <td class="num">{s.time.toFixed(1)} s</td>}
             </tr>
           ))}
         </tbody>
       </table>
 
-      {sv.steps.filter((s: any) => s.caseData).map((s: any) => (
-        <p class="caselink"><LseDiagram c={s.caseData} size={56} /><span>The {s.step} case was <a href={s.caseHref}>{s.caseData.id}</a>. Its shortest solutions take {s.caseData.optimal_moves} moves once the top layer is lined up.</span></p>
-      ))}
+      <div class="cases">
+        {sv.steps.filter((s: any) => s.eod).map((s: any) => (
+          <p class="caselink"><LseDiagram c={s.eod} size={52} /><span>EODFDB case <a href={`/algs/eodfdb/#${s.eod.id}`}>{s.eod.id}</a>: shortest solutions take {s.eod.optimal_moves} moves once the top layer is lined up.</span></p>
+        ))}
+        {sv.steps.filter((s: any) => s.zb).map((s: any) => (
+          <p class="caselink"><Fragment set:html={llSvg(s.zb.state, 56, "ZBLL " + s.zb.id)} /><span>ZBLL case <a href={`/algs/zbll/#${s.zb.id}`}>{s.zb.id}</a>: the first algorithm listed for it is {s.zb.algs[0].moves} moves, without the turns of the top layer.</span></p>
+        ))}
+      </div>
 
       <p><b>Full solution:</b> <span class="alg">{sv.full}</span></p>
       <p class="no-print"><button class="btn copy" type="button" data-copy={sv.full}>Copy solution</button> <a class="btn" href={sv.viewer} target="_blank" rel="noopener">Replay on alg.cubing.net</a></p>
-      <p class="small muted">Moves counted with M and r as one move each.{sv.time_is_estimate && " Step times are estimates, not timer splits."}</p>
+      <p class="small muted">Moves counted with M and r as one move each.{sv.time_is_estimate && (sv.stepTimes ? " Step times are estimates, not timer splits." : " The time is approximate.")}</p>
     </section>
   ))}
 </Base>
@@ -67,13 +103,15 @@ const solves = raw.solves.map((sv: any) => {
 </script>
 
 <style>
+  .num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .avg td{font-weight:650;border-top:2px solid var(--line)}
   .solve{max-width:var(--content);margin-top:8px}
   .solve h2{font-size:1.35rem;padding-bottom:.3em;border-bottom:1px solid var(--line)}
   .solve h2 span{font-weight:400;margin-left:6px}
   .alg{overflow-wrap:anywhere}
-  .num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
   .step{white-space:nowrap;font-weight:600}
   .note2{font-size:.85rem;color:var(--mute);margin-top:3px}
-  .caselink{display:flex;align-items:center;gap:12px}
+  .cases{display:grid;gap:4px;margin:6px 0}
+  .caselink{display:flex;align-items:center;gap:12px;margin:0}
   .caselink :global(svg){color:var(--ink);flex:0 0 auto}
 </style>

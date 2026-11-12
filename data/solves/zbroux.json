@@ -7,12 +7,226 @@
       "orientation": "White top, green front (no rotation)",
       "inspection": "Build the orange block on the left with yellow on the bottom.",
       "steps": [
-        { "step": "First block", "moves": "U L B' L F D M B", "time": 3.0 },
-        { "step": "Second block", "moves": "R U2 r U' r U' r2 U' R2 U' R", "time": 2.4 },
-        { "step": "EODFDB", "moves": "U M U M' U M2 U' M", "time": 1.7, "case": "pO7", "note": "Centres were off by M' after second block. The first U lines the case up; after that, M U M' U M2 U' M is one of the two shortest solutions (7 moves)." },
-        { "step": "ZBLL", "moves": "R' U2 R2 U R U R U' R' U' R2 U R U", "time": 2.1, "note": "Time includes recognition." }
+        {
+          "step": "First block",
+          "moves": "U L B' L F D M B",
+          "time": 3.0
+        },
+        {
+          "step": "Second block",
+          "moves": "R U2 r U' r U' r2 U' R2 U' R",
+          "time": 2.4
+        },
+        {
+          "step": "EODFDB",
+          "moves": "U M U M' U M2 U' M",
+          "time": 1.7,
+          "case": "pO7",
+          "note": "Centres were off by M' after second block. The first U lines the case up; after that, M U M' U M2 U' M is one of the two shortest solutions (7 moves).",
+          "set": "eodfdb"
+        },
+        {
+          "step": "ZBLL",
+          "moves": "R' U2 R2 U R U R U' R' U' R2 U R U",
+          "time": 2.1,
+          "note": "Time includes recognition.",
+          "case": "S1-07",
+          "set": "zbll"
+        }
       ],
       "time_is_estimate": true,
+      "metric": "STM (M and r count as 1)"
+    },
+    {
+      "id": "zbroux-2",
+      "scramble": "B F D' L2 F L R' U' L F2 D U2 R' B U' F2 R' B' F2 D2 R F2 B D' B'",
+      "orientation": "White top, green front (no rotation)",
+      "inspection": "Build the orange block on the left with yellow on the bottom.",
+      "time": 8.6,
+      "time_is_estimate": true,
+      "steps": [
+        {
+          "step": "First block",
+          "moves": "R2 U R' B D' L F"
+        },
+        {
+          "step": "Second block",
+          "moves": "R' r' U' R' U M2 U r' U R2"
+        },
+        {
+          "step": "EODFDB",
+          "moves": "U M U M' U2 M' U M",
+          "case": "A4",
+          "set": "eodfdb",
+          "note": "Centres aligned after the second block. The first U lines the case up; after that it's one of the shortest solutions (7 moves)."
+        },
+        {
+          "step": "ZBLL",
+          "moves": "U2 R U R' U R U2 R2 U L U' R U L'",
+          "case": "U5-04",
+          "set": "zbll"
+        }
+      ],
+      "metric": "STM (M and r count as 1)"
+    },
+    {
+      "id": "zbroux-3",
+      "scramble": "D' B' L' D' F D U' F' U D B R2 F' U' F' B L D2 U R F2 L' R D2 U'",
+      "orientation": "White top, green front (no rotation)",
+      "inspection": "Build the orange block on the left with yellow on the bottom.",
+      "time": 8.3,
+      "time_is_estimate": true,
+      "steps": [
+        {
+          "step": "First block",
+          "moves": "U' L' B D M F' D"
+        },
+        {
+          "step": "Second block",
+          "moves": "r2 U M2 U2 r' R' U r U' R"
+        },
+        {
+          "step": "EODFDB",
+          "moves": "M U' M' U2 M U' M U' M",
+          "case": "pA26",
+          "set": "eodfdb",
+          "note": "Centres turned a quarter after the second block. This is one of the shortest solutions (9 moves)."
+        },
+        {
+          "step": "ZBLL",
+          "moves": "U' R' L U L' U' R U2 L U2 L'",
+          "case": "S6-01",
+          "set": "zbll"
+        }
+      ],
+      "metric": "STM (M and r count as 1)"
+    },
+    {
+      "id": "zbroux-4",
+      "scramble": "B' F D B2 U2 D2 L2 U' R2 B U2 D' B' L' U2 L2 D2 L' U2 B' U L' B L D2",
+      "orientation": "White top, green front (no rotation)",
+      "inspection": "Build the orange block on the left with yellow on the bottom.",
+      "time": 8.6,
+      "time_is_estimate": true,
+      "steps": [
+        {
+          "step": "First block",
+          "moves": "U D F' U2 F2 R B'"
+        },
+        {
+          "step": "Second block",
+          "moves": "U R' U r2 R' U' R' U R2"
+        },
+        {
+          "step": "EODFDB",
+          "moves": "r U2 M U2 r' U' M' U' M2",
+          "case": "hN17",
+          "set": "eodfdb",
+          "note": "Centres upside down after the second block. This uses r moves, which break the second block and rebuild it, and it's as short as the shortest M/U solutions (9 moves)."
+        },
+        {
+          "step": "ZBLL",
+          "moves": "L' U2 L U L' U L2 U' R' U L' U' R U",
+          "case": "Pi5-04",
+          "set": "zbll"
+        }
+      ],
+      "metric": "STM (M and r count as 1)"
+    },
+    {
+      "id": "zbroux-5",
+      "scramble": "B' L' D U' F' L' R D R B2 F2 U2 R' B R' U2 R' D2 L2 B F U' L2 U2 F",
+      "orientation": "White top, green front (no rotation)",
+      "inspection": "Build the orange block on the left with yellow on the bottom.",
+      "time": 8.4,
+      "time_is_estimate": true,
+      "steps": [
+        {
+          "step": "First block",
+          "moves": "D2 L2 R D' B U2 F2"
+        },
+        {
+          "step": "Second block",
+          "moves": "R' U R' U' R U' R2 U' R"
+        },
+        {
+          "step": "EODFDB",
+          "moves": "M2 U2 M U M' U M' U2 M'",
+          "case": "S105",
+          "set": "eodfdb",
+          "note": "Centres aligned after the second block. This is one of the shortest solutions (9 moves)."
+        },
+        {
+          "step": "ZBLL",
+          "moves": "R' U L' U R U' L2 U2 R' U R U2 L'",
+          "case": "T4-11",
+          "set": "zbll"
+        }
+      ],
+      "metric": "STM (M and r count as 1)"
+    },
+    {
+      "id": "zbroux-6",
+      "scramble": "F' U2 B L R' B U' F U D2 F' B' U' D2 B' R2 U2 L2 F R' D' L' F D B'",
+      "orientation": "White top, green front (no rotation)",
+      "inspection": "Build the orange block on the left with yellow on the bottom.",
+      "time": 8.5,
+      "time_is_estimate": true,
+      "steps": [
+        {
+          "step": "First block",
+          "moves": "U F2 R2 U R D' B2"
+        },
+        {
+          "step": "Second block",
+          "moves": "R2 U' r U M2 U r2 U' R' U' R'"
+        },
+        {
+          "step": "EODFDB",
+          "moves": "M U' M U M' U M U2 M'",
+          "case": "mA26",
+          "set": "eodfdb",
+          "note": "Centres turned a quarter after the second block. This is one of the shortest solutions (9 moves)."
+        },
+        {
+          "step": "ZBLL",
+          "moves": "U R' U2 R2 U R2 U R2 U2 R' U'",
+          "case": "Pi4-02",
+          "set": "zbll"
+        }
+      ],
+      "metric": "STM (M and r count as 1)"
+    },
+    {
+      "id": "zbroux-7",
+      "scramble": "B2 U2 B2 F L' F B' L' B' R U R F' L2 B' F2 L2 B2 U2 F R U B2 L B2",
+      "orientation": "White top, green front (no rotation)",
+      "inspection": "Build the orange block on the left with yellow on the bottom.",
+      "time": 8.6,
+      "time_is_estimate": true,
+      "steps": [
+        {
+          "step": "First block",
+          "moves": "U F' M' U2 L2 F R2 D"
+        },
+        {
+          "step": "Second block",
+          "moves": "U R' U2 R' U' r2 U r U' R"
+        },
+        {
+          "step": "EODFDB",
+          "moves": "M' U M U2 M' U' M",
+          "case": "S24",
+          "set": "eodfdb",
+          "note": "Centres aligned after the second block. This is one of the shortest solutions (7 moves)."
+        },
+        {
+          "step": "ZBLL",
+          "moves": "U R' U2 R2 U2 R2 U' R2 U' R2 U R U'",
+          "case": "S1-05",
+          "set": "zbll"
+        }
+      ],
       "metric": "STM (M and r count as 1)"
     }
   ]
