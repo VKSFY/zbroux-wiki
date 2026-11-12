@@ -19,6 +19,11 @@
   "avg_htm_listed_aligned": 12.48,
   "avg_per_case_free_auf": 7.89,
   "avg_per_case_free_auf_aligned": 7.99,
+  "htm_optimal_avg_per_position": 12.73,
+  "htm_optimal_avg_per_case": 12.34,
+  "htm_optimal_avg_per_case_aligned": 12.48,
+  "plus_zbll_turn_fixed_alg": 9.06,
+  "plus_zbll_turn_choosing_end_angle": 8.84,
   "distribution": {
    "0": 1,
    "1": 3,
@@ -39,7 +44,9 @@
  "lse": {
   "states": 184320,
   "avg_stm": 11.14,
-  "max_stm": 20
+  "max_stm": 20,
+  "corners_aligned_states": 46080,
+  "avg_stm_corners_aligned": 11.16
  },
  "zbll": {
   "ll_states": 7776,

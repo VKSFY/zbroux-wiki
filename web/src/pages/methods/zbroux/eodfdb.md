@@ -13,7 +13,7 @@ crumbs:
 
 - **U**: the top layer. **M**: the middle slice between the left and right blocks, turned in the same direction as L.
 - **DF** and **DB**: the bottom-front and bottom-back edges, the two bottom edges that are still unsolved after both blocks.
-- **Moves are counted in STM**: every M, M', M2, U, U' and U2 counts as one move. A turn of the top layer to line a case up before its algorithm isn't counted. In HTM, where each slice turn counts as two, the listed algorithms average about 12.5 moves.
+- **Moves are counted in STM**: every M, M', M2, U, U' and U2 counts as one move. A turn of the top layer to line a case up before its algorithm isn't counted. In HTM, where each slice turn counts as two, it's about 12.5 moves per case (centres aligned, top layer lined up first) and 12.7 per position (counting every U turn).
 
 ## What this step solves
 
