@@ -34,20 +34,23 @@ const REPO = "https://github.com/VKSFY/zbroux-wiki";
       <li><b>4b</b>: 4a, plus the UL and UR edges solved relative to the corners (after some turn of the top layer, the corners and both edges are in place).</li>
       <li><b>4c</b>: solved, including the final turn of the top layer.</li>
     </ul>
-    <p><b>EODFDB</b>, over all 3,840 positions after the second block (top-layer corners ignored):</p>
+    <p><b>EODFDB</b>, over all 3,840 positions after the second block (top-layer corners ignored), split the same way as LSE:</p>
     <ul>
-      <li><b>Step 1</b>: all six edges oriented, both bottom edges on top and opposite each other with their bottom colour facing up, and the top centre showing the bottom colour. That's 4 positions, one up to turns of the top layer.</li>
-      <li><b>Step 2</b>: line them up and do M2 (any shortest finish).</li>
+      <li><b>Step 1</b>: the same goal as 4a. All six edges are oriented, and the top centre shows the top or bottom colour.</li>
+      <li><b>Step 2</b>: both bottom edges on top and opposite each other with their bottom colour facing up, edges still oriented, and the top centre showing the bottom colour. That's 4 positions, one up to turns of the top layer.</li>
+      <li><b>Step 3</b>: line them up and do M2 (any shortest finish).</li>
     </ul>
     <p>Each step is solved with a shortest solution from wherever the previous step left off. When a step has several shortest solutions, the three rules choose differently: <i>lookahead</i> takes the one that makes the remaining steps cheapest; <i>no lookahead</i> treats every shortest move sequence for the step as equally likely; <i>worst choices</i> takes the most expensive. The per-step averages below are measured along the chain, so they add up to the total:</p>
     <table>
-      <thead><tr><th>Rule</th><th>LSE: 4a + 4b + 4c</th><th>EODFDB: step 1 + step 2</th></tr></thead>
+      <thead><tr><th>Rule</th><th>LSE: 4a + 4b + 4c</th><th>EODFDB: steps 1 + 2 + 3</th></tr></thead>
       <tbody>
-        <tr><td>Lookahead</td><td>5.95 + 3.63 + 3.26 = 12.84</td><td>7.85 + 1.30 = 9.15</td></tr>
-        <tr><td>No lookahead</td><td>5.95 + 4.47 + 5.03 = 15.45</td><td>7.85 + 1.64 = 9.49</td></tr>
-        <tr><td>Worst choices</td><td>5.95 + 5.06 + 6.58 = 17.59</td><td>7.85 + 1.87 = 9.72</td></tr>
+        <tr><td>Lookahead</td><td>5.95 + 3.63 + 3.26 = 12.84</td><td>5.95 + 2.57 + 1.34 = 9.86</td></tr>
+        <tr><td>No lookahead</td><td>5.95 + 4.47 + 5.03 = 15.45</td><td>5.95 + 3.57 + 1.57 = 11.09</td></tr>
+        <tr><td>Worst choices</td><td>5.95 + 5.06 + 6.58 = 17.59</td><td>5.95 + 4.26 + 1.83 = 12.04</td></tr>
       </tbody>
     </table>
+    <p>LSE is averaged over all positions with the corners at any angle. Starting with the corners lined up, as after CMLL, gives 12.83, 15.42 and 17.59, so it makes no real difference.</p>
+    <p>EODFDB can also be modelled in two steps, merging steps 1 and 2 into one search for the 4 target positions. That gives 7.85 + 1.30 = 9.15, 7.85 + 1.64 = 9.49 and 7.85 + 1.87 = 9.72. It's close to optimal by construction, because the first step aims for a single position, so the Roux comparison uses the three-step split, which matches LSE.</p>
     <p>Step 1 of each method always costs the same under every rule, because only the choice between equally short solutions differs, not their length. "No lookahead" counts move sequences, not end positions. Choosing uniformly between end positions instead gives slightly different numbers.</p>
 
     <h2 id="zbll">ZBLL</h2>

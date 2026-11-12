@@ -33,16 +33,18 @@ ZBRoux and Roux share the first two blocks, so the difference is entirely in the
 | Turn of the top layer after the last algorithm | (part of LSE) | 0.75[^auf] |
 | Subtotal | 10.30 | 14.55 |
 
-**Intuitive steps**, done four different ways. "Step by step" means the steps the method is usually taught in, each solved as efficiently as possible. What differs is how a solver chooses between equally short solutions for a step: by looking ahead to the next step, at random, or as badly as possible[^steps]:
+**Intuitive steps**, done four different ways. "Step by step" splits both methods into comparable steps, each solved as efficiently as possible: LSE as 4a (orient), 4b (UL and UR), 4c (finish); EODFDB as orient, then bring both bottom edges up opposite each other, then M2. What differs between rows is how a solver chooses between equally short solutions for a step: by looking ahead to the next step, at random, or as badly as possible[^steps]:
 
 | Intuitive step done… | LSE | EODFDB | Roux total | ZBRoux total | Fewer moves |
 |---|---|---|---|---|---|
 | optimally, in one go | 11.14[^lse] | 8.31[^eod] | 21.4 | 22.9 | Roux, by 1.4 |
-| step by step, looking ahead | 12.84 | 9.15 | 23.1 | 23.7 | Roux, by 0.6 |
-| step by step, no lookahead | 15.45 | 9.49 | 25.8 | 24.0 | ZBRoux, by 1.7 |
-| step by step, worst choices | 17.59 | 9.72 | 27.9 | 24.3 | ZBRoux, by 3.6 |
+| step by step, looking ahead | 12.84 | 9.86 | 23.1 | 24.4 | Roux, by 1.3 |
+| step by step, no lookahead | 15.45 | 11.09 | 25.8 | 25.6 | about even |
+| step by step, worst choices | 17.59 | 12.04 | 27.9 | 26.6 | ZBRoux, by 1.3 |
 
-So the answer depends on how well you do the intuitive step. Solved optimally, or step by step with good lookahead, Roux takes fewer moves. Done step by step without lookahead, ZBRoux takes fewer, because taught LSE (4a, 4b, 4c) wastes far more moves than taught EODFDB: about four against about one. Advanced Roux techniques that combine LSE steps, like EOLR, move Roux towards the top rows. Real solvers don't solve each step optimally, so all the step-by-step figures are lower limits.
+For a typical solver who does the intuitive step step by step without planning ahead, the two methods come out **about even in moves**. Solved well, Roux takes about one and a half moves fewer. The winner depends on how each intuitive step is done: combining steps, like EOLR in Roux or orienting while already setting up the bottom edges in EODFDB, moves a method towards the top rows. Real solvers don't solve each step optimally, so all the step-by-step figures are lower limits.
+
+If EODFDB is done in two steps instead (orient while bringing the bottom edges up, then M2), it takes 9.15, 9.49 and 9.72 moves under the three rules. That two-step version is close to optimal by construction, because its first step aims for a single position, so it isn't compared with three-step LSE above.
 
 How the algorithm lists compare with human ones differs per set. For CMLL the search lands almost exactly on a human-picked sheet (9.71 moves per case against 9.75), so hand-picking costs CMLL almost nothing. For ZBLL there's no standard human list to compare with. Hand-picked ZBLL algorithms often give up a move for better finger tricks, so a human ZBLL list may well be longer than this one, but that hasn't been measured. ZBRoux's other possible advantage is time, not moves: it finishes with one drilled face-turn algorithm instead of M and U turns, and during EODFDB you can already read most of your ZBLL case. There's no timing data on this wiki yet to show how big that effect is.
 
@@ -50,7 +52,7 @@ How the algorithm lists compare with human ones differs per set. For CMLL the se
 [^algs]: Both figures are the first algorithm listed for each case, weighted by how often each case comes up (CMLL over 648 positions, ZBLL over 7,776). Both lists come from the same search ([how the algorithms are made](/about/#zbll)). Unweighted, per case, they're 9.71 and 13.07.
 [^lse]: The exact average of the shortest solution over all 184,320 LSE positions, with the top layer at any angle, including the final turn. Starting with the corners already lined up gives 11.16, and leaving the first turn of the top layer free gives 10.55.
 [^eod]: The exact average of the shortest solution over all 3,840 EODFDB positions, counting every U turn. If you pick, among the shortest EODFDB solutions, one that leaves the top layer at the angle your ZBLL algorithm starts from, EODFDB plus the turn before ZBLL drops from 9.06 to 8.84 moves on average, but only if you already know your ZBLL case before EODFDB ends.
-[^steps]: LSE as 4a, 4b, 4c and EODFDB as the two steps on the [EODFDB page](/methods/zbroux/eodfdb/#doing-it-without-algorithms). Each step is solved with a shortest solution from wherever the previous step left off. *Looking ahead* picks, among a step's shortest solutions, the one that makes the rest cheapest. *No lookahead* makes every shortest move sequence for the step equally likely. *Worst choices* picks the one that makes the rest most expensive. The exact step definitions and per-step averages are on the [how the algorithms are made](/about/#step-by-step-models) page.
+[^steps]: Each step is solved with a shortest solution from wherever the previous step left off. *Looking ahead* picks, among a step's shortest solutions, the one that makes the rest cheapest. *No lookahead* makes every shortest move sequence for the step equally likely. *Worst choices* picks the one that makes the rest most expensive. LSE is averaged over all positions with the corners at any angle; starting with the corners lined up, as after CMLL, changes nothing (12.83, 15.42, 17.59). The exact step definitions and per-step averages are on the [how the algorithms are made](/about/#step-by-step-models) page.
 
 **Algorithms to learn.** Roux needs the 42 CMLL algorithms. ZBRoux needs the 493 ZBLL algorithms:
 
@@ -72,7 +74,7 @@ If you want few algorithms or the fewest moves, Roux is the better choice. ZBRou
 ZBRoux is probably **not** for you if:
 
 - you want the fewest algorithms. Roux gets the same blocks done with 42 CMLL algorithms instead of 493 ZBLL.
-- you want the fewest moves and you're good at LSE. Solved well, Roux is shorter for the last ten pieces, by about half a move to one and a half.
+- you want the fewest moves. ZBRoux is at best about even with Roux, and solved well Roux is shorter by about one and a half moves.
 - you're picking your first speed method. ZBRoux assumes you can already build Roux blocks, and it pays off only once you know a lot of ZBLL. Learn Roux or CFOP first.
 - you mainly solve big cubes, where slice-heavy blockbuilding is awkward.
 
@@ -92,7 +94,7 @@ It may suit you if:
 ## Disadvantages
 
 - Full ZBLL is 493 algorithms, 451 more than Roux's 42 CMLL (more if you also learn EODFDB algorithms). You can start with a two-look last layer and learn ZBLL over time; the [learning path](/methods/zbroux/learning-path/) explains how.
-- If you solve LSE well, it takes more moves than Roux for the last ten pieces: about one and a half more when both intuitive steps are solved optimally. Against step-by-step LSE without lookahead, it takes fewer. See the tables above.
+- It doesn't save moves. For a typical step-by-step solver the two methods are about even, and solved well Roux takes about one and a half moves fewer. See the tables above.
 - Blockbuilding takes practice, especially planning the first block in inspection. Roux solvers already have this skill.
 - Slice-heavy blockbuilding is awkward on 4x4 and bigger cubes.
 

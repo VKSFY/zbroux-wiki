@@ -27,12 +27,13 @@ The top-layer edges can be in any order, and the top layer can be at any angle. 
 
 ## Doing it without algorithms
 
-You don't need any algorithms to start. The step works like Roux's EOLR, except the edges you're placing are DF and DB instead of UL and UR.
+You don't need any algorithms to start. The step works like Roux's LSE, except the edges you're placing are DF and DB instead of UL and UR. Learn it in three steps:
 
-1. **Orient the edges** with M and U moves, the same way as in Roux, using the arrow, 2-flip and 4-flip patterns. While doing that, aim to finish with both bottom edges on top, opposite each other, with their bottom colour facing up.
-2. **Insert them.** Turn the top so the DF edge is at the back (UB) and the DB edge is at the front (UF), then do M2. That M2 also turns the centres half a turn, so before it the centres must be upside down: your bottom colour on top. Set that up during step 1.
+1. **Orient the edges** with M and U moves, exactly like Roux step 4a, using the arrow, 2-flip and 4-flip patterns. Finish with the centres on the top–bottom axis: your top or bottom colour on top.
+2. **Bring both bottom edges to the top**, opposite each other, with their bottom colour facing up, and with the centres upside down: your bottom colour on top. Keep the edges oriented.
+3. **Insert them.** Turn the top so the DF edge is at the back (UB) and the DB edge is at the front (UF), then do M2. That M2 also turns the centres back the right way up.
 
-The target of step 1 is a single position, up to turns of the top layer. Even with each step solved as efficiently as possible, this two-step way takes 9.49 moves on average (9.15 if you choose step 1's solution with step 2 in mind), against 8.31 for the shortest solution. Once it's comfortable, use the case lists below to learn shorter solutions for the cases you see most.
+Done this way, with every step solved as efficiently as possible, it takes about 11.1 moves on average, against 8.31 for the shortest solution. The quickest improvement is to merge steps 1 and 2: orient the edges while already bringing the bottom edges up. That two-step version takes about 9.5 moves, because its first step aims for a single position (one up to turns of the top layer). After that, use the case lists below to learn the shortest solutions for the cases you see most.
 
 ## Case lists
 

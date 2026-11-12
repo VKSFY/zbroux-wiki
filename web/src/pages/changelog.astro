@@ -5,7 +5,8 @@ const entries = [
     date: "2026-11-13",
     items: [
       "Fixed the intuitive EODFDB instructions: before the final M2 the centres must be upside down, not aligned.",
-      "Roux comparison: step-by-step models for both intuitive steps under three tie rules (lookahead, no lookahead, worst), with per-step averages that add up. Without lookahead ZBRoux takes about 1.7 fewer moves than Roux; solved optimally, Roux takes about 1.4 fewer.",
+      "Roux comparison: step-by-step models for both intuitive steps under three tie rules (lookahead, no lookahead, worst), with per-step averages that add up. EODFDB is split into three steps like LSE (the earlier two-step split was close to optimal by construction). Result: about even in moves for a typical solver; solved well, Roux takes about 1.4 fewer.",
+      "EODFDB is now taught in three steps: orient, bring the bottom edges up, M2.",
       "Said per set how the computed algorithm lists compare with human ones, and that both algorithm averages are weighted.",
       "Added a trainer for EODFDB and ZBLL.",
     ],

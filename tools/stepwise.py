@@ -74,13 +74,13 @@ def step(states, goal, after, rule):
     return {s: (dist[s],) + value[s][1:] if goal(s) else value[s] for s in states}
 
 
-def run(states, steps, rule, solved):
+def run(states, steps, rule, solved, over=None):
     after = {s: () for s in states}
     for goal in reversed(steps):
         res = step(states, goal, after, rule)
         after = {s: res[s] for s in states}
-    out = {s: (tuple(0 for _ in after[s]) if s == solved else after[s]) for s in states}
-    n = len(states)
+    out = {s: (tuple(0 for _ in after[s]) if s == solved else after[s]) for s in (over or states)}
+    n = len(out)
     parts = [round(sum(v[i] for v in out.values()) / n, 2) for i in range(len(steps))]
     return {"steps": parts, "total": round(sum(sum(v) for v in out.values()) / n, 2)}
 
@@ -99,6 +99,10 @@ def eodfdb_step_a(s):
         return False
     up = sorted(name for name, pos in SLOTS.items() if name[0] == "U" and at(s, pos, U_N) == "D")
     return up in (["UB", "UF"], ["UL", "UR"])
+
+
+def eo_axis(s):
+    return at(s, (0, 1, 0), U_N) in "UD" and edges_oriented(s)
 
 
 def lse_steps():
@@ -127,9 +131,15 @@ if __name__ == "__main__":
     lse_states = reachable(SOLVED_S)
     out = {"eodfdb": {}, "lse": {}}
     out["eodfdb"]["step_a_targets"] = sum(eodfdb_step_a(s) for s in eod_states)
+    out["eodfdb_three_steps"] = {}
+    out["lse_corners_aligned"] = {}
+    ll_corners = [i for i, (p, n) in enumerate(STICKERS) if p[1] == 1 and nz(p) == 3]
+    aligned = [s for s in lse_states if all(s[i] == SOLVED_S[i] for i in ll_corners)]
     for rule in RULES:
         out["eodfdb"][rule] = run(eod_states, [eodfdb_step_a, lambda s: s == masked], rule, masked)
+        out["eodfdb_three_steps"][rule] = run(eod_states, [eo_axis, eodfdb_step_a, lambda s: s == masked], rule, masked)
         out["lse"][rule] = run(lse_states, lse_steps(), rule, SOLVED_S)
+        out["lse_corners_aligned"][rule] = run(lse_states, lse_steps(), rule, SOLVED_S, over=aligned)
     print(json.dumps(out, indent=1))
     stats = json.load(open("../data/stats.json"))
     stats["step_by_step"] = out
