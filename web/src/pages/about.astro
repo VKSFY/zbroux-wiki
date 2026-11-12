@@ -9,19 +9,21 @@ const REPO = "https://github.com/VKSFY/zbroux-wiki";
 
     <h2>How moves are counted</h2>
     <p>Every move count on this wiki is in <b>STM</b> (slice turn metric). Each turn of a face, a slice or a wide layer counts as one move, and half turns count as one too: M, M2, U2, r and R2 are each one move. The turn of the top layer before an algorithm (the pre-AUF) is not counted.</p>
-    <p>In HTM, where a slice turn like M counts as two moves, the EODFDB algorithms average about 12.8 moves instead of 8.3.</p>
+    <p>In HTM, where a slice turn like M counts as two moves, the EODFDB algorithms (centres aligned) average about 12.5 moves instead of 8.0.</p>
 
     <h2>Cases</h2>
     <p>Each case list is built by listing every position the step can start from, directly from the pieces, then grouping positions that only differ by a turn of the top layer into one case. That's how you know a list is complete. ZBLL comes out at 493 cases, the standard count, and the EODFDB count can be checked by hand with Burnside's lemma, as shown on the <a href="/methods/zbroux/eodfdb/#where-the-numbers-come-from">EODFDB page</a>.</p>
 
     <h2>EODFDB and EOStripe</h2>
-    <p>These steps only use a few move types (M and U for EODFDB; R, r, M and U for EOStripe), so a breadth-first search can visit every position. Every algorithm listed is the shortest possible in STM using those moves.</p>
+    <p>These steps only use a few move types (M and U for EODFDB; R, r, M and U for EOStripe), so a breadth-first search can visit every position. Every algorithm listed is the shortest possible in STM using those moves. Each EODFDB case is shown from the angle where its shortest solution starts, so no algorithm begins with a turn of the top layer.</p>
     <p>Shortest doesn't always mean nicest to turn. When a case has several shortest solutions, the order is:</p>
     <ul>
       <li><b>EODFDB:</b> fewest M turns (M' and M2 are preferred over M), then fewest half turns.</li>
       <li><b>EOStripe:</b> fewest M turns, then fewest r turns, then fewest half turns, because M is awkward one-handed.</li>
     </ul>
     <p>Nobody has hand-picked these yet, so look at the alternatives listed under each case too.</p>
+    <h3>Mirror algorithms</h3>
+    <p>The mirror of an EODFDB case is its reflection through the middle slice, left to right. Reflecting a solution turns every U into U' and every U' into U, and leaves M, M' and M2 as they are. Each mirror pair is shown from reflected angles, so the mirror's algorithm is exactly the original with U and U' swapped. There are 992 cases, and one of them is already solved and needs no algorithm, so 991 mirror algorithms are stored. All 991 are checked by the second simulator.</p>
     <p>For LEOR's EOStripe, the table of move counts matches the one RedstoneTim published from a different solver (ksolve++) exactly.</p>
 
     <h2 id="zbll">ZBLL</h2>
@@ -38,7 +40,7 @@ const REPO = "https://github.com/VKSFY/zbroux-wiki";
     <h2>Checking</h2>
     <ul>
       <li>Every algorithm is applied to its case on a simulated cube and must solve the step.</li>
-      <li>EODFDB and EOStripe lists are checked a second time by a separately written simulator, including the mirror algorithms on the 46-case page.</li>
+      <li>EODFDB and EOStripe lists are checked a second time by a separately written simulator, including all 991 EODFDB mirror algorithms.</li>
       <li>ZBLL is checked a second time with <a href="https://github.com/cubing/cubing.js">cubing.js</a>, the open-source library behind alg.cubing.net, which also confirms all 493 cases are different from each other.</li>
       <li>The "paste your scramble" lookups are tested against the same data with hundreds of random positions.</li>
     </ul>

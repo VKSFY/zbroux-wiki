@@ -116,23 +116,19 @@ for s in dist:
     c = canon(s)
     if c in cases: continue
     slots, centre, front = describe(c)
-    sols = sorted(all_optimal(c), key=score)
     cases[c] = {
         "key": c,
-        "slots": slots,
         "centres": CENTRE_NAME[centre],
         "u_centre": centre, "f_centre": front,
         "group": group_of(slots),
         "bad_edges": bad_count(slots),
-        "optimal_moves": dist[c],
-        "n_optimal": len(sols),
-        "algs": [" ".join(a) for a in sols[:4]],
+        "order_moves": dist[c],
     }
 
 def sort_key(item):
     c, d = item
     return (list(CENTRE_NAME.values()).index(d["centres"]), GROUP_ORDER.index(d["group"]),
-            d["bad_edges"], d["optimal_moves"], c)
+            d["bad_edges"], d["order_moves"], c)
 
 out = []
 ids = {}
@@ -153,6 +149,13 @@ def mirror_state(s):
         j = INDEX[((-p[0], p[1], p[2]), (-n[0], n[1], n[2]))]
         o[j] = {"R": "L", "L": "R"}.get(s[i], s[i])
     return "".join(o)
+
+def angles(c):
+    a = [c]
+    for _ in range(3):
+        a.append(mv(a[-1], "U"))
+    return a
+
 QUARTER = {"U": 1, "U2": 2, "U'": 3}
 AUF_NAME = {1: "U", 2: "U2", 3: "U'"}
 
@@ -175,8 +178,33 @@ def run(s, alg):
 for c, d in cases.items():
     d["mirror_of"] = ids[canon(mirror_state(c))]
 by_id = {d["id"]: (c, d) for c, d in cases.items()}
+
+display = {}
+for d in out:
+    c = d["key"]
+    if c in display:
+        continue
+    a = angles(c)
+    best = min(range(4), key=lambda b: (dist[a[b]], b))
+    display[c] = a[best]
+    m_key, _ = by_id[d["mirror_of"]]
+    if m_key not in display:
+        reflected = mirror_state(a[best])
+        assert reflected in angles(m_key)
+        display[m_key] = reflected
+
 for c, d in cases.items():
-    target, _ = by_id[d["mirror_of"]]
+    disp = display[c]
+    slots, _, _ = describe(disp)
+    sols = sorted(all_optimal(disp), key=score)
+    d["angle"] = angles(c).index(disp)
+    d["slots"] = slots
+    d["optimal_moves"] = dist[disp]
+    d["n_optimal"] = len(sols)
+    d["algs"] = [" ".join(a) for a in sols[:4]]
+
+for c, d in cases.items():
+    target = display[by_id[d["mirror_of"]][0]]
     flipped = " ".join(mirror_alg(d["algs"][0].split())) if d["algs"][0] else ""
     for pre in ["", "U", "U2", "U'"]:
         cand = with_pre_auf(pre, flipped)
@@ -186,13 +214,16 @@ for c, d in cases.items():
     else:
         raise AssertionError(d["id"])
 
+for d in out:
+    d.pop("order_moves")
+
 os.makedirs("../data", exist_ok=True)
 meta = {
     "set": "EODFDB",
     "method": "ZBRoux / LLOB / FLSZ",
     "goal": "DF and DB solved, M-slice centres solved, all LL edges oriented. LL permutation and AUF free (finish with ZBLL).",
     "moves": "<M,U>, STM (M2 and U2 count as 1)",
-    "cases_are": "up to pre-AUF; diagram shows the orientation the alg starts from",
+    "cases_are": "up to pre-AUF; each case is shown from the angle with the shortest solution (angle = U turns from the key)",
     "generated_by": "cubing/tools/gen_eodfdb.py (BFS, all optimal solutions)",
     "orientation": "Yellow top, green front. 'flip' = U/D sticker of the edge is not on the U/D face.",
 }

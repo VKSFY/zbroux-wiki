@@ -6,7 +6,7 @@ const ORDER = ["UF", "UR", "UB", "UL", "DF", "DB"] as const;
 const data = cases.map((c) => {
   const up = ORDER.filter((n) => n[0] === "U" && c.slots[n].piece !== "LL");
   return {
-    i: c.id, k: c.key, c: c.u_centre, g: c.group, b: c.bad_edges, m: c.optimal_moves,
+    i: c.id, k: c.key, n: c.angle, c: c.u_centre, g: c.group, b: c.bad_edges, m: c.optimal_moves,
     a: c.algs, r: c.mirror_of,
     s: ORDER.map((n) => { const v = c.slots[n]; const ch = v.piece === "LL" ? "L" : v.piece === "DF" ? "F" : "B"; return v.flip ? ch.toLowerCase() : ch; }).join(""),
     t: up.length, u: up.filter((n) => !c.slots[n].flip).length,
@@ -16,7 +16,7 @@ const data = cases.map((c) => {
 <Base title="EODFDB: find your case" description="Find your ZBRoux EODFDB case: answer a few questions about your cube or paste your scramble. All 992 cases with the shortest M/U algorithms." crumbs={[{ href: "/methods/zbroux/", label: "ZBRoux" }, { href: "/methods/zbroux/eodfdb/", label: "EODFDB" }]}>
   <h1>EODFDB: find your case</h1>
   <p class="lede">You've built both blocks. Answer the questions below about what you see on your cube, and the list narrows down as you go. Or paste your scramble to go straight to your case.</p>
-  <p class="notation">Notation: <b>U</b> is the top layer and <b>M</b> the middle slice between your two blocks (turned like L). <b>DF</b> and <b>DB</b> are the bottom-front and bottom-back edges. Moves are counted in STM: every M, M2, U and U2 is one move.</p>
+  <p class="notation">Notation: <b>U</b> is the top layer and <b>M</b> the middle slice between your two blocks (turned like L). <b>DF</b> and <b>DB</b> are the bottom-front and bottom-back edges. Moves are counted in STM: every M, M', M2, U, U' and U2 is one move, and the turn of the top layer that lines a case up isn't counted.</p>
 
   <details class="paste">
     <summary>Paste a scramble instead</summary>
@@ -33,10 +33,10 @@ const data = cases.map((c) => {
     <h2>1. What colour is the centre on top?</h2>
     <p class="hint">There are four possibilities. If it isn't your top colour, your centres are turned, and these cases fix that too. Colours assume green in front; switch between yellow and white on top with "Top colour" at the top of the page.</p>
     <div class="choices">
-      <button type="button" data-v="U"><i style="background:var(--yel)"></i><span><span class="if-yellow">Yellow</span><span class="if-white">White</span> (your top colour)</span></button>
-      <button type="button" data-v="F"><i style="background:var(--grn)"></i>Green (your front colour)</button>
-      <button type="button" data-v="B"><i style="background:var(--blu)"></i>Blue (your back colour)</button>
-      <button type="button" data-v="D"><i style="background:var(--wht)"></i><span><span class="if-yellow">White</span><span class="if-white">Yellow</span> (your bottom colour)</span></button>
+      <button type="button" data-v="U"><i style="background:var(--yel)"></i><span><span data-colour="top">Yellow</span> (your top colour): centres aligned</span></button>
+      <button type="button" data-v="F"><i style="background:var(--grn)"></i>Green (your front colour): centres turned a quarter</button>
+      <button type="button" data-v="B"><i style="background:var(--blu)"></i>Blue (your back colour): centres turned a quarter</button>
+      <button type="button" data-v="D"><i style="background:var(--wht)"></i><span><span data-colour="bottom">White</span> (your bottom colour): centres upside down</span></button>
     </div>
   </section>
 
@@ -59,7 +59,7 @@ const data = cases.map((c) => {
 
   <section class="q" id="q4">
     <h2 id="q4h">3. How many edges are flipped?</h2>
-    <p class="hint">Count all six unsolved edges. An edge is flipped when its top or bottom colour faces sideways. The answer is always even.</p>
+    <p class="hint">Check all six unsolved edges: the four top-layer edges and the two bottom edges, wherever they are. Each of them has one sticker in your top or bottom colour. If that sticker faces up or down, the edge is fine; if it faces front, back, left or right, the edge is flipped. The count is always even.</p>
     <div class="choices" id="q4opts">
       <button type="button" data-v="0">0</button><button type="button" data-v="2">2</button><button type="button" data-v="4">4</button><button type="button" data-v="6">6</button>
     </div>
@@ -78,9 +78,9 @@ const data = cases.map((c) => {
 
 <script>
   import { lseSvg, type LseSlots } from "../../../lib/lse-diagram.ts";
-  import { findEodfdb } from "../../../lib/eodfdb-engine.ts";
+  import { findEodfdb, AUF } from "../../../lib/eodfdb-engine.ts";
 
-  type C = { i: string; k: string; c: string; g: string; b: number; m: number; a: string[]; r: string; s: string; t: number; u: number };
+  type C = { i: string; k: string; n: number; c: string; g: string; b: number; m: number; a: string[]; r: string; s: string; t: number; u: number };
   const DATA: C[] = JSON.parse(document.getElementById("eodfdb-data")!.textContent!);
   const byId = new Map(DATA.map((c) => [c.i, c]));
   const byKey = new Map(DATA.map((c) => [c.k, c]));
@@ -148,7 +148,8 @@ const data = cases.map((c) => {
     if (!r.ok) { $("pmsg").textContent = r.error ?? "Couldn't read that."; return; }
     const c = byKey.get(r.key!);
     if (!c) { $("pmsg").textContent = "That isn't an EODFDB position. Check the moves."; return; }
-    show(c.i, `Case ${c.i}, ${c.m} moves. ${r.preAuf ? `Do ${r.preAuf} first, then the algorithm.` : "No need to turn the top first."}`);
+    const pre = AUF[(r.turns! + c.n) % 4];
+    show(c.i, `Case ${c.i}, ${c.m} moves. ${pre ? `Do ${pre} first, then the algorithm.` : "No need to turn the top first."}`);
     history.replaceState(null, "", "#" + c.i);
   });
   window.addEventListener("hashchange", () => { const id = location.hash.slice(1); if (byId.has(id)) show(id); });

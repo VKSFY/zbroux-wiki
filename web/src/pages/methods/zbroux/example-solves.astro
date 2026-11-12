@@ -46,7 +46,7 @@ const solves = raw.solves.map((sv: any) => {
       </table>
 
       {sv.steps.filter((s: any) => s.caseData).map((s: any) => (
-        <p class="caselink"><LseDiagram c={s.caseData} size={56} /><span>The {s.step} case was <a href={s.caseHref}>{s.caseData.id}</a>, and the solution used is one of the shortest ({s.caseData.optimal_moves} moves).</span></p>
+        <p class="caselink"><LseDiagram c={s.caseData} size={56} /><span>The {s.step} case was <a href={s.caseHref}>{s.caseData.id}</a>. Its shortest solutions take {s.caseData.optimal_moves} moves once the top layer is lined up.</span></p>
       ))}
 
       <p><b>Full solution:</b> <span class="alg">{sv.full}</span></p>

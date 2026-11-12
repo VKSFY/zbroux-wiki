@@ -9,7 +9,7 @@
       "steps": [
         { "step": "First block", "moves": "U L B' L F D M B", "time": 3.0 },
         { "step": "Second block", "moves": "R U2 r U' r U' r2 U' R2 U' R", "time": 2.4 },
-        { "step": "EODFDB", "moves": "U M U M' U M2 U' M", "time": 1.7, "case": "pO7", "note": "Centres were off by M' after second block. This 8-mover is optimal: 6 optimal solutions exist for the case." },
+        { "step": "EODFDB", "moves": "U M U M' U M2 U' M", "time": 1.7, "case": "pO7", "note": "Centres were off by M' after second block. The first U lines the case up; after that, M U M' U M2 U' M is one of the two shortest solutions (7 moves)." },
         { "step": "ZBLL", "moves": "R' U2 R2 U R U R U' R' U' R2 U R U", "time": 2.1, "note": "Time includes recognition." }
       ],
       "time_is_estimate": true,

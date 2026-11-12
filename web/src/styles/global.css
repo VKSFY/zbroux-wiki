@@ -87,6 +87,3 @@ textarea:focus,input:focus,button:focus-visible,a:focus-visible{outline:2px soli
   .case-row{break-inside:avoid;padding:6px 2px}
 }
 
-.if-white{display:none}
-:root[data-top="white"] .if-white{display:inline}
-:root[data-top="white"] .if-yellow{display:none}

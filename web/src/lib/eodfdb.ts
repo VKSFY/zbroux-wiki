@@ -6,6 +6,7 @@ export type SlotName = "UF" | "UR" | "UB" | "UL" | "DF" | "DB";
 export interface EodfdbCase {
   id: string;
   key: string;
+  angle: number;
   slots: Record<SlotName, Slot>;
   centres: "solved" | "off-M" | "off-M'" | "off-M2";
   u_centre: string;

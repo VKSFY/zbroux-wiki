@@ -1,7 +1,7 @@
 import json
 from collections import Counter, deque
-from cube import STICKERS, SOLVED, MOVES
-from zbll_cases import all_states, canon
+from cube import STICKERS, SOLVED, MOVES, apply
+from zbll_cases import all_states, canon, relabel_u
 
 MU = ["U", "U'", "U2", "M", "M'", "M2"]
 
@@ -61,6 +61,35 @@ zbll = json.load(open("../data/zbll.json"))["cases"]
 weight = Counter(canon(s) for s in all_states())
 moves = {c["key"]: c["algs"][0]["moves"] for c in zbll}
 ll_states = sum(weight.values())
+by_key = {c["key"]: c for c in zbll}
+AUF = ["", "U", "U2", "U'"]
+pre_turns = post_turns = 0
+for st in all_states():
+    k = canon(st)
+    if k not in by_key:
+        if tuple(st) != tuple(SOLVED):
+            post_turns += 1
+        continue
+    c = by_key[k]
+    a, found = st, None
+    for p in range(4):
+        b = a
+        for _ in range(4):
+            if b == c["state"]:
+                found = p
+                break
+            b = relabel_u(b)
+        if found is not None:
+            break
+        a = mv(a, "U")
+    assert found is not None
+    end = apply(tuple(st), (AUF[found] + " " + c["algs"][0]["alg"]).strip())
+    q = next(i for i in range(4) if (apply(end, AUF[i]) if i else end) == tuple(SOLVED))
+    pre_turns += found != 0
+    post_turns += q != 0
+
+case_moves = [c["optimal_moves"] for c in cases]
+case_moves_aligned = [c["optimal_moves"] for c in cases if c["centres"] == "solved"]
 
 stats = {
     "eodfdb": {
@@ -71,6 +100,8 @@ stats = {
         "avg_stm": round(sum(eod.values()) / len(eod), 2),
         "avg_stm_aligned": round(sum(aligned.values()) / len(aligned), 2),
         "avg_htm_listed_aligned": round(sum(htm(a) for a in best) / len(best), 2),
+        "avg_per_case_free_auf": round(sum(case_moves) / len(case_moves), 2),
+        "avg_per_case_free_auf_aligned": round(sum(case_moves_aligned) / len(case_moves_aligned), 2),
         "distribution": dict(sorted(Counter(eod.values()).items())),
     },
     "lse": {
@@ -81,6 +112,8 @@ stats = {
     "zbll": {
         "ll_states": ll_states,
         "avg_moves_weighted": round(sum(weight[k] * moves.get(k, 0) for k in weight) / ll_states, 2),
+        "avg_pre_auf_turns": round(pre_turns / ll_states, 3),
+        "avg_post_auf_turns": round(post_turns / ll_states, 3),
     },
 }
 json.dump(stats, open("../data/stats.json", "w"), indent=1)

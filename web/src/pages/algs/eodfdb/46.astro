@@ -37,7 +37,7 @@ const groups = [
     <p>Keeping the two pure-insert cases gives 48 instead, so that exclusion is the only difference between 46 and 48. This is a reconstruction: it matches the number, but nobody has confirmed it's the set the wiki meant.</p>
 
     <h2>The list</h2>
-    <p>Each algorithm is a shortest solution in M and U, counted in STM (every M, M2, U and U2 is one move). Average {s.avg.toFixed(1)} moves. Where a case has a mirror, the mirror's algorithm is shown next to it. It's the same algorithm with U and U' swapped, plus a turn of the top layer where needed, because the mirror is shown from a different angle.</p>
+    <p>Each algorithm is a shortest solution in M and U, counted in STM (every M, M', M2, U, U' and U2 is one move). Average {s.avg.toFixed(1)} moves. Where a case has a mirror, the mirror's algorithm is shown next to it: it's the same algorithm with every U and U' swapped. Each case is shown from the angle where its shortest solution starts, so no algorithm begins with a turn of the top layer.</p>
   </article>
 
   {groups.map((g) => (

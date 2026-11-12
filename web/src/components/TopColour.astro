@@ -11,6 +11,10 @@ const { compact = false } = Astro.props;
   function sync() {
     const cur = document.documentElement.dataset.top === "white" ? "white" : "yellow";
     document.querySelectorAll<HTMLButtonElement>(".topc button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.top === cur)));
+    document.querySelectorAll<HTMLElement>("[data-colour]").forEach((el) => {
+      const top = el.dataset.colour === "top";
+      el.textContent = (cur === "white") === top ? "White" : "Yellow";
+    });
   }
   document.addEventListener("click", (e) => {
     const b = (e.target as HTMLElement).closest<HTMLButtonElement>(".topc button");

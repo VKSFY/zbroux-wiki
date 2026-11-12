@@ -2,7 +2,7 @@
 layout: ../../../layouts/Article.astro
 title: "Step 3: EODFDB"
 description: Orient all edges and insert DF and DB in ZBRoux. How the step works, how to do it intuitively, how many cases there are and where the numbers come from.
-lede: Orient every remaining edge and put the two bottom edges (DF and DB) in place at the same time, using only M and U. Solved as efficiently as possible it takes 8.3 moves on average. Afterwards only the last layer is left, with every edge already oriented.
+lede: Orient every remaining edge and put the two bottom edges (DF and DB) in place at the same time, using only M and U. Solved as efficiently as possible it takes about 8 moves. Afterwards only the last layer is left, with every edge already oriented.
 crumbs:
   - { href: "/methods/zbroux/", label: "ZBRoux" }
 ---
@@ -13,7 +13,7 @@ crumbs:
 
 - **U**: the top layer. **M**: the middle slice between the left and right blocks, turned in the same direction as L.
 - **DF** and **DB**: the bottom-front and bottom-back edges, the two bottom edges that are still unsolved after both blocks.
-- **Moves are counted in STM**: every M, M', M2, U, U' and U2 counts as one move. In HTM, where each slice turn counts as two, the same algorithms average about 12.8 moves.
+- **Moves are counted in STM**: every M, M', M2, U, U' and U2 counts as one move. A turn of the top layer to line a case up before its algorithm isn't counted. In HTM, where each slice turn counts as two, the listed algorithms average about 12.5 moves.
 
 ## What this step solves
 
@@ -39,7 +39,7 @@ Solving it this way usually takes a few moves more than the shortest solution. O
 - **[Find your case](/algs/eodfdb/)**: all 992 cases, each with the shortest possible M/U solutions, found by answering questions about your cube or by pasting a scramble.
 - **[The 46-case set](/algs/eodfdb/46/)**: a smaller set for solvers who always set the two bottom edges up on top first. See below for where the number 46 comes from.
 
-With aligned centres, most cases take 7–9 moves when solved optimally. The longest take 13.
+With aligned centres, most cases take 7 or 9 moves once the top layer is lined up, and the longest take 13. Each case is shown from the angle where its shortest solution starts, so no algorithm begins with a turn of the top layer.
 
 ## Where the numbers come from
 
@@ -51,7 +51,10 @@ After both blocks, the unsolved part of the cube is the six edges in the top lay
 
 That gives 30 × 32 × 4 = **3,840** positions. Two positions that only differ by a turn of the top layer are the same case, so the cases are counted with Burnside's lemma over the four top-layer turns. 3,840 positions stay the same under no turn, 32 under U, 64 under U2 and 32 under U'. That gives (3,840 + 32 + 64 + 32) / 4 = **992 cases**. With the centres aligned there are 960 positions, and (960 + 8 + 16 + 8) / 4 = **248 cases**.
 
-The average of 8.3 moves is over all 3,840 positions, each solved as efficiently as possible, so every position counts equally, not every case.
+There are two ways to quote an average, and they give different numbers:
+
+- **7.9 moves per case** (8.0 with aligned centres): each case solved from its best angle, with the turn that lines it up not counted, and every case counting equally. This is the number to compare algorithm lists by.
+- **8.3 moves per position**: each of the 3,840 positions solved as efficiently as possible, counting every U turn, including the one that lines the case up. Positions are weighted by how often they come up, so this is what a real solve costs on average, and it's the number used in the [comparison with Roux](/methods/zbroux/#is-it-worth-it-zbroux-against-roux).
 
 ### The 46
 

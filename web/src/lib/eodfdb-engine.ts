@@ -4,7 +4,9 @@ const nz = (p: number[]) => p.filter((c) => c !== 0).length;
 const U = MOVES["U"];
 const turnU = (s: string) => { let o = ""; for (let i = 0; i < 54; i++) o += s[U[i]]; return o; };
 
-export interface Lookup { ok: boolean; error?: string; key?: string; preAuf?: string }
+export interface Lookup { ok: boolean; error?: string; key?: string; turns?: number }
+
+export const AUF = ["", "U", "U2", "U'"];
 
 export function findEodfdb(scramble: string, blocks: string): Lookup {
   let s: string[];
@@ -26,5 +28,5 @@ export function findEodfdb(scramble: string, blocks: string): Lookup {
   }
   let cur = out.join(""), best = cur, k = 0;
   for (let i = 1; i < 4; i++) { cur = turnU(cur); if (cur < best) { best = cur; k = i; } }
-  return { ok: true, key: best, preAuf: ["", "U", "U2", "U'"][k] };
+  return { ok: true, key: best, turns: k };
 }
