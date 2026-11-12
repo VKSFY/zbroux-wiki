@@ -1,30 +1,48 @@
 ---
 layout: ../../../layouts/Article.astro
 title: "Start here: learning path"
-description: The order to learn ZBRoux in, from your first blocks to full ZBLL, with a two-look last layer along the way.
-lede: You don't need 493 algorithms to start. This order lets you do full solves with the method from the first day, and add algorithms as you go.
+description: The order to learn ZBRoux in, from your first blocks to full ZBLL, with algorithm counts for every stage.
+lede: You don't need 493 algorithms to start. This route lets you do full ZBRoux solves from day one and add algorithms in stages, with a working last layer at every stage.
 crumbs:
   - { href: "/methods/zbroux/", label: "ZBRoux" }
 ---
 
-## Stage 1: Blocks and an easy finish
+| Stage | What you learn | New algorithms | Total so far |
+|---|---|---|---|
+| 1 | Blocks, intuitive EODFDB, last layer with OCLL + PLL | 28 (7 OCLL, 21 PLL) | 28 |
+| 2 | Two-look last layer: COLL + edge PLL | 42 COLL (edge PLL is already part of PLL) | 70 |
+| 3 | Full ZBLL, one set at a time | up to 472 (ZBLL without the 21 PLLs) | up to 542 |
+| 4 | EODFDB algorithms (optional) | 46 for the 46-case set | up to 588 |
 
-- Learn the [first block](/methods/zbroux/first-block/) and [second block](/methods/zbroux/second-block/). If you already solve Roux, you can skip this.
-- Do [EODFDB](/methods/zbroux/eodfdb/) without algorithms: orient the edges first, then bring the two bottom edges to the top and insert them with M2.
-- Finish the last layer with what you already know, for example OLL and PLL. Since the edges are already oriented, you'll only get the 7 OLL cases that have all edges oriented (the "OCLL" cases).
+If you already know OLL and PLL from CFOP, stage 1 costs nothing new.
 
-## Stage 2: A two-look last layer
+## Stage 1: Blocks, intuitive EODFDB, a familiar last layer
 
-- Learn **COLL** (42 cases). It solves the corners while keeping the edges oriented.
-- Finish with the 4 **edge PLLs** (Ua, Ub, H and Z).
-- COLL then EPLL is a complete two-look last layer for ZBRoux. Each COLL algorithm also solves one ZBLL case, the one where the edges are already in place, so nothing you learn here is wasted.
+- Learn the [first block](/methods/zbroux/first-block/) and [second block](/methods/zbroux/second-block/). If you already solve Roux, skip this.
+- Do [EODFDB](/methods/zbroux/eodfdb/#doing-it-without-algorithms) without algorithms, in three steps: orient the edges, bring both bottom edges to the top, then M2.
+- Finish the last layer with OLL and PLL. Since EODFDB has already oriented the edges, the only OLL cases you'll see are the 7 with all edges oriented (OCLL), plus the 21 PLLs.
 
-## Stage 3: EODFDB algorithms
+## Stage 2: A two-look last layer that leads into ZBLL
 
-- Use the [EODFDB case finder](/algs/eodfdb/) to replace your slow intuitive solutions with shorter ones. Start with the cases you see most, and the ones where your own solution is much longer than the listed one.
+- Learn **COLL** (42 algorithms). It solves the corners while keeping the edges oriented.
+- Finish with an edge PLL: Ua, Ub, H or Z, which you already know from PLL.
+- Each COLL algorithm is also the ZBLL algorithm for one case, the one where the edges are already solved, so nothing here is wasted.
 
-## Stage 4: Full ZBLL
+## Stage 3: ZBLL, one set at a time
 
-- Learn ZBLL one shape at a time with the [ZBLL lists](/algs/zbll/). Many people start with T and U (72 cases each), then L, then Pi, H, Sune and Antisune.
-- Keep COLL and EPLL as a backup for cases you haven't learned yet.
-- Practise recognising the corners during EODFDB, so you know your ZBLL case before you get there.
+ZBLL is split by the shape the top colour makes on the corners. Each set replaces COLL and edge PLL whenever that shape comes up:
+
+| Set | Cases | Comes up in |
+|---|---|---|
+| T, U, L, Pi, Sune, Antisune | 72 each | 14.8% of solves each |
+| H | 40 | 7.4% of solves |
+| PLL | 21 | 3.7% of solves (you already know these) |
+
+Every set is worth almost exactly the same per algorithm learned, so choose by how comfortable you are recognising it. A natural start is Sune or Antisune, whose shapes are easy to spot, or H, the smallest set. Learn a set one corner group (12 cases) at a time, using the [ZBLL lists](/algs/zbll/), the [recognition guide](/methods/zbroux/zbll-recognition/) and the [trainer](/tools/trainer/). Use COLL and edge PLL as the backup for sets you haven't learned yet.
+
+## Stage 4: EODFDB algorithms
+
+- First merge steps 1 and 2 of intuitive EODFDB: orient the edges while already bringing the bottom edges up. That alone saves about one and a half moves on average.
+- Then learn the [46-case set](/algs/eodfdb/46/). It works the other way round: bring both bottom edges to the top first, opposite each other, and then one algorithm orients everything and inserts them. There's a [one-page cheat sheet](/algs/eodfdb/46-sheet/) to print.
+- For the shortest solutions to everything, use the [full EODFDB case finder](/algs/eodfdb/).
+- Practise reading your ZBLL case during EODFDB, so you know it before you get there.

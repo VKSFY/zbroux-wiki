@@ -21,6 +21,7 @@ export const SIDEBAR: NavSection[] = [
       { href: "/methods/zbroux/second-block/", label: "2. Second block" },
       { href: "/methods/zbroux/eodfdb/", label: "3. EODFDB" },
       { href: "/methods/zbroux/zbll/", label: "4. ZBLL" },
+      { href: "/methods/zbroux/zbll-recognition/", label: "ZBLL recognition" },
       { href: "/methods/zbroux/example-solves/", label: "Example solves" },
     ],
   },

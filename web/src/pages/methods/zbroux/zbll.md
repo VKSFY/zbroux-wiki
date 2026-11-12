@@ -19,6 +19,8 @@ Each shape is then split by how the corners are arranged (6 groups of 12 for mos
 
 ## Recognising a case
 
+The [ZBLL recognition guide](/methods/zbroux/zbll-recognition/) explains this in detail. In short:
+
 1. **Shape**: look at where the top colour is on the corners.
 2. **Corner pattern**: look at the side colours of the corners to find which group it is.
 3. **Edges**: within the group, look at the edges to pick the exact case.

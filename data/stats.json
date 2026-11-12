@@ -164,5 +164,35 @@
     "total": 17.59
    }
   }
+ },
+ "zbll_recognition": {
+  "front and right": {
+   "unique_share": 1.0,
+   "by_shape": {
+    "PLL": 1.0,
+    "T": 1.0,
+    "U": 1.0,
+    "L": 1.0,
+    "H": 1.0,
+    "Pi": 1.0,
+    "S": 1.0,
+    "AS": 1.0
+   },
+   "max_cases_sharing_a_view": 1
+  },
+  "left, front and right": {
+   "unique_share": 1.0,
+   "by_shape": {
+    "PLL": 1.0,
+    "T": 1.0,
+    "U": 1.0,
+    "L": 1.0,
+    "H": 1.0,
+    "Pi": 1.0,
+    "S": 1.0,
+    "AS": 1.0
+   },
+   "max_cases_sharing_a_view": 1
+  }
  }
 }
