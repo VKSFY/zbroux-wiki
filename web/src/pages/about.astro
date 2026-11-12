@@ -26,6 +26,30 @@ const REPO = "https://github.com/VKSFY/zbroux-wiki";
     <p>The mirror of an EODFDB case is its reflection through the middle slice, left to right. Reflecting a solution turns every U into U' and every U' into U, and leaves M, M' and M2 as they are. Each mirror pair is shown from reflected angles, so the mirror's algorithm is exactly the original with U and U' swapped. There are 992 cases, and one of them is already solved and needs no algorithm, so 991 mirror algorithms are stored. All 991 are checked by the second simulator.</p>
     <p>For LEOR's EOStripe, the table of move counts matches the one RedstoneTim published from a different solver (ksolve++) exactly.</p>
 
+    <h2 id="step-by-step-models">Step-by-step models</h2>
+    <p>The <a href="/methods/zbroux/#is-it-worth-it-zbroux-against-roux">Roux comparison</a> models the intuitive steps as they're usually taught. The code is <a href={`${REPO}/blob/main/tools/stepwise.py`}>stepwise.py</a>. Every position is equally likely, moves are M and U in STM, and the turn of the top layer is counted.</p>
+    <p><b>Roux LSE</b>, over all 184,320 positions reachable with M and U from solved (corners at any angle, centres in any of four positions):</p>
+    <ul>
+      <li><b>4a</b>: all six edges oriented (each edge's top-or-bottom-colour sticker faces up or down), and the top centre shows the top or bottom colour.</li>
+      <li><b>4b</b>: 4a, plus the UL and UR edges solved relative to the corners (after some turn of the top layer, the corners and both edges are in place).</li>
+      <li><b>4c</b>: solved, including the final turn of the top layer.</li>
+    </ul>
+    <p><b>EODFDB</b>, over all 3,840 positions after the second block (top-layer corners ignored):</p>
+    <ul>
+      <li><b>Step 1</b>: all six edges oriented, both bottom edges on top and opposite each other with their bottom colour facing up, and the top centre showing the bottom colour. That's 4 positions, one up to turns of the top layer.</li>
+      <li><b>Step 2</b>: line them up and do M2 (any shortest finish).</li>
+    </ul>
+    <p>Each step is solved with a shortest solution from wherever the previous step left off. When a step has several shortest solutions, the three rules choose differently: <i>lookahead</i> takes the one that makes the remaining steps cheapest; <i>no lookahead</i> treats every shortest move sequence for the step as equally likely; <i>worst choices</i> takes the most expensive. The per-step averages below are measured along the chain, so they add up to the total:</p>
+    <table>
+      <thead><tr><th>Rule</th><th>LSE: 4a + 4b + 4c</th><th>EODFDB: step 1 + step 2</th></tr></thead>
+      <tbody>
+        <tr><td>Lookahead</td><td>5.95 + 3.63 + 3.26 = 12.84</td><td>7.85 + 1.30 = 9.15</td></tr>
+        <tr><td>No lookahead</td><td>5.95 + 4.47 + 5.03 = 15.45</td><td>7.85 + 1.64 = 9.49</td></tr>
+        <tr><td>Worst choices</td><td>5.95 + 5.06 + 6.58 = 17.59</td><td>7.85 + 1.87 = 9.72</td></tr>
+      </tbody>
+    </table>
+    <p>Step 1 of each method always costs the same under every rule, because only the choice between equally short solutions differs, not their length. "No lookahead" counts move sequences, not end positions. Choosing uniformly between end positions instead gives slightly different numbers.</p>
+
     <h2 id="zbll">ZBLL</h2>
     <p><b>The ZBLL algorithms are unvetted.</b> They're correct, but no experienced ZBLL solver has chosen them yet, and the first algorithm for a case is often not the one most people use.</p>
     <p>They were found with a meet-in-the-middle search written for this wiki (<a href={`${REPO}/blob/main/tools/zbll_gen.mts`}>zbll_gen.mts</a>). It searches each of the move sets people use for speed (RU, RUD, RUF, RUL and RUr) separately, up to 16 moves, and keeps every solution it finds. Longer algorithms, or ones that mix more move types, aren't included. Each case lists up to four, ordered by this rule:</p>

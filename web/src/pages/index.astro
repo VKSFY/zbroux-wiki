@@ -44,7 +44,7 @@ const nEodfdb = cases.filter((c) => c.centres === "solved").length;
       </tbody>
     </table>
 
-    <p>Coming from Roux? ZBRoux takes a few more moves than Roux for the last ten pieces: about half a move more when the intuitive step is done step by step, about one and a half when it's solved optimally, and needs 451 more algorithms if you do EODFDB intuitively. What you get is a single drilled algorithm at the end instead of M and U turns, which is where any speed gain comes from. <a href="/methods/zbroux/#is-it-worth-it-zbroux-against-roux">See the numbers</a>.</p>
+    <p>Coming from Roux? Whether ZBRoux uses more or fewer moves for the last ten pieces depends on how you do LSE. Against well-solved LSE, ZBRoux takes about half a move to one and a half more. Against LSE done step by step (4a, 4b, 4c), it takes nearly two fewer. Either way it needs 451 more algorithms if you do EODFDB intuitively. <a href="/methods/zbroux/#is-it-worth-it-zbroux-against-roux">See the numbers</a>.</p>
 
     <h2>Other methods</h2>
     <p><a href="/methods/leor/">LEOR</a> starts with the same left block, then does EOStripe and a right block, and also finishes with ZBLL. Its hardest step, EOStripe, has a <a href="/tools/eostripe-solver/">solver</a> and case lists here.</p>

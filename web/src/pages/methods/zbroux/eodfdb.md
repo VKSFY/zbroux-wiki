@@ -32,7 +32,7 @@ You don't need any algorithms to start. The step works like Roux's EOLR, except 
 1. **Orient the edges** with M and U moves, the same way as in Roux, using the arrow, 2-flip and 4-flip patterns. While doing that, aim to finish with both bottom edges on top, opposite each other, with their bottom colour facing up.
 2. **Insert them.** Turn the top so the DF edge is at the back (UB) and the DB edge is at the front (UF), then do M2. That M2 also turns the centres half a turn, so before it the centres must be upside down: your bottom colour on top. Set that up during step 1.
 
-Even done perfectly, this two-step way takes 9.15 moves on average, against 8.31 for the shortest solution. Once it's comfortable, use the case lists below to learn shorter solutions for the cases you see most.
+The target of step 1 is a single position, up to turns of the top layer. Even with each step solved as efficiently as possible, this two-step way takes 9.49 moves on average (9.15 if you choose step 1's solution with step 2 in mind), against 8.31 for the shortest solution. Once it's comfortable, use the case lists below to learn shorter solutions for the cases you see most.
 
 ## Case lists
 
