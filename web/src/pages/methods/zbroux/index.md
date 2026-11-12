@@ -54,7 +54,7 @@ How the algorithm lists compare with human ones differs per set. For CMLL the se
 [^eod]: The exact average of the shortest solution over all 3,840 EODFDB positions, counting every U turn. If you pick, among the shortest EODFDB solutions, one that leaves the top layer at the angle your ZBLL algorithm starts from, EODFDB plus the turn before ZBLL drops from 9.06 to 8.84 moves on average, but only if you already know your ZBLL case before EODFDB ends.
 [^steps]: Each step is solved with a shortest solution from wherever the previous step left off. *Looking ahead* picks, among a step's shortest solutions, the one that makes the rest cheapest. *No lookahead* makes every shortest move sequence for the step equally likely. *Worst choices* picks the one that makes the rest most expensive. LSE is averaged over all positions with the corners at any angle; starting with the corners lined up, as after CMLL, changes nothing (12.83, 15.42, 17.59). The exact step definitions and per-step averages are on the [how the algorithms are made](/about/#step-by-step-models) page.
 
-**Algorithms to learn.** Roux needs the 42 CMLL algorithms. ZBRoux needs the 493 ZBLL algorithms:
+**Algorithms to learn**, counted as the algorithms in your final set. Roux needs the 42 CMLL algorithms. ZBRoux needs the 493 ZBLL algorithms:
 
 | EODFDB done | Algorithms in total | More than Roux |
 |---|---|---|

@@ -26,8 +26,8 @@ const groups = [
     <button class="btn primary" type="button" onclick="window.print()">Print</button>
   </header>
   <main>
-    <h1>EODFDB: the 46-case set</h1>
-    <p class="sub">Both bottom edges on top and opposite. Moves in STM. For a mirror case, use the second line (U and U' swapped). From {SITE_NAME}.</p>
+    <h1>EODFDB: the 46-case set (62 cases, 46 algorithms)</h1>
+    <p class="sub">Both bottom edges on top and opposite. Moves in STM. Each box is one algorithm. Where a box has a second line, that's the mirror case, under its own ID, with the same algorithm with U and U' swapped. From {SITE_NAME}.</p>
     {groups.map((g) => (
       <section>
         <h2>{g.title}</h2>

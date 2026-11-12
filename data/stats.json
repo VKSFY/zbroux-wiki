@@ -166,22 +166,40 @@
   }
  },
  "zbll_recognition": {
-  "front and right": {
-   "unique_share": 1.0,
+  "top only": {
+   "distinct_views": 64,
+   "unique_share": 0.0,
+   "max_cases_sharing_a_view": 48,
    "by_shape": {
-    "PLL": 1.0,
-    "T": 1.0,
-    "U": 1.0,
-    "L": 1.0,
-    "H": 1.0,
-    "Pi": 1.0,
-    "S": 1.0,
-    "AS": 1.0
-   },
-   "max_cases_sharing_a_view": 1
+    "PLL": 0.0,
+    "T": 0.0,
+    "U": 0.0,
+    "L": 0.0,
+    "H": 0.0,
+    "Pi": 0.0,
+    "S": 0.0,
+    "AS": 0.0
+   }
   },
-  "left, front and right": {
+  "top and front": {
+   "distinct_views": 588,
+   "unique_share": 0.0,
+   "max_cases_sharing_a_view": 6,
+   "by_shape": {
+    "PLL": 0.0,
+    "T": 0.0,
+    "U": 0.0,
+    "L": 0.0,
+    "H": 0.0,
+    "Pi": 0.0,
+    "S": 0.0,
+    "AS": 0.0
+   }
+  },
+  "top, front and right": {
+   "distinct_views": 1943,
    "unique_share": 1.0,
+   "max_cases_sharing_a_view": 1,
    "by_shape": {
     "PLL": 1.0,
     "T": 1.0,
@@ -191,8 +209,67 @@
     "Pi": 1.0,
     "S": 1.0,
     "AS": 1.0
-   },
-   "max_cases_sharing_a_view": 1
+   }
+  },
+  "scheme: relations within each side": {
+   "distinct_views": 549,
+   "unique_share": 0.0832,
+   "max_cases_sharing_a_view": 36,
+   "by_shape": {
+    "PLL": 0.6667,
+    "T": 0.0556,
+    "U": 0.1806,
+    "L": 0.0833,
+    "H": 0.0,
+    "Pi": 0.0556,
+    "S": 0.0,
+    "AS": 0.0
+   }
+  },
+  "scheme: plus where the top colour sits": {
+   "distinct_views": 588,
+   "unique_share": 0.0933,
+   "max_cases_sharing_a_view": 36,
+   "by_shape": {
+    "PLL": 0.6667,
+    "T": 0.0556,
+    "U": 0.25,
+    "L": 0.0833,
+    "H": 0.0,
+    "Pi": 0.0556,
+    "S": 0.0,
+    "AS": 0.0
+   }
+  },
+  "scheme: plus which neighbouring colour": {
+   "distinct_views": 947,
+   "unique_share": 0.2495,
+   "max_cases_sharing_a_view": 18,
+   "by_shape": {
+    "PLL": 1.0,
+    "T": 0.1667,
+    "U": 0.5,
+    "L": 0.4167,
+    "H": 0.0,
+    "Pi": 0.1667,
+    "S": 0.0833,
+    "AS": 0.0833
+   }
+  },
+  "scheme: plus comparing front with right": {
+   "distinct_views": 1331,
+   "unique_share": 0.4483,
+   "max_cases_sharing_a_view": 6,
+   "by_shape": {
+    "PLL": 1.0,
+    "T": 0.5,
+    "U": 0.5,
+    "L": 0.75,
+    "H": 0.05,
+    "Pi": 0.5,
+    "S": 0.25,
+    "AS": 0.25
+   }
   }
  }
 }
