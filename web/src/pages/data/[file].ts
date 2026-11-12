@@ -55,6 +55,8 @@ export const MANIFEST = {
   files: Object.keys(FILES).sort(),
   moves: "STM; the turn of the top layer before an algorithm is not counted",
   source: "https://github.com/VKSFY/zbroux-wiki",
+  license: "CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)",
+  credit: "Algorithm data from the ZBRoux Wiki (https://github.com/VKSFY/zbroux-wiki), CC BY 4.0",
 };
 
 export function getStaticPaths() {

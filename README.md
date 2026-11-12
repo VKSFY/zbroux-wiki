@@ -65,3 +65,7 @@ npm run build    # static output in web/dist
 - `src/pages/methods/zbroux/*.md`: ZBRoux guide pages (plain Markdown, easy to edit)
 - `src/pages/algs/eodfdb/[...variant].astro`: EODFDB sheet (one page per centre state, print = PDF)
 - `src/lib/site.ts`: site name (working title "AlgBase") and nav
+
+## License
+
+Code: MIT (see `LICENSE`). Algorithm data in `data/`: CC BY 4.0 (see `data/LICENSE`).
