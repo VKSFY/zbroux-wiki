@@ -3,7 +3,7 @@
   "set": "CMLL",
   "cases": 42,
   "corner_states": 648,
-  "note": "Edges and middle centres are ignored. Same search and ranking as ZBLL."
+  "note": "Edges and middle centers are ignored. Same search and ranking as ZBLL."
  },
  "cases": [
   {

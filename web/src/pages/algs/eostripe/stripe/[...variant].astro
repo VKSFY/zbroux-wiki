@@ -8,23 +8,23 @@ export function getStaticPaths() {
   return STRIPE_VARIANTS.map((v) => ({ params: { variant: v.slug }, props: { variant: v } }));
 }
 const TOP: Record<string, { label: string; col: string }> = {
-  solved: { label: "your top colour", col: "yel" }, "off-M": { label: "green", col: "grn" },
-  "off-M'": { label: "blue", col: "blu" }, "off-M2": { label: "your bottom colour", col: "wht" },
+  solved: { label: "your top color", col: "yel" }, "off-M": { label: "green", col: "grn" },
+  "off-M'": { label: "blue", col: "blu" }, "off-M2": { label: "your bottom color", col: "wht" },
 };
 const { variant } = Astro.props;
-const list = stripeCases.filter((c) => c.centres === variant.centres);
+const list = stripeCases.filter((c) => c.centers === variant.centers);
 const s = stats(list);
 const base = "/algs/eostripe/stripe/";
 ---
-<Base title="EOStripe: placing DF and DB" description={`LEOR EOStripe cases where all edges are oriented and DF, DB and the centres are left. ${s.n} cases with the top centre showing ${TOP[variant.centres].label}.`} crumbs={[{ href: "/methods/leor/", label: "LEOR" }, { href: "/methods/leor/eostripe/", label: "EOStripe" }]}>
+<Base title="EOStripe: placing DF and DB" description={`LEOR EOStripe cases where all edges are oriented and DF, DB and the centers are left. ${s.n} cases with the top center showing ${TOP[variant.centers].label}.`} crumbs={[{ href: "/methods/leor/", label: "LEOR" }, { href: "/methods/leor/eostripe/", label: "EOStripe" }]}>
   <h1>EOStripe: placing DF and DB</h1>
-  <p class="lede">Every edge is already oriented. What's left is putting the two bottom edges (DF and DB) in place and aligning the centres. Every solution keeps the edges oriented and is the shortest possible in R, r, M and U.</p>
+  <p class="lede">Every edge is already oriented. What's left is putting the two bottom edges (DF and DB) in place and aligning the centers. Every solution keeps the edges oriented and is the shortest possible in R, r, M and U.</p>
   <div class="no-print">
-    <p class="pick">Which colour is on your top centre?</p>
+    <p class="pick">Which color is on your top center?</p>
     <div class="choices">
       {STRIPE_VARIANTS.map((v) => (
-        <a class="choice" href={v.slug ? `${base}${v.slug}/` : base} aria-pressed={v.centres === variant.centres ? "true" : "false"}>
-          <i style={`background:var(--${TOP[v.centres].col})`}></i>{TOP[v.centres].label[0].toUpperCase() + TOP[v.centres].label.slice(1)}
+        <a class="choice" href={v.slug ? `${base}${v.slug}/` : base} aria-pressed={v.centers === variant.centers ? "true" : "false"}>
+          <i style={`background:var(--${TOP[v.centers].col})`}></i>{TOP[v.centers].label[0].toUpperCase() + TOP[v.centers].label.slice(1)}
         </a>
       ))}
     </div>

@@ -31,7 +31,7 @@ def feats(s):
     return stripe
 U_C = INDEX[((0,1,0),(0,1,0))]
 cent = collections.Counter(s[U_C] for s in dist)
-print("centre states:", cent)
+print("center states:", cent)
 
 print("---- subsets ----")
 from cube import SOLVED
@@ -47,9 +47,9 @@ def eo_done(s):
     for i,(p,n) in enumerate(STICKERS):
         if nz(p)==2 and s[i]=="o" and n!=ref_face(p): return False
     return True
-for name, pred in [("EO left, stripe+centres done", lambda s: stripe_done(s) and not eo_done(s)),
+for name, pred in [("EO left, stripe+centers done", lambda s: stripe_done(s) and not eo_done(s)),
                    ("stripe left, EO done", lambda s: eo_done(s) and not stripe_done(s)),
-                   ("stripe left, EO done, centres solved", lambda s: eo_done(s) and not stripe_done(s) and s[INDEX[((0,1,0),(0,1,0))]]=="U")]:
+                   ("stripe left, EO done, centers solved", lambda s: eo_done(s) and not stripe_done(s) and s[INDEX[((0,1,0),(0,1,0))]]=="U")]:
     st = [s for s in dist if pred(s)]
     cls = {orbit_id[s] for s in st}
     ds = [dist[s] for s in st]

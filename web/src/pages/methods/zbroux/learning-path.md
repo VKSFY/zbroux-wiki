@@ -32,7 +32,7 @@ If you already know OLL and PLL from CFOP, stage 1 costs nothing new.
 
 ## Stage 3: ZBLL, one set at a time
 
-ZBLL is split by the shape the top colour makes on the corners. Each set replaces COLL and edge PLL whenever that shape comes up. "Share of solves" is how often a random last layer lands in that set (4/27 for each 72-case set, 2/27 for H, 1/27 for PLL), which isn't the same as its share of the 493 cases:
+ZBLL is split by the shape the top color makes on the corners. Each set replaces COLL and edge PLL whenever that shape comes up. "Share of solves" is how often a random last layer lands in that set (4/27 for each 72-case set, 2/27 for H, 1/27 for PLL), which isn't the same as its share of the 493 cases:
 
 | Set | Cases | Share of solves |
 |---|---|---|
@@ -40,11 +40,11 @@ ZBLL is split by the shape the top colour makes on the corners. Each set replace
 | H | 40 | 7.4% |
 | PLL | 21 | 3.7% (you already know these) |
 
-The six 72-case sets are worth exactly the same per algorithm learned. H and PLL are worth about 10% and 15% less per algorithm, but they're smaller. So choose by how comfortable you are recognising a set. A natural start is Sune or Antisune, whose shapes are easy to spot, or H, the smallest set. Learn a set one corner group at a time (12 cases in most groups, 8 in two of the H groups), using the [ZBLL lists](/algs/zbll/), the [recognition guide](/methods/zbroux/zbll-recognition/) and the [trainer](/tools/trainer/). Use COLL and edge PLL as the backup for sets you haven't learned yet.
+The six 72-case sets are worth exactly the same per algorithm learned. H and PLL are worth about 10% and 15% less per algorithm, but they're smaller. So choose by how comfortable you are recognizing a set. A natural start is Sune or Antisune, whose shapes are easy to spot, or H, the smallest set. Learn a set one corner group at a time (12 cases in most groups, 8 in two of the H groups), using the [ZBLL lists](/algs/zbll/), the [recognition guide](/methods/zbroux/zbll-recognition/) and the [trainer](/tools/trainer/). Use COLL and edge PLL as the backup for sets you haven't learned yet.
 
 ## Stage 4: EODFDB algorithms
 
 - First merge steps 1 and 2 of intuitive EODFDB: orient the edges while already bringing the bottom edges up. That alone saves about one and a half moves on average.
 - Then learn the [46-case set](/algs/eodfdb/46/). It works the other way round: bring both bottom edges to the top first, opposite each other, and then one algorithm orients everything and inserts them. There's a [one-page cheat sheet](/algs/eodfdb/46-sheet/) to print.
 - For the shortest solutions to everything, use the [full EODFDB case finder](/algs/eodfdb/).
-- Practise reading your ZBLL case during EODFDB, so you know it before you get there.
+- Practice reading your ZBLL case during EODFDB, so you know it before you get there.

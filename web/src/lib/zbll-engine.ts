@@ -1,4 +1,4 @@
-import { STICKERS, SOLVED, MOVES, apply, parse, normalizeByCentres } from "./cube.ts";
+import { STICKERS, SOLVED, MOVES, apply, parse, normalizeByCenters } from "./cube.ts";
 
 const U = MOVES["U"];
 const turnU = (s: string) => { let o = ""; for (let i = 0; i < 54; i++) o += s[U[i]]; return o; };
@@ -48,7 +48,7 @@ export function findZbll(scramble: string, moves: string): ZbllLookup {
   let s: string[];
   try { s = apply(SOLVED, parse(scramble).concat(parse(moves))); }
   catch (e) { return { ok: false, error: (e as Error).message }; }
-  s = normalizeByCentres(s);
+  s = normalizeByCenters(s);
   const f2l = STICKERS.every((st, i) => st.p[1] === 1 || s[i] === SOLVED[i]);
   if (!f2l) return { ok: false, error: "The first two layers aren't solved after these moves. ZBLL starts once everything except the top layer is done." };
   const eo = STICKERS.every((st, i) => !(st.p[1] === 1 && st.n[1] === 1 && st.p.filter((c) => c !== 0).length === 2) || s[i] === "U");

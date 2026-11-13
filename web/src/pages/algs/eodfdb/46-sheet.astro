@@ -6,8 +6,8 @@ import "../../../styles/global.css";
 
 const { list } = set46();
 const groups = [
-  { title: "Top centre: your top colour", items: list.filter((c) => c.centres === "solved") },
-  { title: "Top centre: your bottom colour", items: list.filter((c) => c.centres === "off-M2") },
+  { title: "Top center: your top color", items: list.filter((c) => c.centers === "solved") },
+  { title: "Top center: your bottom color", items: list.filter((c) => c.centers === "off-M2") },
 ];
 ---
 <!doctype html>
@@ -18,7 +18,7 @@ const groups = [
   <title>EODFDB 46-case cheat sheet · {SITE_NAME}</title>
   <meta name="description" content="One printable page with all 46 EODFDB cases and algorithms." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <script is:inline>try{if(localStorage.getItem("topColour")==="white")document.documentElement.dataset.top="white"}catch(e){}</script>
+  <script is:inline>try{if(localStorage.getItem("topColor")==="white")document.documentElement.dataset.top="white"}catch(e){}</script>
 </head>
 <body>
   <header class="no-print">
@@ -34,7 +34,7 @@ const groups = [
         <div class="grid">
           {g.items.map((c) => (
             <div class="cell">
-              <Fragment set:html={lseSvg(c.slots as any, c.u_centre, 44, c.id)} />
+              <Fragment set:html={lseSvg(c.slots as any, c.u_center, 44, c.id)} />
               <div class="txt">
                 <b>{c.id}</b>
                 <span class="alg">{c.algs[0]}</span>

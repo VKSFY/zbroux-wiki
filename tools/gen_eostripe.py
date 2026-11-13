@@ -70,16 +70,16 @@ def build(pred, prefix):
         slots, u, f = describe(c)
         sols = sorted(all_optimal(c), key=score)
         stripe_pieces = [n for n, v in slots.items() if v["piece"] in ("DF", "DB")]
-        out.append({"slots": slots, "u_centre": u, "f_centre": f, "centres": CNAME[u],
+        out.append({"slots": slots, "u_center": u, "f_center": f, "centers": CNAME[u],
                     "bad_edges": sum(v["flip"] for v in slots.values()),
                     "stripe_in": sorted(stripe_pieces),
                     "optimal_moves": dist[c], "n_optimal": len(sols),
                     "algs": [" ".join(a) for a in sols[:4]]})
     order = list(CNAME.values())
-    out.sort(key=lambda d: (order.index(d["centres"]), d["bad_edges"], d["optimal_moves"], json.dumps(d["slots"], sort_keys=True)))
+    out.sort(key=lambda d: (order.index(d["centers"]), d["bad_edges"], d["optimal_moves"], json.dumps(d["slots"], sort_keys=True)))
     cnt = collections.Counter()
     for d in out:
-        k = prefix + {"solved": "", "off-M": "m", "off-M'": "p", "off-M2": "h"}[d["centres"]]
+        k = prefix + {"solved": "", "off-M": "m", "off-M'": "p", "off-M2": "h"}[d["centers"]]
         cnt[k] += 1; d["id"] = f"{k}{cnt[k]}"
     return out
 
@@ -90,7 +90,7 @@ depth = collections.Counter(dist.values())
 data = {
   "meta": {
     "set": "EOStripe", "method": "LEOR",
-    "goal": "After the left block: DF, DB and M-slice centres solved, all remaining edges oriented (ZZ / F-B axis EO). Corners ignored.",
+    "goal": "After the left block: DF, DB and M-slice centers solved, all remaining edges oriented (ZZ / F-B axis EO). Corners ignored.",
     "moves": "<R, r, M, U>, STM", "orientation": "Yellow top, green front, left block on L.",
     "cross_check": "Depth table matches RedstoneTim's ksolve++ table on redstonetim.github.io/cubing/leor_method.html exactly.",
     "generated_by": "cubing/tools/gen_eostripe.py",
@@ -101,6 +101,6 @@ data = {
 }
 json.dump(data, open("../data/eostripe.json", "w"), indent=1)
 for k, v in data["sets"].items():
-    c = collections.Counter(d["centres"] for d in v)
+    c = collections.Counter(d["centers"] for d in v)
     print(k, len(v), dict(c), "avg", round(sum(d["optimal_moves"] for d in v) / len(v), 2))
     for d in v[:3]: print("  ", d["id"], d["optimal_moves"], d["algs"][:2])

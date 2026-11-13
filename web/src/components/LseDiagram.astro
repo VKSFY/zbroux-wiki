@@ -4,4 +4,4 @@ import { lseSvg } from "../lib/lse-diagram.ts";
 interface Props { c: EodfdbCase; size?: number }
 const { c, size = 96 } = Astro.props;
 ---
-<Fragment set:html={lseSvg(c.slots as any, c.u_centre, size, `Case ${c.id}`)} />
+<Fragment set:html={lseSvg(c.slots as any, c.u_center, size, `Case ${c.id}`)} />

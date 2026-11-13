@@ -50,7 +50,7 @@ function buildState(c) {
     s[p] = flip ? b : a;
     s[q] = flip ? a : b;
   }
-  s[4] = c.u_centre; s[22] = c.f_centre; s[31] = OPP[c.u_centre]; s[49] = OPP[c.f_centre];
+  s[4] = c.u_center; s[22] = c.f_center; s[31] = OPP[c.u_center]; s[49] = OPP[c.f_center];
   return s;
 }
 

@@ -2,8 +2,8 @@
 interface Props { compact?: boolean }
 const { compact = false } = Astro.props;
 ---
-<div class:list={["topc", { compact }]} role="group" aria-label="Top colour used in diagrams">
-  <span class="lbl">{compact ? "Top colour" : "Diagrams show"}</span>
+<div class:list={["topc", { compact }]} role="group" aria-label="Top color used in diagrams">
+  <span class="lbl">{compact ? "Top color" : "Diagrams show"}</span>
   <button type="button" data-top="yellow" title="Yellow on top"><i style="background:#fcd535"></i>{!compact && "Yellow top"}</button>
   <button type="button" data-top="white" title="White on top"><i style="background:#ffffff"></i>{!compact && "White top"}</button>
 </div>
@@ -11,8 +11,8 @@ const { compact = false } = Astro.props;
   function sync() {
     const cur = document.documentElement.dataset.top === "white" ? "white" : "yellow";
     document.querySelectorAll<HTMLButtonElement>(".topc button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.top === cur)));
-    document.querySelectorAll<HTMLElement>("[data-colour]").forEach((el) => {
-      const top = el.dataset.colour === "top";
+    document.querySelectorAll<HTMLElement>("[data-color]").forEach((el) => {
+      const top = el.dataset.color === "top";
       el.textContent = (cur === "white") === top ? "White" : "Yellow";
     });
   }
@@ -21,7 +21,7 @@ const { compact = false } = Astro.props;
     if (!b) return;
     const v = b.dataset.top === "white" ? "white" : "yellow";
     document.documentElement.dataset.top = v;
-    try { localStorage.setItem("topColour", v); } catch {}
+    try { localStorage.setItem("topColor", v); } catch {}
     sync();
   });
   sync();

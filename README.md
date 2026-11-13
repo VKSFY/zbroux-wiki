@@ -7,7 +7,7 @@ The site is built from `web/` (`npm run build`, output in `web/dist`).
 Goal: complete, verified algorithm sets for under-documented speedsolving methods.
 
 ## EODFDB (ZBRoux / LLOB / FLSZ)
-- `data/eodfdb.json`: all 992 cases (248 with centres solved), with up to 4 optimal `<M,U>` solutions each.
+- `data/eodfdb.json`: all 992 cases (248 with centers solved), with up to 4 optimal `<M,U>` solutions each.
 
 Regenerate and verify:
 ```
@@ -63,7 +63,7 @@ npm run dev      # http://localhost:4321
 npm run build    # static output in web/dist
 ```
 - `src/pages/methods/zbroux/*.md`: ZBRoux guide pages (plain Markdown, easy to edit)
-- `src/pages/algs/eodfdb/[...variant].astro`: EODFDB sheet (one page per centre state, print = PDF)
+- `src/pages/algs/eodfdb/[...variant].astro`: EODFDB sheet (one page per center state, print = PDF)
 - `src/lib/site.ts`: site name (working title "AlgBase") and nav
 
 ## License

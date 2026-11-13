@@ -75,13 +75,13 @@ def report(name, pred):
     print(f"{name:55s} states={len(states):5d} cases(modAUF)={len(cases):4d} +mirror={len(mir):4d}")
 
 report("all", lambda s: True)
-report("centres solved", centers_ok)
-report("centres U/D (off by M2 allowed)", centers_ud)
-report("centres solved, DF&DB both in U layer", lambda s: centers_ok(s) and all(p[1] == 1 for p in dfdb_positions(s)))
-report("centres solved, DF&DB both in U, EO not solved", lambda s: centers_ok(s) and all(p[1]==1 for p in dfdb_positions(s)) and bad_edges(s) > 0)
-report("centres solved, DF&DB not already solved", lambda s: centers_ok(s) and dfdb_positions(s) and True)
+report("centers solved", centers_ok)
+report("centers U/D (off by M2 allowed)", centers_ud)
+report("centers solved, DF&DB both in U layer", lambda s: centers_ok(s) and all(p[1] == 1 for p in dfdb_positions(s)))
+report("centers solved, DF&DB both in U, EO not solved", lambda s: centers_ok(s) and all(p[1]==1 for p in dfdb_positions(s)) and bad_edges(s) > 0)
+report("centers solved, DF&DB not already solved", lambda s: centers_ok(s) and dfdb_positions(s) and True)
 for b in (0, 2, 4, 6):
-    report(f"centres solved, {b} bad edges", lambda s, b=b: centers_ok(s) and bad_edges(s) == b)
+    report(f"centers solved, {b} bad edges", lambda s, b=b: centers_ok(s) and bad_edges(s) == b)
 
 print("---- with y2 symmetry ----")
 from cube import MOVES as MV
@@ -115,23 +115,23 @@ def opp(s):
     ps = dfdb_positions(s)
     return inU(s) and ps[0][0] == -ps[1][0] and ps[0][2] == -ps[1][2]
 rep2("all", lambda s: True)
-rep2("centres solved", centers_ok)
-rep2("centres solved, DF&DB in U", lambda s: centers_ok(s) and inU(s))
-rep2("centres solved, DF&DB in U, opposite", lambda s: centers_ok(s) and opp(s))
-rep2("centres solved, DF&DB in U, adjacent", lambda s: centers_ok(s) and inU(s) and not opp(s))
-rep2("centres U/D, DF&DB in U", lambda s: centers_ud(s) and inU(s))
-report("centres solved, DF&DB in U, opposite", lambda s: centers_ok(s) and opp(s))
-report("centres solved, DF&DB in U, adjacent", lambda s: centers_ok(s) and inU(s) and not opp(s))
-report("centres U/D, DF&DB in U", lambda s: centers_ud(s) and inU(s))
-report("centres any, DF&DB in U", lambda s: inU(s))
+rep2("centers solved", centers_ok)
+rep2("centers solved, DF&DB in U", lambda s: centers_ok(s) and inU(s))
+rep2("centers solved, DF&DB in U, opposite", lambda s: centers_ok(s) and opp(s))
+rep2("centers solved, DF&DB in U, adjacent", lambda s: centers_ok(s) and inU(s) and not opp(s))
+rep2("centers U/D, DF&DB in U", lambda s: centers_ud(s) and inU(s))
+report("centers solved, DF&DB in U, opposite", lambda s: centers_ok(s) and opp(s))
+report("centers solved, DF&DB in U, adjacent", lambda s: centers_ok(s) and inU(s) and not opp(s))
+report("centers U/D, DF&DB in U", lambda s: centers_ud(s) and inU(s))
+report("centers any, DF&DB in U", lambda s: inU(s))
 print("---- more ----")
 def eo_bad(s): return bad_edges(s) > 0
 for nm, pr in [
-  ("centres solved, in U, EO unsolved", lambda s: centers_ok(s) and inU(s) and eo_bad(s)),
-  ("centres solved, in U, opposite, EO unsolved", lambda s: centers_ok(s) and opp(s) and eo_bad(s)),
-  ("centres solved, in U, adjacent, EO unsolved", lambda s: centers_ok(s) and inU(s) and not opp(s) and eo_bad(s)),
-  ("centres solved, not in U (>=1 in D/M), ", lambda s: centers_ok(s) and not inU(s)),
-  ("centres solved, exactly one in U", lambda s: centers_ok(s) and sum(p[1]==1 for p in dfdb_positions(s))==1),
+  ("centers solved, in U, EO unsolved", lambda s: centers_ok(s) and inU(s) and eo_bad(s)),
+  ("centers solved, in U, opposite, EO unsolved", lambda s: centers_ok(s) and opp(s) and eo_bad(s)),
+  ("centers solved, in U, adjacent, EO unsolved", lambda s: centers_ok(s) and inU(s) and not opp(s) and eo_bad(s)),
+  ("centers solved, not in U (>=1 in D/M), ", lambda s: centers_ok(s) and not inU(s)),
+  ("centers solved, exactly one in U", lambda s: centers_ok(s) and sum(p[1]==1 for p in dfdb_positions(s))==1),
 ]:
     st = [s for s in dist if pr(s)]
     cases = {canon(s) for s in st}

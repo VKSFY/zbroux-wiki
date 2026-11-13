@@ -68,8 +68,8 @@ masked = "".join(
     for (p, n), col in zip(STICKERS, SOLVED)
 )
 eod = bfs(masked, MU)
-top_centre = next(i for i, (p, n) in enumerate(STICKERS) if p == (0, 1, 0))
-aligned = {s: d for s, d in eod.items() if s[top_centre] == "U"}
+top_center = next(i for i, (p, n) in enumerate(STICKERS) if p == (0, 1, 0))
+aligned = {s: d for s, d in eod.items() if s[top_center] == "U"}
 lse = bfs(solved, MU)
 ll_corners = [i for i, (p, n) in enumerate(STICKERS) if p[1] == 1 and nz(p) == 3]
 lse_aligned = [d for x, d in lse.items() if all(x[i] == solved[i] for i in ll_corners)]
@@ -89,7 +89,7 @@ eod_htm_case = {}
 for x in eod_htm:
     key = min(u_turns(x))
     eod_htm_case[key] = min(eod_htm[y] for y in u_turns(x))
-eod_htm_case_aligned = [d for k, d in eod_htm_case.items() if k[top_centre] == "U"]
+eod_htm_case_aligned = [d for k, d in eod_htm_case.items() if k[top_center] == "U"]
 
 corner_sticker = next(i for i, (p, n) in enumerate(STICKERS) if p == (1, 1, 1) and n == (0, 1, 0))
 marked = masked[:corner_sticker] + "k" + masked[corner_sticker + 1:]
@@ -102,7 +102,7 @@ for x in by_goal[0]:
     extra.append(best + (4 - ds.count(best)) / 4)
 
 cases = json.load(open("../data/eodfdb.json"))["cases"]
-best = [c["algs"][0] for c in cases if c["centres"] == "solved"]
+best = [c["algs"][0] for c in cases if c["centers"] == "solved"]
 
 zbll = json.load(open("../data/zbll.json"))["cases"]
 weight = Counter(canon(s) for s in all_states())
@@ -147,7 +147,7 @@ for st in corner_states():
     cm_pre += a
 
 case_moves = [c["optimal_moves"] for c in cases]
-case_moves_aligned = [c["optimal_moves"] for c in cases if c["centres"] == "solved"]
+case_moves_aligned = [c["optimal_moves"] for c in cases if c["centers"] == "solved"]
 
 stats = {
     "eodfdb": {

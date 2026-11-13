@@ -6,9 +6,9 @@ import { zbll } from "../../lib/zbll.ts";
 const ORDER = ["UF", "UR", "UB", "UL", "DF", "DB"] as const;
 const in46 = new Set(set46().kept.map((c) => c.id));
 const eod = eodfdb.filter((c) => c.algs[0]).map((c) => ({
-  i: c.id, c: c.u_centre, a: c.algs,
+  i: c.id, c: c.u_center, a: c.algs,
   s: ORDER.map((n) => { const v = c.slots[n]; const ch = v.piece === "LL" ? "L" : v.piece === "DF" ? "F" : "B"; return v.flip ? ch.toLowerCase() : ch; }).join(""),
-  f: in46.has(c.id) ? 2 : c.centres === "solved" ? 1 : 0,
+  f: in46.has(c.id) ? 2 : c.centers === "solved" ? 1 : 0,
 }));
 const zb = zbll.map((c) => ({ i: c.id, sh: c.shape, st: c.state, a: c.algs.map((x) => x.alg) }));
 const SHAPES = [["T", "T"], ["U", "U"], ["L", "L"], ["H", "H"], ["Pi", "Pi"], ["S", "Sune"], ["AS", "Antisune"], ["PLL", "PLL"]];
@@ -22,7 +22,7 @@ const SHAPES = [["T", "T"], ["U", "U"], ["L", "L"], ["H", "H"], ["Pi", "Pi"], ["
       <span class="lbl">Set</span>
       <div class="choices" id="sets">
         <button type="button" data-v="eod46">EODFDB: 46-case set (62 with mirrors)</button>
-        <button type="button" data-v="eod248">EODFDB: centres aligned (248)</button>
+        <button type="button" data-v="eod248">EODFDB: centers aligned (248)</button>
         <button type="button" data-v="eod992">EODFDB: all 992</button>
         <button type="button" data-v="zbll">ZBLL</button>
       </div>
@@ -163,7 +163,7 @@ const SHAPES = [["T", "T"], ["U", "U"], ["L", "L"], ["H", "H"], ["Pi", "Pi"], ["
     const rows = Object.entries(times).filter(([id, r]) => ids.has(id) && r.t.length).sort((a, b) => avg(b[1]) - avg(a[1]));
     const all = rows.flatMap(([, r]) => r.t);
     $("summary").textContent = rows.length
-      ? `${rows.length} of ${list.length} cases practised, ${all.length} solves, overall average ${(all.reduce((a, b) => a + b, 0) / all.length).toFixed(2)} s. Slowest first.`
+      ? `${rows.length} of ${list.length} cases practiced, ${all.length} solves, overall average ${(all.reduce((a, b) => a + b, 0) / all.length).toFixed(2)} s. Slowest first.`
       : `${list.length} cases in this set. No times yet.`;
     ($("table").querySelector("tbody") as HTMLElement).innerHTML = rows.map(([id, r]) =>
       `<tr><td>${id}</td><td>${r.t.length}</td><td>${avg(r).toFixed(2)}</td><td>${Math.min(...r.t).toFixed(2)}</td><td>${r.m}</td></tr>`).join("");

@@ -6,9 +6,9 @@ import { eoCases, stats } from "../../../lib/eostripe.ts";
 const s = stats(eoCases);
 const groups = [...new Set(eoCases.map((c) => c.bad_edges))].sort((a, b) => a - b);
 ---
-<Base title="EOStripe: orienting the edges" description={`All ${s.n} LEOR EOStripe cases where DF, DB and the centres are already solved and only edge orientation is left.`} crumbs={[{ href: "/methods/leor/", label: "LEOR" }, { href: "/methods/leor/eostripe/", label: "EOStripe" }]}>
+<Base title="EOStripe: orienting the edges" description={`All ${s.n} LEOR EOStripe cases where DF, DB and the centers are already solved and only edge orientation is left.`} crumbs={[{ href: "/methods/leor/", label: "LEOR" }, { href: "/methods/leor/eostripe/", label: "EOStripe" }]}>
   <h1>EOStripe: orienting the edges</h1>
-  <p class="lede">DF, DB and the centres are already solved, and only the edges need orienting. These are all {s.n} cases, with the shortest solutions in R, r, M and U (average {s.avg.toFixed(1)} moves). For any other EOStripe position, use the <a href="/tools/eostripe-solver/">solver</a>.</p>
+  <p class="lede">DF, DB and the centers are already solved, and only the edges need orienting. These are all {s.n} cases, with the shortest solutions in R, r, M and U (average {s.avg.toFixed(1)} moves). For any other EOStripe position, use the <a href="/tools/eostripe-solver/">solver</a>.</p>
   <p class="no-print"><button class="btn" type="button" onclick="window.print()">Print / save as PDF</button> <a class="btn" href="/algs/eostripe/stripe/">Cases for placing DF and DB</a></p>
   <EsLegend />
   {groups.map((b) => (

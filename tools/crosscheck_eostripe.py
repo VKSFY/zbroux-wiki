@@ -18,11 +18,11 @@ vecs.append({"scramble": "R U", "lb": "x2", "expect_error": True})
 json.dump(vecs, open("_vecs.json", "w"))
 
 js = r'''
-import { analyse } from "../web/src/lib/eostripe-engine.ts";
+import { analyze } from "../web/src/lib/eostripe-engine.ts";
 import { readFileSync, writeFileSync } from "node:fs";
 const vecs = JSON.parse(readFileSync("_vecs.json", "utf8"));
 const t0 = performance.now();
-const out = vecs.map((v) => { const a = analyse(v.scramble, v.lb); return { ok: a.ok, error: a.error, masked: a.masked, optimal: a.optimal, sols: (a.solutions ?? []).slice(0, 5).map((s) => s.join(" ")), n: a.solutions?.length, bad: a.badEdges }; });
+const out = vecs.map((v) => { const a = analyze(v.scramble, v.lb); return { ok: a.ok, error: a.error, masked: a.masked, optimal: a.optimal, sols: (a.solutions ?? []).slice(0, 5).map((s) => s.join(" ")), n: a.solutions?.length, bad: a.badEdges }; });
 writeFileSync("_out.json", JSON.stringify(out));
 console.log("engine ran", vecs.length, "cases in", Math.round(performance.now() - t0), "ms");
 '''

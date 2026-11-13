@@ -1,7 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { cases } from "../lib/eodfdb";
-const nEodfdb = cases.filter((c) => c.centres === "solved").length;
+const nEodfdb = cases.filter((c) => c.centers === "solved").length;
 ---
 <Base description="Guides and full algorithm lists for the ZBRoux (LLOB) speedsolving method: first block, second block, EODFDB and ZBLL.">
   <div class="intro">
@@ -24,7 +24,7 @@ const nEodfdb = cases.filter((c) => c.centres === "solved").length;
       <h2>Already solving it</h2>
       <p>Go straight to your case. Answer a couple of questions about your cube, or paste a scramble.</p>
       <ul>
-        <li><a href="/algs/eodfdb/">EODFDB: find your case</a> ({nEodfdb} cases with centres aligned)</li>
+        <li><a href="/algs/eodfdb/">EODFDB: find your case</a> ({nEodfdb} cases with centers aligned)</li>
         <li><a href="/algs/zbll/">ZBLL: find your case</a> (493 cases)</li>
         <li><a href="/tools/trainer/">Trainer</a>: drill EODFDB and ZBLL with a timer, weakest cases first</li>
         <li>ZBLL lists by set: <a href="/algs/zbll/t/">T</a>, <a href="/algs/zbll/u/">U</a>, <a href="/algs/zbll/l/">L</a>, <a href="/algs/zbll/h/">H</a>, <a href="/algs/zbll/pi/">Pi</a>, <a href="/algs/zbll/s/">Sune</a>, <a href="/algs/zbll/as/">Antisune</a>, <a href="/algs/zbll/pll/">PLL</a></li>

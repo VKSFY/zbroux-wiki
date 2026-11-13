@@ -1,7 +1,7 @@
 ---
 import "../styles/global.css";
 import { SITE_NAME, TOP, pagePath } from "../lib/site";
-import TopColour from "../components/TopColour.astro";
+import TopColor from "../components/TopColor.astro";
 import Sidebar from "../components/Sidebar.astro";
 interface Props { title?: string; description?: string; sidebar?: boolean; crumbs?: { href: string; label: string }[] }
 const { title, description = "Guides and full algorithm lists for the ZBRoux speedsolving method.", sidebar = true, crumbs = [] } = Astro.props;
@@ -17,7 +17,7 @@ const active = (m: string[]) => m.some((p) => (p.endsWith("$") ? path === p.slic
   <title>{full}</title>
   <meta name="description" content={description} />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <script is:inline>try{if(localStorage.getItem("topColour")==="white")document.documentElement.dataset.top="white"}catch(e){}</script>
+  <script is:inline>try{if(localStorage.getItem("topColor")==="white")document.documentElement.dataset.top="white"}catch(e){}</script>
 </head>
 <body>
   <header class="top no-print">
@@ -26,7 +26,7 @@ const active = (m: string[]) => m.some((p) => (p.endsWith("$") ? path === p.slic
       <nav class="links" aria-label="Main">
         {TOP.map((n) => <a href={n.href} aria-current={active(n.match) ? "page" : undefined}>{n.label}</a>)}
       </nav>
-      <div class="right"><TopColour compact /></div>
+      <div class="right"><TopColor compact /></div>
     </div>
   </header>
 

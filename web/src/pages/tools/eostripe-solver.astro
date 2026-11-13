@@ -34,13 +34,13 @@ import EsLegend from "../../components/EsLegend.astro";
 </Base>
 
 <script>
-  import { analyse, GEN } from "../../lib/eostripe-engine.ts";
+  import { analyze, GEN } from "../../lib/eostripe-engine.ts";
   import { slotsFromMasked, eostripeSvg } from "../../lib/eostripe-diagram.ts";
 
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const status = $("status"), result = $("result"), solsEl = $("sols"), more = $<HTMLButtonElement>("more");
   let all: string[][] = [];
-  const TOP: Record<string, string> = { U: "your top colour", F: "green", D: "your bottom colour", B: "blue" };
+  const TOP: Record<string, string> = { U: "your top color", F: "green", D: "your bottom color", B: "blue" };
 
   function render(list: string[][], n: number) {
     solsEl.innerHTML = list.slice(0, n).map((s) => `<li><span class="alg">${s.join(" ") || "(already solved)"}</span></li>`).join("");
@@ -50,13 +50,13 @@ import EsLegend from "../../components/EsLegend.astro";
   function run(scr: string, lb: string) {
     status.textContent = "Solving…";
     setTimeout(() => {
-      const a = analyse(scr, lb);
+      const a = analyze(scr, lb);
       if (!a.ok) { status.textContent = a.error ?? "Something went wrong."; result.hidden = true; return; }
       const { slots, u, f } = slotsFromMasked(a.masked!);
       $("diagram").innerHTML = eostripeSvg(slots, u, f, 200, "Your EOStripe position");
       $("opt").textContent = String(a.optimal);
       const n = a.solutions!.length;
-      $("facts").textContent = `${n}${n >= 400 ? "+" : ""} shortest solutions · ${a.badEdges} flipped edges · top centre is ${TOP[u] ?? "?"}`;
+      $("facts").textContent = `${n}${n >= 400 ? "+" : ""} shortest solutions · ${a.badEdges} flipped edges · top center is ${TOP[u] ?? "?"}`;
       all = a.solutions!;
       render(all, 12);
       result.hidden = false;

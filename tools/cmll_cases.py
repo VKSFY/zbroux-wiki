@@ -5,12 +5,12 @@ from zbll_cases import build, relabel_u, mv, parity
 
 U_EDGE_OR_M = {i for i, (p, n) in enumerate(STICKERS)
                if sum(1 for c in p if c) == 2 and (p[1] == 1 or p[0] == 0)}
-M_CENTRES = {i for i, (p, n) in enumerate(STICKERS)
+M_CENTERS = {i for i, (p, n) in enumerate(STICKERS)
              if sum(1 for c in p if c) == 1 and p[0] == 0}
 
 
 def mask(s):
-    return "".join("e" if i in U_EDGE_OR_M else "c" if i in M_CENTRES else ch for i, ch in enumerate(s))
+    return "".join("e" if i in U_EDGE_OR_M else "c" if i in M_CENTERS else ch for i, ch in enumerate(s))
 
 
 def variants(s):

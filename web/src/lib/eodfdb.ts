@@ -8,9 +8,9 @@ export interface EodfdbCase {
   key: string;
   angle: number;
   slots: Record<SlotName, Slot>;
-  centres: "solved" | "off-M" | "off-M'" | "off-M2";
-  u_centre: string;
-  f_centre: string;
+  centers: "solved" | "off-M" | "off-M'" | "off-M2";
+  u_center: string;
+  f_center: string;
   group: "both-in-U-opposite" | "both-in-U-adjacent" | "one-in-U" | "none-in-U";
   bad_edges: number;
   optimal_moves: number;
@@ -31,10 +31,10 @@ export const GROUPS: { key: EodfdbCase["group"]; label: string; blurb: string }[
 ];
 
 export function set46() {
-  const chosen = cases.filter((c) => c.group === "both-in-U-opposite" && (c.centres === "solved" || c.centres === "off-M2"));
+  const chosen = cases.filter((c) => c.group === "both-in-U-opposite" && (c.centers === "solved" || c.centers === "off-M2"));
   const excluded = chosen.filter((c) => c.bad_edges === 0);
   const kept = chosen.filter((c) => c.bad_edges > 0)
-    .sort((a, b) => Number(a.centres !== "solved") - Number(b.centres !== "solved") || a.optimal_moves - b.optimal_moves || a.id.localeCompare(b.id));
+    .sort((a, b) => Number(a.centers !== "solved") - Number(b.centers !== "solved") || a.optimal_moves - b.optimal_moves || a.id.localeCompare(b.id));
   const seen = new Set<string>();
   const list: EodfdbCase[] = [];
   for (const c of kept) {

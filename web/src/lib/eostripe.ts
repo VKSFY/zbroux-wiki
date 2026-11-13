@@ -2,8 +2,8 @@ import raw from "../../../data/eostripe.json";
 import type { Slots } from "./eostripe-diagram.ts";
 
 export interface EsCase {
-  id: string; slots: Slots; u_centre: string; f_centre: string;
-  centres: "solved" | "off-M" | "off-M'" | "off-M2";
+  id: string; slots: Slots; u_center: string; f_center: string;
+  centers: "solved" | "off-M" | "off-M'" | "off-M2";
   bad_edges: number; stripe_in: string[]; optimal_moves: number; n_optimal: number; algs: string[];
 }
 const data = raw as any;
@@ -15,10 +15,10 @@ export const eoCases = data.sets.eo as EsCase[];
 export const stripeCases = data.sets.stripe as EsCase[];
 
 export const STRIPE_VARIANTS = [
-  { slug: undefined, centres: "solved", label: "Centres solved" },
-  { slug: "centres-m", centres: "off-M", label: "Centres off by M" },
-  { slug: "centres-m-prime", centres: "off-M'", label: "Centres off by M'" },
-  { slug: "centres-m2", centres: "off-M2", label: "Centres off by M2" },
+  { slug: undefined, centers: "solved", label: "Centers solved" },
+  { slug: "centers-m", centers: "off-M", label: "Centers off by M" },
+  { slug: "centers-m-prime", centers: "off-M'", label: "Centers off by M'" },
+  { slug: "centers-m2", centers: "off-M2", label: "Centers off by M2" },
 ] as const;
 
 const zone = (slot: string) => (slot[0] === "U" ? "U" : slot === "DF" || slot === "DB" ? "D" : "R");

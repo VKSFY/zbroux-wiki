@@ -22,7 +22,7 @@
           "moves": "U M U M' U M2 U' M",
           "time": 1.7,
           "case": "pO7",
-          "note": "Centres were off by M' after second block. The first U lines the case up; after that, M U M' U M2 U' M is one of the two shortest solutions (7 moves).",
+          "note": "Centers were off by M' after second block. The first U lines the case up; after that, M U M' U M2 U' M is one of the two shortest solutions (7 moves).",
           "set": "eodfdb"
         },
         {
@@ -58,7 +58,7 @@
           "moves": "U M U M' U2 M' U M",
           "case": "A4",
           "set": "eodfdb",
-          "note": "Centres aligned after the second block. The first U lines the case up; after that it's one of the shortest solutions (7 moves)."
+          "note": "Centers aligned after the second block. The first U lines the case up; after that it's one of the shortest solutions (7 moves)."
         },
         {
           "step": "ZBLL",
@@ -90,7 +90,7 @@
           "moves": "M U' M' U2 M U' M U' M",
           "case": "pA26",
           "set": "eodfdb",
-          "note": "Centres turned a quarter after the second block. This is one of the shortest solutions (9 moves)."
+          "note": "Centers turned a quarter after the second block. This is one of the shortest solutions (9 moves)."
         },
         {
           "step": "ZBLL",
@@ -122,7 +122,7 @@
           "moves": "r U2 M U2 r' U' M' U' M2",
           "case": "hN17",
           "set": "eodfdb",
-          "note": "Centres upside down after the second block. This uses r moves, which break the second block and rebuild it, and it's as short as the shortest M/U solutions (9 moves)."
+          "note": "Centers upside down after the second block. This uses r moves, which break the second block and rebuild it, and it's as short as the shortest M/U solutions (9 moves)."
         },
         {
           "step": "ZBLL",
@@ -154,7 +154,7 @@
           "moves": "M2 U2 M U M' U M' U2 M'",
           "case": "S105",
           "set": "eodfdb",
-          "note": "Centres aligned after the second block. This is one of the shortest solutions (9 moves)."
+          "note": "Centers aligned after the second block. This is one of the shortest solutions (9 moves)."
         },
         {
           "step": "ZBLL",
@@ -186,7 +186,7 @@
           "moves": "M U' M U M' U M U2 M'",
           "case": "mA26",
           "set": "eodfdb",
-          "note": "Centres turned a quarter after the second block. This is one of the shortest solutions (9 moves)."
+          "note": "Centers turned a quarter after the second block. This is one of the shortest solutions (9 moves)."
         },
         {
           "step": "ZBLL",
@@ -218,7 +218,7 @@
           "moves": "M' U M U2 M' U' M",
           "case": "S24",
           "set": "eodfdb",
-          "note": "Centres aligned after the second block. This is one of the shortest solutions (7 moves)."
+          "note": "Centers aligned after the second block. This is one of the shortest solutions (7 moves)."
         },
         {
           "step": "ZBLL",

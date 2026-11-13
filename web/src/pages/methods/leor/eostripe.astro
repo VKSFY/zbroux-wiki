@@ -5,25 +5,25 @@ const maxN = Math.max(...depthTable.map((r) => r.states));
 let cum = 0;
 const rows = depthTable.map((r) => { cum += r.states; return { ...r, cum, pct: (100 * r.states) / totalStates }; });
 ---
-<Base title="EOStripe" description="LEOR's EOStripe step: orient all edges while solving DF, DB and the centres. How it works, how many moves it takes, case lists and a solver." crumbs={[{ href: "/methods/leor/", label: "LEOR" }]}>
+<Base title="EOStripe" description="LEOR's EOStripe step: orient all edges while solving DF, DB and the centers. How it works, how many moves it takes, case lists and a solver." crumbs={[{ href: "/methods/leor/", label: "LEOR" }]}>
   <article class="prose">
     <h1>EOStripe</h1>
-    <p class="lede">The second step of LEOR. After the left block, you orient every remaining edge and solve the "stripe" (the DF and DB edges plus the centres) using R, r, M and U. Solved as efficiently as possible, it averages {average.toFixed(1)} moves.</p>
+    <p class="lede">The second step of LEOR. After the left block, you orient every remaining edge and solve the "stripe" (the DF and DB edges plus the centers) using R, r, M and U. Solved as efficiently as possible, it averages {average.toFixed(1)} moves.</p>
 
     <p><b>Need a solution for your own solve?</b> Use the <a href="/tools/eostripe-solver/">EOStripe solver</a>.</p>
 
     <h2>What the step solves</h2>
-    <p>After the left block, nine edges are still free: the four top-layer edges, the three right-layer edges (FR, BR and DR) and the two stripe edges (DF and DB). The middle-slice centres may also be turned. At the end of EOStripe:</p>
+    <p>After the left block, nine edges are still free: the four top-layer edges, the three right-layer edges (FR, BR and DR) and the two stripe edges (DF and DB). The middle-slice centers may also be turned. At the end of EOStripe:</p>
     <ul>
       <li>DF and DB are solved;</li>
-      <li>the centres are aligned;</li>
+      <li>the centers are aligned;</li>
       <li>every edge is oriented the ZZ way, meaning it could be solved using only R, U, L and D.</li>
     </ul>
     <p>The right block then only needs R and U, and the last layer always has its edges oriented, so it's a ZBLL case.</p>
 
     <h2>Doing it intuitively</h2>
     <ol>
-      <li><b>Find the flipped edges.</b> Use ZZ-style edge orientation. For an edge on the top or bottom: it's flipped if its top or bottom colour faces sideways, or, when it has no top or bottom colour, if its front or back colour faces up or down. For FR and BR, look at the sticker on the front or back face.</li>
+      <li><b>Find the flipped edges.</b> Use ZZ-style edge orientation. For an edge on the top or bottom: it's flipped if its top or bottom color faces sideways, or, when it has no top or bottom color, if its front or back color faces up or down. For FR and BR, look at the sticker on the front or back face.</li>
       <li><b>Flip them with M or r.</b> A quarter turn of M or r flips the four edges in the middle slice, the same as in Roux. R and U never change orientation, so use them to bring flipped edges into the slice first.</li>
       <li><b>Place DF and DB as you go.</b> Bring them into the top layer or the middle slice, then finish with M2 or r2.</li>
     </ol>
@@ -32,7 +32,7 @@ const rows = depthTable.map((r) => { cum += r.states; return { ...r, cum, pct: (
     <h2>Case lists</h2>
     <p>The whole step has too many positions to learn as a list, but the two halves don't:</p>
     <ul>
-      <li><a href="/algs/eostripe/eo/">Orienting the edges</a> when DF, DB and the centres are already solved: {eoCases.length} cases.</li>
+      <li><a href="/algs/eostripe/eo/">Orienting the edges</a> when DF, DB and the centers are already solved: {eoCases.length} cases.</li>
       <li><a href="/algs/eostripe/stripe/">Placing DF and DB</a> when every edge is already oriented: {stripeCases.length} cases.</li>
     </ul>
 

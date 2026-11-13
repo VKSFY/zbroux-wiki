@@ -22,8 +22,8 @@ const FILES: Record<string, { type: string; body: () => string }> = {
   "eodfdb.csv": {
     type: "text/csv",
     body: () => csv(
-      ["id", "centres", "group", "flipped_edges", "moves", "alg1", "alg2", "alg3", "alg4", "mirror_of", "mirror_alg"],
-      e.cases.map((x: any) => [x.id, x.centres, x.group, x.bad_edges, x.optimal_moves, ...algCols(x.algs), x.mirror_of, x.mirror_of === x.id ? "" : x.mirror_alg]),
+      ["id", "centers", "group", "flipped_edges", "moves", "alg1", "alg2", "alg3", "alg4", "mirror_of", "mirror_alg"],
+      e.cases.map((x: any) => [x.id, x.centers, x.group, x.bad_edges, x.optimal_moves, ...algCols(x.algs), x.mirror_of, x.mirror_of === x.id ? "" : x.mirror_alg]),
     ),
   },
   "zbll.csv": {
@@ -43,9 +43,9 @@ const FILES: Record<string, { type: string; body: () => string }> = {
   "eostripe.csv": {
     type: "text/csv",
     body: () => csv(
-      ["id", "set", "centres", "flipped_edges", "moves", "alg1", "alg2", "alg3", "alg4"],
+      ["id", "set", "centers", "flipped_edges", "moves", "alg1", "alg2", "alg3", "alg4"],
       [...s.sets.eo.map((x: any) => ["eo", x]), ...s.sets.stripe.map((x: any) => ["stripe", x])]
-        .map(([set, x]: any) => [x.id, set, x.centres, x.bad_edges, x.optimal_moves, ...algCols(x.algs)]),
+        .map(([set, x]: any) => [x.id, set, x.centers, x.bad_edges, x.optimal_moves, ...algCols(x.algs)]),
     ),
   },
 };

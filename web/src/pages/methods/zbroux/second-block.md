@@ -7,7 +7,7 @@ crumbs:
   - { href: "/methods/zbroux/", label: "ZBRoux" }
 ---
 
-The second block mirrors the first: a 1x2x3 at the bottom right, made of the DR edge, the right centre, and a front and back pair. Because the first block is on the left, you only use moves that don't touch it: R, r, U and M.
+The second block mirrors the first: a 1x2x3 at the bottom right, made of the DR edge, the right center, and a front and back pair. Because the first block is on the left, you only use moves that don't touch it: R, r, U and M.
 
 ## How to build it
 
@@ -21,10 +21,10 @@ After the first block, every piece you still need is in the top layer, the middl
 
 The block itself is the same as in Roux. What changes is what you keep track of while you build it:
 
-- **DF, DB and the centres.** These are what step 3 solves. If you know where they are by the time the block is done, you can start EODFDB without a pause.
-- **Turned centres are fine.** The middle-slice centres don't have to be aligned after this step. EODFDB fixes them, and some EODFDB cases are actually shorter when the centres are turned.
+- **DF, DB and the centers.** These are what step 3 solves. If you know where they are by the time the block is done, you can start EODFDB without a pause.
+- **Turned centers are fine.** The middle-slice centers don't have to be aligned after this step. EODFDB fixes them, and some EODFDB cases are actually shorter when the centers are turned.
 
 ## Practice
 
-- Practise the second block on its own with a block trainer.
+- Practice the second block on its own with a block trainer.
 - If you already solve Roux, you already know this step.

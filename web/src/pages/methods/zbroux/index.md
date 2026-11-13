@@ -42,7 +42,7 @@ ZBRoux and Roux share the first two blocks, so the difference is entirely in the
 | step by step, no lookahead | 15.45 | 11.09 | 25.8 | 25.6 | about even |
 | step by step, worst choices | 17.59 | 12.04 | 27.9 | 26.6 | ZBRoux, by 1.3 |
 
-For a typical solver who does the intuitive step step by step without planning ahead, the two methods come out **about even in moves**. Solved well, Roux takes about one and a half moves fewer. The winner depends on how each intuitive step is done: combining steps, like EOLR in Roux or orienting while already setting up the bottom edges in EODFDB, moves a method towards the top rows. Real solvers don't solve each step optimally, so all the step-by-step figures are lower limits.
+For a typical solver who does the intuitive step step by step without planning ahead, the two methods come out **about even in moves**. Solved well, Roux takes about one and a half moves fewer. The winner depends on how each intuitive step is done: combining steps, like EOLR in Roux or orienting while already setting up the bottom edges in EODFDB, moves a method toward the top rows. Real solvers don't solve each step optimally, so all the step-by-step figures are lower limits.
 
 If EODFDB is done in two steps instead (orient while bringing the bottom edges up, then M2), it takes 9.15, 9.49 and 9.72 moves under the three rules. That two-step version is close to optimal by construction, because its first step aims for a single position, so it isn't compared with three-step LSE above.
 
@@ -60,7 +60,7 @@ How the algorithm lists compare with human ones differs per set. For CMLL the se
 |---|---|---|
 | intuitively | 493 | 451 |
 | with the [46-case set](/algs/eodfdb/46/) | 539 | 497 |
-| with all [248 cases](/algs/eodfdb/) with aligned centres | 741 | 699 |
+| with all [248 cases](/algs/eodfdb/) with aligned centers | 741 | 699 |
 
 If you want few algorithms or the fewest moves, Roux is the better choice. ZBRoux is for people who like Roux blockbuilding and want a faster-turning, more algorithmic finish, and are happy to learn ZBLL for it.
 
@@ -82,14 +82,14 @@ It may suit you if:
 
 - you already solve Roux and want a finish that's one drilled algorithm instead of M and U turns;
 - you already know ZBLL, for example from ZZ, so the expensive part is already done and you only add blockbuilding and EODFDB;
-- you like learning algorithms and practising look-ahead, since reading the ZBLL case during EODFDB is the method's main trick.
+- you like learning algorithms and practicing look-ahead, since reading the ZBLL case during EODFDB is the method's main trick.
 
 ## Advantages
 
 - It's rotationless. After the first block you mostly turn R, r, U and M, and the only rotations come from a few ZBLL algorithms.
 - The first two layers are efficient. Two blocks plus EODFDB take about as many moves as ZZ's EOLine plus F2L.
 - The finish is a single drilled algorithm instead of M and U turns, which most people can turn faster.
-- You can look ahead easily. The DF and DB edges are easy to track during the second block, and the corners only move with the top layer during EODFDB, so you can recognise most of the ZBLL case before you get there.
+- You can look ahead easily. The DF and DB edges are easy to track during the second block, and the corners only move with the top layer during EODFDB, so you can recognize most of the ZBLL case before you get there.
 
 ## Disadvantages
 

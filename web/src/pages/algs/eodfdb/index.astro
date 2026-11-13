@@ -6,7 +6,7 @@ const ORDER = ["UF", "UR", "UB", "UL", "DF", "DB"] as const;
 const data = cases.map((c) => {
   const up = ORDER.filter((n) => n[0] === "U" && c.slots[n].piece !== "LL");
   return {
-    i: c.id, k: c.key, n: c.angle, c: c.u_centre, g: c.group, b: c.bad_edges, m: c.optimal_moves,
+    i: c.id, k: c.key, n: c.angle, c: c.u_center, g: c.group, b: c.bad_edges, m: c.optimal_moves,
     a: c.algs, r: c.mirror_of,
     s: ORDER.map((n) => { const v = c.slots[n]; const ch = v.piece === "LL" ? "L" : v.piece === "DF" ? "F" : "B"; return v.flip ? ch.toLowerCase() : ch; }).join(""),
     t: up.length, u: up.filter((n) => !c.slots[n].flip).length,
@@ -30,19 +30,19 @@ const data = cases.map((c) => {
   </details>
 
   <section class="q" id="q1">
-    <h2>1. What colour is the centre on top?</h2>
-    <p class="hint">There are four possibilities. If it isn't your top colour, your centres are turned, and these cases fix that too. Colours assume green in front; switch between yellow and white on top with "Top colour" at the top of the page.</p>
+    <h2>1. What color is the center on top?</h2>
+    <p class="hint">There are four possibilities. If it isn't your top color, your centers are turned, and these cases fix that too. Colors assume green in front; switch between yellow and white on top with "Top color" at the top of the page.</p>
     <div class="choices">
-      <button type="button" data-v="U"><i style="background:var(--yel)"></i><span><span data-colour="top">Yellow</span> (your top colour): centres aligned</span></button>
-      <button type="button" data-v="F"><i style="background:var(--grn)"></i>Green (your front colour): centres turned a quarter</button>
-      <button type="button" data-v="B"><i style="background:var(--blu)"></i>Blue (your back colour): centres turned a quarter</button>
-      <button type="button" data-v="D"><i style="background:var(--wht)"></i><span><span data-colour="bottom">White</span> (your bottom colour): centres upside down</span></button>
+      <button type="button" data-v="U"><i style="background:var(--yel)"></i><span><span data-color="top">Yellow</span> (your top color): centers aligned</span></button>
+      <button type="button" data-v="F"><i style="background:var(--grn)"></i>Green (your front color): centers turned a quarter</button>
+      <button type="button" data-v="B"><i style="background:var(--blu)"></i>Blue (your back color): centers turned a quarter</button>
+      <button type="button" data-v="D"><i style="background:var(--wht)"></i><span><span data-color="bottom">White</span> (your bottom color): centers upside down</span></button>
     </div>
   </section>
 
   <section class="q" id="q2">
     <h2>2. Where are your two bottom edges?</h2>
-    <p class="hint">The two edges that still belong at the bottom, front and back. Each has your bottom colour and green or blue.</p>
+    <p class="hint">The two edges that still belong at the bottom, front and back. Each has your bottom color and green or blue.</p>
     <div class="choices">
       <button type="button" data-v="both-in-U-opposite">Both on top, across from each other</button>
       <button type="button" data-v="both-in-U-adjacent">Both on top, next to each other</button>
@@ -52,14 +52,14 @@ const data = cases.map((c) => {
   </section>
 
   <section class="q" id="q3" hidden>
-    <h2>3. Which way does their bottom colour face?</h2>
-    <p class="hint">Only for the bottom edges that are on top: is their bottom-colour sticker facing up, or out to the side?</p>
+    <h2>3. Which way does their bottom color face?</h2>
+    <p class="hint">Only for the bottom edges that are on top: is their bottom-color sticker facing up, or out to the side?</p>
     <div class="choices" id="q3opts"></div>
   </section>
 
   <section class="q" id="q4">
     <h2 id="q4h">3. How many edges are flipped?</h2>
-    <p class="hint">Check all six unsolved edges: the four top-layer edges and the two bottom edges, wherever they are. Each of them has one sticker in your top or bottom colour. If that sticker faces up or down, the edge is fine; if it faces front, back, left or right, the edge is flipped. The count is always even.</p>
+    <p class="hint">Check all six unsolved edges: the four top-layer edges and the two bottom edges, wherever they are. Each of them has one sticker in your top or bottom color. If that sticker faces up or down, the edge is fine; if it faces front, back, left or right, the edge is flipped. The count is always even.</p>
     <div class="choices" id="q4opts">
       <button type="button" data-v="0">0</button><button type="button" data-v="2">2</button><button type="button" data-v="4">4</button><button type="button" data-v="6">6</button>
     </div>
@@ -71,7 +71,7 @@ const data = cases.map((c) => {
   </div>
   <p class="hint">Pictures show the top of the cube with green in front. The thin bars are the side stickers, and the two small squares underneath show what's in the bottom-front (DF) and bottom-back (DB) slots. Turn the top layer until it matches, then do the algorithm.</p>
   <div class="cases" id="list"></div>
-  <p class="small muted">All 992 cases, 248 of them with aligned centres (<a href="/methods/zbroux/eodfdb/#where-the-numbers-come-from">where these numbers come from</a>). Each algorithm is a shortest solution in M and U, counted in STM. For a smaller set, see <a href="/algs/eodfdb/46/">the 46-case set</a>. <a href="/about/">How these were made</a>.</p>
+  <p class="small muted">All 992 cases, 248 of them with aligned centers (<a href="/methods/zbroux/eodfdb/#where-the-numbers-come-from">where these numbers come from</a>). Each algorithm is a shortest solution in M and U, counted in STM. For a smaller set, see <a href="/algs/eodfdb/46/">the 46-case set</a>. <a href="/about/">How these were made</a>.</p>
 </Base>
 
 <script type="application/json" id="eodfdb-data" set:html={JSON.stringify(data)} />

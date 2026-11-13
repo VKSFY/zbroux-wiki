@@ -7,9 +7,9 @@ const NAMES: Record<string, string> = { T: "T", U: "U", L: "L", H: "H", Pi: "Pi"
 const shapes = SHAPES.map((s) => ({ key: s.key, name: NAMES[s.key], blurb: s.blurb, n: zbll.filter((c) => c.shape === s.key).length, pic: zbll.find((c) => c.shape === s.key)!.state }));
 const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape, g: c.group, st: c.state, a: c.algs.map((x) => [x.alg, x.moves]) }));
 ---
-<Base title="ZBLL: find your case" description="Find your ZBLL case in two looks (the shape of the top colour, then the corner pattern) or paste a scramble. All 493 cases." crumbs={[{ href: "/methods/zbroux/", label: "ZBRoux" }, { href: "/methods/zbroux/zbll/", label: "ZBLL" }]}>
+<Base title="ZBLL: find your case" description="Find your ZBLL case in two looks (the shape of the top color, then the corner pattern) or paste a scramble. All 493 cases." crumbs={[{ href: "/methods/zbroux/", label: "ZBRoux" }, { href: "/methods/zbroux/zbll/", label: "ZBLL" }]}>
   <h1>ZBLL: find your case</h1>
-  <p class="lede">The first two layers are done and every top edge is oriented. Pick the shape the top colour makes, then tap the colours you see on your cube. Or paste your scramble.</p>
+  <p class="lede">The first two layers are done and every top edge is oriented. Pick the shape the top color makes, then tap the colors you see on your cube. Or paste your scramble.</p>
   <p class="note"><b>Unvetted list.</b> Every algorithm here is correct and checked, but they were found by computer search (RU, RUD, RUF, RUL and RUr, up to 16 moves) and nobody has picked them for ergonomics yet. They're ordered by a simple rule that can't judge finger tricks or regrips, so the first one isn't always the one most people use. Try the alternatives. Moves are counted in STM, without the AUF. <a href="/about/#zbll">More about how these were made</a>.</p>
 
   <details class="paste">
@@ -24,8 +24,8 @@ const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape,
   </details>
 
   <section class="q" id="q1">
-    <h2>1. Which shape does your top colour make?</h2>
-    <p class="hint">Look only at the top colour, on the top face and on the sides of the corners. If all four corners already show it on top, pick PLL.</p>
+    <h2>1. Which shape does your top color make?</h2>
+    <p class="hint">Look only at the top color, on the top face and on the sides of the corners. If all four corners already show it on top, pick PLL.</p>
     <div class="pics">
       {shapes.map((s) => (
         <button type="button" class="choice" data-v={s.key} title={s.blurb}>
@@ -37,18 +37,18 @@ const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape,
   </section>
 
   <section class="q" id="q2" hidden>
-    <h2>2. Tap the colours you see</h2>
+    <h2>2. Tap the colors you see</h2>
     <p class="hint" id="hold"></p>
     <div class="paint">
       <div id="painter"></div>
       <div class="ptext">
         <p id="pcount" role="status"></p>
-        <button type="button" class="btn" id="pclear">Clear colours</button>
+        <button type="button" class="btn" id="pclear">Clear colors</button>
       </div>
     </div>
     <div id="gpick">
       <h3>Or pick the corner pattern</h3>
-      <p class="hint">Every picture is drawn from the same angle as above. The arrows show where the corners need to go. The side colours on your cube may be shifted round from these, so match the arrows, not the exact colours.</p>
+      <p class="hint">Every picture is drawn from the same angle as above. The arrows show where the corners need to go. The side colors on your cube may be shifted round from these, so match the arrows, not the exact colors.</p>
       <div class="pics" id="groups"></div>
     </div>
   </section>
@@ -162,8 +162,8 @@ const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape,
     let rows: string[] = [], text = "";
     if (st.sh) {
       $("hold").textContent = st.sh === "PLL"
-        ? "Tap a sticker on the picture to set its colour; tap again for the next colour. Hold the cube any way round and fill in what you see on the front and right. Three or four stickers are usually enough."
-        : "Hold your cube so the top-colour stickers are in the same places as on this picture. Then tap a sticker to set its colour; tap again for the next colour. Fill in what you see on the front and right first. Four to six stickers are usually enough.";
+        ? "Tap a sticker on the picture to set its color; tap again for the next color. Hold the cube any way round and fill in what you see on the front and right. Three or four stickers are usually enough."
+        : "Hold your cube so the top-color stickers are in the same places as on this picture. Then tap a sticker to set its color; tap again for the next color. Fill in what you see on the front and right first. Four to six stickers are usually enough.";
       drawPainter();
       $("gpick").hidden = st.sh === "PLL";
       if (st.sh !== "PLL") {
@@ -177,15 +177,15 @@ const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape,
       if (paint.size) {
         const ms = matches();
         $("pcount").innerHTML = ms.length === 0
-          ? "<b>No case has these colours.</b> Check the stickers, and that the top-colour stickers on your cube are where they are on the picture."
-          : ms.length === 1 ? "<b>Found it.</b> Your case is below." : `<b>${ms.length} cases</b> have these colours. Tap more stickers to narrow it down.`;
+          ? "<b>No case has these colors.</b> Check the stickers, and that the top-color stickers on your cube are where they are on the picture."
+          : ms.length === 1 ? "<b>Found it.</b> Your case is below." : `<b>${ms.length} cases</b> have these colors. Tap more stickers to narrow it down.`;
         rows = ms.map((m) => caseRow(m.c, llSvg(m.v, 78, "ZBLL " + m.c.i), m.pre));
-        text = ms.length ? `<b>${ms.length}</b> ${ms.length === 1 ? "case matches" : "cases match"} your colours, drawn in your colours. The algorithms start from the angle you are holding.` : "";
+        text = ms.length ? `<b>${ms.length}</b> ${ms.length === 1 ? "case matches" : "cases match"} your colors, drawn in your colors. The algorithms start from the angle you are holding.` : "";
       } else {
-        $("pcount").textContent = "No colours set yet.";
+        $("pcount").textContent = "No colors set yet.";
         const list = st.sh === "PLL" ? shapeCases().sort((a, b) => a.n.localeCompare(b.n)) : st.g !== null ? shapeCases().filter((c) => c.g === st.g) : [];
         rows = list.map((c) => caseRow(c, llSvg(c.st, 78, "ZBLL " + c.i), ""));
-        text = list.length ? `<b>${list.length}</b> cases. Hold the cube like the pictures, then match the arrows; your side colours may be shifted round from these.` : "";
+        text = list.length ? `<b>${list.length}</b> cases. Hold the cube like the pictures, then match the arrows; your side colors may be shifted round from these.` : "";
       }
     }
     $("res").hidden = rows.length === 0;

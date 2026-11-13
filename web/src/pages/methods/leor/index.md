@@ -7,7 +7,7 @@ crumbs:
   - { href: "/methods/", label: "Methods" }
 ---
 
-LEOR starts like Roux and ZBRoux, with a 1x2x3 block on the left. Then comes EOStripe: you orient every remaining edge while solving the DF and DB edges and the centres. After that, the rest of the first two layers is a right block built almost entirely with R and U, and because all edges are oriented, the last layer is a ZBLL case.
+LEOR starts like Roux and ZBRoux, with a 1x2x3 block on the left. Then comes EOStripe: you orient every remaining edge while solving the DF and DB edges and the centers. After that, the rest of the first two layers is a right block built almost entirely with R and U, and because all edges are oriented, the last layer is a ZBLL case.
 
 The name stands for **L**eft block, **EO**Stripe, **R**ight block. It was proposed by Noah Arthurs (2013) and by Arc and Pyjam (2017), with Joseph Briggs's methods as another influence. The first three steps together build an edge-oriented 2x2x3 block, so it's also often compared to Petrus.
 
@@ -16,7 +16,7 @@ The name stands for **L**eft block, **EO**Stripe, **R**ight block. It was propos
 | Step | What you do | Moves |
 |------|-------------|-------|
 | 1. Left block | 1x2x3 block on the left, as in Roux | ~7 |
-| 2. [EOStripe](/methods/leor/eostripe/) | Orient all edges and solve DF, DB and the centres, with R, r, M and U | ~8.4 |
+| 2. [EOStripe](/methods/leor/eostripe/) | Orient all edges and solve DF, DB and the centers, with R, r, M and U | ~8.4 |
 | 3. Right block | The right 1x2x3 block, mostly with R and U | |
 | 4. [ZBLL](/algs/zbll/) | The last layer, in one algorithm or two looks | ~13 |
 

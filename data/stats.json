@@ -226,7 +226,7 @@
     "AS": 0.0
    }
   },
-  "scheme: plus where the top colour sits": {
+  "scheme: plus where the top color sits": {
    "distinct_views": 588,
    "unique_share": 0.0933,
    "max_cases_sharing_a_view": 36,
@@ -241,7 +241,7 @@
     "AS": 0.0
    }
   },
-  "scheme: plus which neighbouring colour": {
+  "scheme: plus which neighboring color": {
    "distinct_views": 947,
    "unique_share": 0.2495,
    "max_cases_sharing_a_view": 18,

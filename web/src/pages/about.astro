@@ -9,7 +9,7 @@ const REPO = "https://github.com/VKSFY/zbroux-wiki";
 
     <h2>How moves are counted</h2>
     <p>Every move count on this wiki is in <b>STM</b> (slice turn metric). Each turn of a face, a slice or a wide layer counts as one move, and half turns count as one too: M, M2, U2, r and R2 are each one move. The turn of the top layer before an algorithm (the pre-AUF) is not counted.</p>
-    <p>In HTM, where a slice turn like M counts as two moves, EODFDB takes about 12.5 moves per case instead of 8.0 (centres aligned, top layer lined up first), and 12.7 per position instead of 8.3 (every U turn counted). "Per case" means each case counts once; "per position" weights each case by how often it comes up and counts the turn that lines it up.</p>
+    <p>In HTM, where a slice turn like M counts as two moves, EODFDB takes about 12.5 moves per case instead of 8.0 (centers aligned, top layer lined up first), and 12.7 per position instead of 8.3 (every U turn counted). "Per case" means each case counts once; "per position" weights each case by how often it comes up and counts the turn that lines it up.</p>
 
     <h2>Cases</h2>
     <p>Each case list is built by listing every position the step can start from, directly from the pieces, then grouping positions that only differ by a turn of the top layer into one case. That's how you know a list is complete. ZBLL comes out at 493 cases, the standard count, and the EODFDB count can be checked by hand with Burnside's lemma, as shown on the <a href="/methods/zbroux/eodfdb/#where-the-numbers-come-from">EODFDB page</a>.</p>
@@ -28,16 +28,16 @@ const REPO = "https://github.com/VKSFY/zbroux-wiki";
 
     <h2 id="step-by-step-models">Step-by-step models</h2>
     <p>The <a href="/methods/zbroux/#is-it-worth-it-zbroux-against-roux">Roux comparison</a> models the intuitive steps as they're usually taught. The code is <a href={`${REPO}/blob/main/tools/stepwise.py`}>stepwise.py</a>. Every position is equally likely, moves are M and U in STM, and the turn of the top layer is counted.</p>
-    <p><b>Roux LSE</b>, over all 184,320 positions reachable with M and U from solved (corners at any angle, centres in any of four positions):</p>
+    <p><b>Roux LSE</b>, over all 184,320 positions reachable with M and U from solved (corners at any angle, centers in any of four positions):</p>
     <ul>
-      <li><b>4a</b>: all six edges oriented (each edge's top-or-bottom-colour sticker faces up or down), and the top centre shows the top or bottom colour.</li>
+      <li><b>4a</b>: all six edges oriented (each edge's top-or-bottom-color sticker faces up or down), and the top center shows the top or bottom color.</li>
       <li><b>4b</b>: 4a, plus the UL and UR edges solved relative to the corners (after some turn of the top layer, the corners and both edges are in place).</li>
       <li><b>4c</b>: solved, including the final turn of the top layer.</li>
     </ul>
     <p><b>EODFDB</b>, over all 3,840 positions after the second block (top-layer corners ignored), split the same way as LSE:</p>
     <ul>
-      <li><b>Step 1</b>: the same goal as 4a. All six edges are oriented, and the top centre shows the top or bottom colour.</li>
-      <li><b>Step 2</b>: both bottom edges on top and opposite each other with their bottom colour facing up, edges still oriented, and the top centre showing the bottom colour. That's 4 positions, one up to turns of the top layer.</li>
+      <li><b>Step 1</b>: the same goal as 4a. All six edges are oriented, and the top center shows the top or bottom color.</li>
+      <li><b>Step 2</b>: both bottom edges on top and opposite each other with their bottom color facing up, edges still oriented, and the top center showing the bottom color. That's 4 positions, one up to turns of the top layer.</li>
       <li><b>Step 3</b>: line them up and do M2 (any shortest finish).</li>
     </ul>
     <p>Each step is solved with a shortest solution from wherever the previous step left off. When a step has several shortest solutions, the three rules choose differently: <i>lookahead</i> takes the one that makes the remaining steps cheapest; <i>no lookahead</i> treats every shortest move sequence for the step as equally likely; <i>worst choices</i> takes the most expensive. The per-step averages below are measured along the chain, so they add up to the total:</p>
@@ -50,7 +50,7 @@ const REPO = "https://github.com/VKSFY/zbroux-wiki";
       </tbody>
     </table>
     <p>LSE is averaged over all positions with the corners at any angle. Starting with the corners lined up, as after CMLL, gives 12.83, 15.42 and 17.59, so it makes no real difference.</p>
-    <p>EODFDB can also be modelled in two steps, merging steps 1 and 2 into one search for the 4 target positions. That gives 7.85 + 1.30 = 9.15, 7.85 + 1.64 = 9.49 and 7.85 + 1.87 = 9.72. It's close to optimal by construction, because the first step aims for a single position, so the Roux comparison uses the three-step split, which matches LSE.</p>
+    <p>EODFDB can also be modeled in two steps, merging steps 1 and 2 into one search for the 4 target positions. That gives 7.85 + 1.30 = 9.15, 7.85 + 1.64 = 9.49 and 7.85 + 1.87 = 9.72. It's close to optimal by construction, because the first step aims for a single position, so the Roux comparison uses the three-step split, which matches LSE.</p>
     <p>Step 1 of each method always costs the same under every rule, because only the choice between equally short solutions differs, not their length. "No lookahead" counts move sequences, not end positions. Choosing uniformly between end positions instead gives slightly different numbers.</p>
 
     <h2 id="zbll">ZBLL</h2>

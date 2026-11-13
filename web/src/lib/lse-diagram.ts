@@ -8,12 +8,12 @@ function stickers(s: Slot): [string, string] {
   return s.flip ? [b, a] : [a, b];
 }
 
-export function lseSvg(slots: LseSlots, uCentre: string, size = 96, label = ""): string {
+export function lseSvg(slots: LseSlots, uCenter: string, size = 96, label = ""): string {
   const g = 26, o = 10, out: string[] = [];
   const r = (x: number, y: number, w: number, h: number, c: string) =>
     out.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="var(--${c})" stroke="#0006" stroke-width="0.8"/>`);
   for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
-    if (i === 1 && j === 1) r(o + g, o + g, g - 2, g - 2, COL[uCentre] ?? "yel");
+    if (i === 1 && j === 1) r(o + g, o + g, g - 2, g - 2, COL[uCenter] ?? "yel");
     else if ((i + j) % 2 === 0) r(o + j * g, o + i * g, g - 2, g - 2, "crn");
   }
   const put = (n: keyof LseSlots, i: number, j: number, sx: number, sy: number, sw: number, sh: number) => {

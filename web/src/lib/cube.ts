@@ -101,7 +101,7 @@ export function normalizeByLeftBlock(s: string[]): string[] | null {
   return s.map((c) => m[c]);
 }
 
-export function normalizeByCentres(s: string[]): string[] {
+export function normalizeByCenters(s: string[]): string[] {
   const map: Record<string, string> = {};
   for (const [face, n] of Object.entries(FACES)) map[s[idx(n, n)]] = face;
   return s.map((c) => map[c] ?? c);

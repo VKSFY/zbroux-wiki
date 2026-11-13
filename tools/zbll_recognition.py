@@ -36,7 +36,7 @@ def relation(a, b, directional):
     d = (SIDES.index(a) - SIDES.index(b)) % 4
     if directional:
         return {0: "same", 1: "next-cw", 2: "opposite", 3: "next-ccw"}[d]
-    return {0: "same", 2: "opposite"}.get(d, "neighbouring")
+    return {0: "same", 2: "opposite"}.get(d, "neighboring")
 
 
 def side_row(state, side):
@@ -83,8 +83,8 @@ if __name__ == "__main__":
         "top and front": measure(cases, lambda t, c: full_view(t, ["F"])),
         "top, front and right": measure(cases, lambda t, c: full_view(t, ["F", "R"])),
         "scheme: relations within each side": measure(cases, scheme(False, False, False)),
-        "scheme: plus where the top colour sits": measure(cases, scheme(False, False, True)),
-        "scheme: plus which neighbouring colour": measure(cases, scheme(True, False, True)),
+        "scheme: plus where the top color sits": measure(cases, scheme(False, False, True)),
+        "scheme: plus which neighboring color": measure(cases, scheme(True, False, True)),
         "scheme: plus comparing front with right": measure(cases, scheme(True, True, True)),
     }
     print(json.dumps({k: {kk: vv for kk, vv in v.items() if kk != "by_shape"} for k, v in out.items()}, indent=1))

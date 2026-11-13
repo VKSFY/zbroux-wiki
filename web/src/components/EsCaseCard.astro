@@ -6,7 +6,7 @@ const { c } = Astro.props;
 const [best, ...alts] = c.algs;
 ---
 <div class="case-row" id={c.id}>
-  <Fragment set:html={eostripeSvg(c.slots, c.u_centre, c.f_centre, 132, `Case ${c.id}`)} />
+  <Fragment set:html={eostripeSvg(c.slots, c.u_center, c.f_center, 132, `Case ${c.id}`)} />
   <div>
     <div class="cid">{c.id} <span class="muted small">{c.bad_edges} flipped</span></div>
     <div class="alg">{best}</div>

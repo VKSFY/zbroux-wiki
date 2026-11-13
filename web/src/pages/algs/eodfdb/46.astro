@@ -8,11 +8,11 @@ const pairs = list.filter((c) => c.mirror_of !== c.id).length;
 const own = list.length - pairs;
 const s = stats(list);
 const groups = [
-  { title: "Top centre shows your top colour", items: list.filter((c) => c.centres === "solved") },
-  { title: "Top centre shows your bottom colour", items: list.filter((c) => c.centres === "off-M2") },
+  { title: "Top center shows your top color", items: list.filter((c) => c.centers === "solved") },
+  { title: "Top center shows your bottom color", items: list.filter((c) => c.centers === "off-M2") },
 ];
 ---
-<Base title="The 46-case EODFDB set" description="A 46-case EODFDB set: both bottom edges on top and opposite, centres aligned or off by M2, mirrors counted once. Definition, count and full list." crumbs={[{ href: "/methods/zbroux/eodfdb/", label: "EODFDB" }, { href: "/algs/eodfdb/", label: "All cases" }]}>
+<Base title="The 46-case EODFDB set" description="A 46-case EODFDB set: both bottom edges on top and opposite, centers aligned or off by M2, mirrors counted once. Definition, count and full list." crumbs={[{ href: "/methods/zbroux/eodfdb/", label: "EODFDB" }, { href: "/algs/eodfdb/", label: "All cases" }]}>
   <article class="prose">
     <h1>The 46-case EODFDB set</h1>
     <p class="lede">The <a href="https://www.speedsolving.com/wiki/index.php/ZBRoux">ZBRoux page on the Speedsolving wiki</a> gives EODFDB as 46 algorithms (in the info box, under "No. Algs": "493 ZBLL, 46 EOFB or EODFDB"), but no list or definition has been published. This page gives a definition that produces exactly 46 cases, and the list.</p>
@@ -22,7 +22,7 @@ const groups = [
     <p>You set the step up intuitively first, the same way as in the beginner approach, and then use one algorithm:</p>
     <ul>
       <li>both bottom edges (DF and DB) are on top, opposite each other;</li>
-      <li>the top centre shows your top colour or your bottom colour (centres aligned, or off by M2);</li>
+      <li>the top center shows your top color or your bottom color (centers aligned, or off by M2);</li>
       <li>at least one edge still needs orienting, so cases that only need an M2-style insert are left out;</li>
       <li>a case and its mirror image count as one algorithm, because the mirror is solved by the same algorithm with U and U' swapped.</li>
     </ul>
@@ -30,7 +30,7 @@ const groups = [
     <h2>How the count comes out</h2>
     <table>
       <tbody>
-        <tr><td>Cases with both bottom edges on top and opposite, centres aligned or off by M2</td><td>{chosen.length}</td></tr>
+        <tr><td>Cases with both bottom edges on top and opposite, centers aligned or off by M2</td><td>{chosen.length}</td></tr>
         <tr><td>Minus cases with nothing to orient ({excluded.map((c) => `${c.id}: ${c.algs[0]}`).join(", ")})</td><td>{kept.length}</td></tr>
         <tr><td>Mirror pairs counted once ({pairs} pairs, {own} cases that are their own mirror)</td><td><b>{list.length}</b></td></tr>
       </tbody>

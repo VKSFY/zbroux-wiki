@@ -90,7 +90,7 @@ if __name__ == "__main__":
     for n, d in enumerate(out, 1):
         d["id"] = f"C{n:02d}"
     meta = {"set": "CMLL", "cases": len(out), "corner_states": 648,
-            "note": "Edges and middle centres are ignored. Same search and ranking as ZBLL."}
+            "note": "Edges and middle centers are ignored. Same search and ranking as ZBLL."}
     json.dump({"meta": meta, "cases": out}, open("../data/cmll.json", "w"), indent=1)
     best = [d["algs"][0]["moves"] for d in out]
     print(f"cases {len(out)} rejected {rejected} | first-alg avg per case {sum(best)/len(best):.2f} max {max(best)}")

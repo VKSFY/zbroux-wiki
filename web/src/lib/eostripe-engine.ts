@@ -5,7 +5,7 @@ const nz = (p: V) => p.filter((c) => c !== 0).length;
 const inLeftBlock = (p: V) => p[0] === -1 && p[1] <= 0;
 
 function refFace(p: V): V { return p[1] !== 0 ? [0, p[1], 0] : [0, 0, p[2]]; }
-function refColour(cols: string[]): string | null {
+function refColor(cols: string[]): string | null {
   for (const c of "UDFB") if (cols.includes(c)) return c;
   return null;
 }
@@ -27,7 +27,7 @@ export function mask(state: string[]): string {
     const cols = ids.map((i) => state[i]);
     const set = new Set(cols);
     if (set.has("D") && (set.has("F") || set.has("B"))) continue;
-    const r = refColour(cols);
+    const r = refColor(cols);
     for (const i of ids) out[i] = state[i] === r ? "o" : "x";
   }
   return out.join("");
@@ -95,7 +95,7 @@ export interface Analysis {
   badEdges?: number;
 }
 
-export function analyse(scramble: string, leftBlock: string): Analysis {
+export function analyze(scramble: string, leftBlock: string): Analysis {
   let s: string[];
   try { s = apply(SOLVED, parse(scramble).concat(parse(leftBlock))); }
   catch (e) { return { ok: false, error: (e as Error).message }; }

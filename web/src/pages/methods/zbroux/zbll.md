@@ -1,7 +1,7 @@
 ---
 layout: ../../../layouts/Article.astro
 title: "Step 4: ZBLL"
-description: ZBLL in ZBRoux. Solving the whole last layer in one algorithm after EODFDB, how the cases are grouped, and how to recognise them.
+description: ZBLL in ZBRoux. Solving the whole last layer in one algorithm after EODFDB, how the cases are grouped, and how to recognize them.
 lede: Once the first two layers are done and every top edge is oriented, one algorithm solves the rest of the cube. There are 493 cases.
 crumbs:
   - { href: "/methods/zbroux/", label: "ZBRoux" }
@@ -13,16 +13,16 @@ ZBLL (Zborowski–Bruchem Last Layer) solves the whole last layer in one algorit
 
 ## How the cases are grouped
 
-ZBLL is split by the shape the top colour makes on the corners. These are the same seven shapes as the corner cases of OLL: T, U, L, H, Pi, Sune and Antisune. If all corners are already oriented, the case is a PLL.
+ZBLL is split by the shape the top color makes on the corners. These are the same seven shapes as the corner cases of OLL: T, U, L, H, Pi, Sune and Antisune. If all corners are already oriented, the case is a PLL.
 
 Each shape is then split by how the corners are arranged (6 groups of 12 for most shapes), and each group by the edges. Most people learn one shape at a time.
 
-## Recognising a case
+## Recognizing a case
 
 The [ZBLL recognition guide](/methods/zbroux/zbll-recognition/) explains this in detail. In short:
 
-1. **Shape**: look at where the top colour is on the corners.
-2. **Corner pattern**: look at the side colours of the corners to find which group it is.
+1. **Shape**: look at where the top color is on the corners.
+2. **Corner pattern**: look at the side colors of the corners to find which group it is.
 3. **Edges**: within the group, look at the edges to pick the exact case.
 
 In ZBRoux you can do the first two looks early. During EODFDB the corners only move with U turns, so you can work out the shape and corner pattern before EODFDB is finished, and only the edges are left to check at the end.
