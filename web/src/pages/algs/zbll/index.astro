@@ -9,7 +9,7 @@ const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape,
 ---
 <Base title="ZBLL: find your case" description="Find your ZBLL case in two looks (the shape of the top colour, then the corner pattern) or paste a scramble. All 493 cases." crumbs={[{ href: "/methods/zbroux/", label: "ZBRoux" }, { href: "/methods/zbroux/zbll/", label: "ZBLL" }]}>
   <h1>ZBLL: find your case</h1>
-  <p class="lede">The first two layers are done and every top edge is oriented. Find your case in two looks: first the shape the top colour makes, then the corner pattern. Or paste your scramble.</p>
+  <p class="lede">The first two layers are done and every top edge is oriented. Pick the shape the top colour makes, then tap the colours you see on your cube. Or paste your scramble.</p>
   <p class="note"><b>Unvetted list.</b> Every algorithm here is correct and checked, but they were found by computer search (RU, RUD, RUF, RUL and RUr, up to 16 moves) and nobody has picked them for ergonomics yet. They're ordered by a simple rule that can't judge finger tricks or regrips, so the first one isn't always the one most people use. Try the alternatives. Moves are counted in STM, without the AUF. <a href="/about/#zbll">More about how these were made</a>.</p>
 
   <details class="paste">
@@ -26,7 +26,6 @@ const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape,
   <section class="q" id="q1">
     <h2>1. Which shape does your top colour make?</h2>
     <p class="hint">Look only at the top colour, on the top face and on the sides of the corners. If all four corners already show it on top, pick PLL.</p>
-    <p class="note colours"><b>Your colours may not match the pictures.</b> The same case can turn up with the side colours shifted round, so don't look for the exact colours. Look for the pattern: the arrows show where pieces need to go, and what matters is which stickers match each other.</p>
     <div class="pics">
       {shapes.map((s) => (
         <button type="button" class="choice" data-v={s.key} title={s.blurb}>
@@ -38,14 +37,25 @@ const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape,
   </section>
 
   <section class="q" id="q2" hidden>
-    <h2>2. Which corner pattern matches?</h2>
-    <p class="hint">Now look at the corners only; the edges don't matter yet. The arrows show where the corners need to go. Turn the top layer until the pattern matches: for example, which side has two corners showing the same colour ("headlights").</p>
-    <div class="pics" id="groups"></div>
+    <h2>2. Tap the colours you see</h2>
+    <p class="hint" id="hold"></p>
+    <div class="paint">
+      <div id="painter"></div>
+      <div class="ptext">
+        <p id="pcount" role="status"></p>
+        <button type="button" class="btn" id="pclear">Clear colours</button>
+      </div>
+    </div>
+    <div id="gpick">
+      <h3>Or pick the corner pattern</h3>
+      <p class="hint">Every picture is drawn from the same angle as above. The arrows show where the corners need to go. The side colours on your cube may be shifted round from these, so match the arrows, not the exact colours.</p>
+      <div class="pics" id="groups"></div>
+    </div>
   </section>
 
   <section id="res" hidden>
     <div class="rhead">
-      <p><b id="count"></b> cases. Turn the top layer until your cube matches one of these, then do the algorithm. Match the arrows and which stickers match each other, not the exact colours.</p>
+      <p id="rtext"></p>
       <button type="button" class="btn" id="reset">Start over</button>
     </div>
     <div class="cases" id="list"></div>
@@ -59,20 +69,27 @@ const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape,
 <script>
   import { llSvg } from "../../../lib/ll-diagram.ts";
   import { findZbll, preAufFor, relabelU } from "../../../lib/zbll-engine.ts";
-  import { apply, SOLVED, STICKERS } from "../../../lib/cube.ts";
+  import { apply, parse, SOLVED, STICKERS } from "../../../lib/cube.ts";
 
   type C = { i: string; n: string; k: string; sh: string; g: number; st: string; a: [string, number][] };
+  type M = { c: C; v: string; pre: string };
   const DATA: C[] = JSON.parse(document.getElementById("zbll-data")!.textContent!);
   const byId = new Map(DATA.map((c) => [c.i, c]));
   const byKey = new Map(DATA.map((c) => [c.k, c]));
   const NAME: Record<string, string> = { S: "Sune ", AS: "Antisune ", PLL: "Group " };
+  const FACES = ["F", "R", "B", "L"];
+  const AUFS = ["", "U", "U2", "U'"];
   const $ = (id: string) => document.getElementById(id)!;
   const st: { sh: string | null; g: number | null } = { sh: null, g: null };
   let highlight: string | null = null;
+  const paint = new Map<number, string>();
 
   const pressed = (box: HTMLElement, v: string | null) =>
     box.querySelectorAll<HTMLButtonElement>("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === v)));
-  const llCorners = STICKERS.map((s, i) => [s, i] as const).filter(([s]) => s.p[1] === 1 && s.p.filter((x) => x !== 0).length === 3);
+  const llIds = STICKERS.map((s, i) => [s, i] as const).filter(([s]) => s.p[1] === 1 && s.p.filter((x) => x !== 0).length >= 2);
+  const llCorners = llIds.filter(([s]) => s.p.filter((x) => x !== 0).length === 3);
+  const turnU = (s: string) => apply(s.split(""), "U").join("");
+  const uMask = (s: string) => llCorners.map(([, i]) => (s[i] === "U" ? "1" : "0")).join("");
   function movedCorners(state: string) {
     const groups = new Map<string, number[]>();
     for (const [s, i] of llCorners) groups.set(s.p.join(), [...(groups.get(s.p.join()) ?? []), i]);
@@ -81,53 +98,125 @@ const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape,
     return n;
   }
   function calmCorners(state: string) {
-    let best = state, bestN = movedCorners(state), a = state;
-    for (let p = 0; p < 4; p++) {
-      let b = a;
-      for (let j = 0; j < 4; j++) { const n = movedCorners(b); if (n < bestN) { best = b; bestN = n; } b = relabelU(b); }
-      a = apply(a.split(""), "U").join("");
-    }
+    let best = state, bestN = movedCorners(state), b = state;
+    for (let j = 0; j < 4; j++) { const n = movedCorners(b); if (n < bestN) { best = b; bestN = n; } b = relabelU(b); }
     return best;
+  }
+  function withPre(pre: string, alg: string) {
+    if (!pre) return alg;
+    const q: Record<string, number> = { U: 1, U2: 2, "U'": 3 };
+    const m = parse(alg);
+    let t = q[pre];
+    while (m.length && m[0][0] === "U") t += q[m.shift()!];
+    t %= 4;
+    return [t ? AUFS[t] : "", ...m].filter(Boolean).join(" ");
+  }
+  const shapeCases = () => DATA.filter((c) => c.sh === st.sh);
+  const pose = () => shapeCases()[0].st;
+  const paintable = () => { const p = pose(); return new Set(llIds.filter(([, i]) => p[i] !== "U").map(([, i]) => i)); };
+  let variantCache: { sh: string; list: M[] } | null = null;
+  function variants(): M[] {
+    if (variantCache?.sh === st.sh) return variantCache.list;
+    const mask = uMask(pose()), list: M[] = [];
+    for (const c of shapeCases()) {
+      let a = c.st;
+      const seen = new Set<string>();
+      for (let p = 0; p < 4; p++) {
+        if (uMask(a) === mask && !seen.has(a)) {
+          const pre = preAufFor(a, c.st) ?? "";
+          let b = a;
+          for (let j = 0; j < 4; j++) { seen.add(b); list.push({ c, v: b, pre }); b = relabelU(b); }
+        }
+        a = turnU(a);
+      }
+    }
+    variantCache = { sh: st.sh!, list };
+    return list;
+  }
+  function matches(): M[] {
+    const out = new Map<string, M>();
+    for (const m of variants()) {
+      const k = m.c.i + "|" + m.pre;
+      if (out.has(k)) continue;
+      let ok = true;
+      for (const [i, f] of paint) if (m.v[i] !== f) { ok = false; break; }
+      if (ok) out.set(k, m);
+    }
+    return [...out.values()];
+  }
+  function drawPainter() {
+    const p = pose(), can = paintable();
+    const s = p.split("").map((x, i) => (can.has(i) ? paint.get(i) ?? "X" : x)).join("");
+    $("painter").innerHTML = llSvg(s, 220, "Your top layer", "full", false);
+    $("painter").querySelectorAll<SVGRectElement>("rect").forEach((r) => { if (can.has(Number(r.dataset.i))) r.classList.add("tap"); });
+  }
+  function caseRow(c: C, pic: string, pre: string) {
+    const [best, ...alts] = c.a.map((x) => withPre(pre, x[0]));
+    return `<div class="case-row${c.i === highlight ? " hl" : ""}" id="${c.i}">${pic}
+      <div><div class="cid">${c.n ? `<span class="pname">${c.n}</span> ` : ""}${c.i}</div><div class="alg">${best}</div>${alts.length ? `<div class="alts">${alts.join("<br>")}</div>` : ""}</div>
+      <div class="mv">${c.a[0][1]} moves</div></div>`;
   }
   function render() {
     pressed($("q1"), st.sh);
-    $("q2").hidden = !st.sh || st.sh === "PLL";
-    if (st.sh && st.sh !== "PLL") {
-      const groups = [...new Set(DATA.filter((c) => c.sh === st.sh).map((c) => c.g))].sort((a, b) => a - b);
-      $("groups").innerHTML = groups.map((g) => {
-        const rep = DATA.find((c) => c.sh === st.sh && c.g === g)!;
-        return `<button type="button" class="choice col" data-v="${g}">${llSvg(calmCorners(rep.st), 72, `${st.sh}${g} corners`, "corners")}<small>${NAME[st.sh!] ?? st.sh}${g}</small></button>`;
-      }).join("");
-      pressed($("groups"), st.g === null ? null : String(st.g));
+    $("q2").hidden = !st.sh;
+    let rows: string[] = [], text = "";
+    if (st.sh) {
+      $("hold").textContent = st.sh === "PLL"
+        ? "Tap a sticker on the picture to set its colour; tap again for the next colour. Hold the cube any way round and fill in what you see on the front and right. Three or four stickers are usually enough."
+        : "Hold your cube so the top-colour stickers are in the same places as on this picture. Then tap a sticker to set its colour; tap again for the next colour. Fill in what you see on the front and right first. Four to six stickers are usually enough.";
+      drawPainter();
+      $("gpick").hidden = st.sh === "PLL";
+      if (st.sh !== "PLL") {
+        const groups = [...new Set(shapeCases().map((c) => c.g))].sort((a, b) => a - b);
+        $("groups").innerHTML = groups.map((g) => {
+          const rep = DATA.find((c) => c.sh === st.sh && c.g === g)!;
+          return `<button type="button" class="choice col" data-v="${g}">${llSvg(calmCorners(rep.st), 72, `${st.sh}${g} corners`, "corners")}<small>${NAME[st.sh!] ?? st.sh}${g}</small></button>`;
+        }).join("");
+        pressed($("groups"), st.g === null ? null : String(st.g));
+      }
+      if (paint.size) {
+        const ms = matches();
+        $("pcount").innerHTML = ms.length === 0
+          ? "<b>No case has these colours.</b> Check the stickers, and that the top-colour stickers on your cube are where they are on the picture."
+          : ms.length === 1 ? "<b>Found it.</b> Your case is below." : `<b>${ms.length} cases</b> have these colours. Tap more stickers to narrow it down.`;
+        rows = ms.map((m) => caseRow(m.c, llSvg(m.v, 78, "ZBLL " + m.c.i), m.pre));
+        text = ms.length ? `<b>${ms.length}</b> ${ms.length === 1 ? "case matches" : "cases match"} your colours, drawn in your colours. The algorithms start from the angle you are holding.` : "";
+      } else {
+        $("pcount").textContent = "No colours set yet.";
+        const list = st.sh === "PLL" ? shapeCases().sort((a, b) => a.n.localeCompare(b.n)) : st.g !== null ? shapeCases().filter((c) => c.g === st.g) : [];
+        rows = list.map((c) => caseRow(c, llSvg(c.st, 78, "ZBLL " + c.i), ""));
+        text = list.length ? `<b>${list.length}</b> cases. Hold the cube like the pictures, then match the arrows; your side colours may be shifted round from these.` : "";
+      }
     }
-    const list = st.sh === "PLL"
-      ? DATA.filter((c) => c.sh === "PLL").sort((a, b) => a.n.localeCompare(b.n))
-      : st.sh && st.g !== null ? DATA.filter((c) => c.sh === st.sh && c.g === st.g) : [];
-    $("res").hidden = list.length === 0;
-    $("count").textContent = String(list.length);
-    $("list").innerHTML = list.map((c) => {
-      const [best, ...alts] = c.a;
-      return `<div class="case-row${c.i === highlight ? " hl" : ""}" id="${c.i}">${llSvg(c.st, 78, "ZBLL " + c.i)}
-        <div><div class="cid">${c.n ? `<span class="pname">${c.n}</span> ` : ""}${c.i}</div><div class="alg">${best[0]}</div>${alts.length ? `<div class="alts">${alts.map((x) => x[0]).join("<br>")}</div>` : ""}</div>
-        <div class="mv">${best[1]} moves</div></div>`;
-    }).join("");
+    $("res").hidden = rows.length === 0;
+    $("rtext").innerHTML = text;
+    $("list").innerHTML = rows.join("");
   }
   function show(id: string, note?: string) {
     const c = byId.get(id); if (!c) return;
-    st.sh = c.sh; st.g = c.g; highlight = id; render();
+    st.sh = c.sh; st.g = c.g; highlight = id; paint.clear(); render();
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "center" });
     if (note) $("pmsg").textContent = note;
   }
   $("q1").addEventListener("click", (e) => {
     const b = (e.target as HTMLElement).closest<HTMLButtonElement>("button"); if (!b) return;
-    st.sh = st.sh === b.dataset.v ? null : b.dataset.v!; st.g = null; highlight = null; render();
+    st.sh = st.sh === b.dataset.v ? null : b.dataset.v!; st.g = null; highlight = null; paint.clear(); render();
+    if (st.sh) $("q2").scrollIntoView({ behavior: "smooth", block: "start" });
   });
+  $("painter").addEventListener("click", (e) => {
+    const r = (e.target as Element).closest<SVGRectElement>("rect.tap"); if (!r) return;
+    const i = Number(r.dataset.i), cur = paint.get(i);
+    const next = cur === undefined ? FACES[0] : FACES[FACES.indexOf(cur) + 1];
+    if (next) paint.set(i, next); else paint.delete(i);
+    st.g = null; highlight = null; render();
+  });
+  $("pclear").addEventListener("click", () => { paint.clear(); render(); });
   $("groups").addEventListener("click", (e) => {
     const b = (e.target as HTMLElement).closest<HTMLButtonElement>("button"); if (!b) return;
-    const g = Number(b.dataset.v); st.g = st.g === g ? null : g; highlight = null; render();
+    const g = Number(b.dataset.v); st.g = st.g === g ? null : g; highlight = null; paint.clear(); render();
     if (st.g !== null) $("res").scrollIntoView({ behavior: "smooth", block: "start" });
   });
-  $("reset").addEventListener("click", () => { st.sh = null; st.g = null; highlight = null; history.replaceState(null, "", location.pathname); render(); scrollTo({ top: 0, behavior: "smooth" }); });
+  $("reset").addEventListener("click", () => { st.sh = null; st.g = null; highlight = null; paint.clear(); history.replaceState(null, "", location.pathname); render(); scrollTo({ top: 0, behavior: "smooth" }); });
   $("pf").addEventListener("submit", (e) => {
     e.preventDefault();
     const r = findZbll(($("scr") as HTMLTextAreaElement).value, ($("mv") as HTMLTextAreaElement).value);
@@ -164,6 +253,11 @@ const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape,
   .rhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:30px;padding-top:14px;border-top:1px solid var(--line)}
   .rhead p{margin:0;max-width:var(--content)}
   .more{margin-top:32px}
-  .colours{margin:10px 0 4px;max-width:var(--content)}
+  .paint{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin:4px 0 6px}
+  .paint :global(rect.tap){cursor:pointer}
+  .paint :global(rect.tap:hover){stroke:var(--ink);stroke-width:1.6}
+  .ptext{max-width:320px}
+  .ptext p{margin:0 0 10px}
+  #gpick h3{font-size:1rem;margin:22px 0 2px}
   .grid :global(.pname),.cases :global(.pname){display:inline-block;background:var(--surface-2);border:1px solid var(--line);border-radius:4px;padding:0 6px;margin-right:4px;font-weight:700}
 </style>

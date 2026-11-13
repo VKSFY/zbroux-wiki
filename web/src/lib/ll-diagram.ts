@@ -32,7 +32,7 @@ export function llSvg(state: string, size = 104, label = "", mode: LlMode = "ful
     return COL[c] ?? "crn";
   };
   const r = (x: number, y: number, w: number, h: number, p: V, n: V) =>
-    out.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="var(--${colour(p, n)})" stroke="#0006" stroke-width="0.8"/>`);
+    out.push(`<rect data-i="${idx(p, n)}" x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="var(--${colour(p, n)})" stroke="#0006" stroke-width="0.8"/>`);
   for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
     const p: V = [j - 1, 1, i - 1];
     r(o + j * g, o + i * g, g - 2, g - 2, p, [0, 1, 0]);

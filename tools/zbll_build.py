@@ -1,5 +1,5 @@
 import json, glob, collections
-from cube import apply, parse, SOLVED, STICKERS
+from cube import apply, parse, invert, SOLVED, STICKERS
 from zbll_cases import relabel_u
 
 SOLVED_S = "".join(SOLVED)
@@ -59,6 +59,30 @@ def calmest_view(state):
     for _ in range(3):
         views.append(relabel_u(views[-1]))
     return min(views, key=lambda v: (moved_pieces(v), views.index(v)))
+
+
+POSE_ALGS = {
+    "T": "R U R' U' R' F R F'",
+    "U": "R2 D R' U2 R D' R' U2 R'",
+    "L": "F R' F' r U R U' r'",
+    "H": "R U R' U R U' R' U R U2 R'",
+    "Pi": "R U2 R2 U' R2 U' R2 U2 R",
+    "S": "R U R' U R U2 R'",
+    "AS": "R U2 R' U' R U' R'",
+}
+LL_CORNER_IDS = sorted(i for p, ids in LL_PIECES.items() if sum(1 for c in p if c) == 3 for i in ids)
+
+
+def upattern(state):
+    return tuple(i for i in LL_CORNER_IDS if state[i] == "U")
+
+
+def _inv(alg):
+    inv = invert(alg)
+    return inv if isinstance(inv, str) else " ".join(inv)
+
+
+POSE = {k: upattern(apply(SOLVED, _inv(a))) for k, a in POSE_ALGS.items()}
 
 
 PLL_ALGS = {
@@ -122,6 +146,10 @@ for i, c in enumerate(cases):
     cand.sort()
     best = cand[0][1]
     k = auf_amount(split_auf(best)[0])
+    if c["shape"] != "PLL":
+        fits = [j for j in range(4) if upattern(apply(tuple(c["state"]), AUF[j]) if j else c["state"]) == POSE[c["shape"]]]
+        assert fits, (i, c["shape"])
+        if k not in fits: k = fits[0]
     disp = "".join(apply(tuple(c["state"]), AUF[k])) if k else c["state"]
     disp = calmest_view(disp)
     algs, seen = [], set()
@@ -138,7 +166,7 @@ for i, c in enumerate(cases):
                 "best_moves": algs[0]["moves"], "candidates": len(cand)})
 
 SHAPES = ["PLL", "T", "U", "L", "H", "Pi", "S", "AS"]
-out.sort(key=lambda d: (SHAPES.index(d["shape"]), d["corners"], d["best_moves"], d["algs"][0]["alg"]))
+out.sort(key=lambda d: (SHAPES.index(d["shape"]), d["corners"], d["best_moves"], " ".join(split_auf(d["algs"][0]["alg"])[1])))
 gnum = {}
 cnt = collections.Counter()
 for d in out:
@@ -158,7 +186,7 @@ json.dump({"meta": {
     "generated_by": "cubing/tools/zbll_gen.mts (bidirectional search per move subset), ranked by zbll_build.py",
     "subsets": "RU (<=16 moves), RUD / RUF / RUL / RUr (<=14 moves)",
     "ranking": "heuristic: R,U=1, r=1.15, D/F/L=1.5, B=2 per move; half turns +0.1 (U) to +0.4 (F/L/B); +0.3 per pre-AUF",
-    "orientation": "Yellow top, green front. Diagram shows the angle the first alg starts from.",
+    "orientation": "Yellow top, green front. Every case of a shape is drawn from the same angle, so the first alg may start with a U turn.",
   }, "cases": out}, open("../data/zbll.json", "w"), indent=1)
 print(f"cases with algs: {len(out)}/{len(cases)}  rejected candidates: {bad}  missing: {len(missing)}")
 bm = [d['best_moves'] for d in out]

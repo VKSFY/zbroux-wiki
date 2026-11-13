@@ -20,7 +20,7 @@ const s = stats(list);
     <span>Other sets: {SHAPES.filter((x) => x.key !== shape.key).map((x, i) => <>{i > 0 && " · "}<a href={`/algs/zbll/${slug(x.key)}/`}>{NAMES[x.key] ?? x.key}</a></>)}</span>
     <button class="btn" type="button" id="print">Print / save as PDF</button>
   </p>
-  <p class="note"><b>Unvetted list.</b> Every algorithm here is correct and checked, but they were found by computer search (RU, RUD, RUF, RUL and RUr, up to 16 moves) and nobody has picked them for ergonomics yet. They're ordered by a simple rule that can't judge finger tricks or regrips, so the first one isn't always the one most people use. Try the alternatives. Moves are counted in STM, without the AUF. <a href="/about/#zbll">More about how these were made</a>.</p>
+  <p class="note"><b>Unvetted list.</b> Every algorithm here is correct and checked, but they were found by computer search (RU, RUD, RUF, RUL and RUr, up to 16 moves) and nobody has picked them for ergonomics yet. They're ordered by a simple rule that can't judge finger tricks or regrips, so the first one isn't always the one most people use. Try the alternatives. Moves are counted in STM, without the AUF. Every case in a set is drawn from the same angle, so you never have to turn the picture in your head; some algorithms start with a U turn because of that. <a href="/about/#zbll">More about how these were made</a>.</p>
   {shape.key === "PLL" && (
     <section>
       <h2>All 21 PLLs</h2>
