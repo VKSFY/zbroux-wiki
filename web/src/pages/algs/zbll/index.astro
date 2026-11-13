@@ -5,7 +5,7 @@ import { llSvg } from "../../../lib/ll-diagram.ts";
 
 const NAMES: Record<string, string> = { T: "T", U: "U", L: "L", H: "H", Pi: "Pi", S: "Sune", AS: "Antisune", PLL: "PLL" };
 const shapes = SHAPES.map((s) => ({ key: s.key, name: NAMES[s.key], blurb: s.blurb, n: zbll.filter((c) => c.shape === s.key).length, pic: zbll.find((c) => c.shape === s.key)!.state }));
-const data = zbll.map((c) => ({ i: c.id, k: c.key, sh: c.shape, g: c.group, st: c.state, a: c.algs.map((x) => [x.alg, x.moves]) }));
+const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape, g: c.group, st: c.state, a: c.algs.map((x) => [x.alg, x.moves]) }));
 ---
 <Base title="ZBLL: find your case" description="Find your ZBLL case in two looks (the shape of the top colour, then the corner pattern) or paste a scramble. All 493 cases." crumbs={[{ href: "/methods/zbroux/", label: "ZBRoux" }, { href: "/methods/zbroux/zbll/", label: "ZBLL" }]}>
   <h1>ZBLL: find your case</h1>
@@ -25,7 +25,8 @@ const data = zbll.map((c) => ({ i: c.id, k: c.key, sh: c.shape, g: c.group, st: 
 
   <section class="q" id="q1">
     <h2>1. Which shape does your top colour make?</h2>
-    <p class="hint">Look only at the top colour, on the top face and on the sides of the corners.</p>
+    <p class="hint">Look only at the top colour, on the top face and on the sides of the corners. If all four corners already show it on top, pick PLL.</p>
+    <p class="note colours"><b>Your colours may not match the pictures.</b> The same case can turn up with the side colours shifted round, so don't look for the exact colours. Look for the pattern: the arrows show where pieces need to go, and what matters is which stickers match each other.</p>
     <div class="pics">
       {shapes.map((s) => (
         <button type="button" class="choice" data-v={s.key} title={s.blurb}>
@@ -38,13 +39,13 @@ const data = zbll.map((c) => ({ i: c.id, k: c.key, sh: c.shape, g: c.group, st: 
 
   <section class="q" id="q2" hidden>
     <h2>2. Which corner pattern matches?</h2>
-    <p class="hint">Now look at the corner colours only. Turn the top layer until one of these matches; the edges don't matter yet.</p>
+    <p class="hint">Now look at the corners only; the edges don't matter yet. The arrows show where the corners need to go. Turn the top layer until the pattern matches: for example, which side has two corners showing the same colour ("headlights").</p>
     <div class="pics" id="groups"></div>
   </section>
 
   <section id="res" hidden>
     <div class="rhead">
-      <p><b id="count"></b> cases. Turn the top layer until your cube matches one of these exactly, then do the algorithm.</p>
+      <p><b id="count"></b> cases. Turn the top layer until your cube matches one of these, then do the algorithm. Match the arrows and which stickers match each other, not the exact colours.</p>
       <button type="button" class="btn" id="reset">Start over</button>
     </div>
     <div class="cases" id="list"></div>
@@ -57,9 +58,10 @@ const data = zbll.map((c) => ({ i: c.id, k: c.key, sh: c.shape, g: c.group, st: 
 
 <script>
   import { llSvg } from "../../../lib/ll-diagram.ts";
-  import { findZbll, preAufFor } from "../../../lib/zbll-engine.ts";
+  import { findZbll, preAufFor, relabelU } from "../../../lib/zbll-engine.ts";
+  import { apply, SOLVED, STICKERS } from "../../../lib/cube.ts";
 
-  type C = { i: string; k: string; sh: string; g: number; st: string; a: [string, number][] };
+  type C = { i: string; n: string; k: string; sh: string; g: number; st: string; a: [string, number][] };
   const DATA: C[] = JSON.parse(document.getElementById("zbll-data")!.textContent!);
   const byId = new Map(DATA.map((c) => [c.i, c]));
   const byKey = new Map(DATA.map((c) => [c.k, c]));
@@ -70,24 +72,43 @@ const data = zbll.map((c) => ({ i: c.id, k: c.key, sh: c.shape, g: c.group, st: 
 
   const pressed = (box: HTMLElement, v: string | null) =>
     box.querySelectorAll<HTMLButtonElement>("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === v)));
+  const llCorners = STICKERS.map((s, i) => [s, i] as const).filter(([s]) => s.p[1] === 1 && s.p.filter((x) => x !== 0).length === 3);
+  function movedCorners(state: string) {
+    const groups = new Map<string, number[]>();
+    for (const [s, i] of llCorners) groups.set(s.p.join(), [...(groups.get(s.p.join()) ?? []), i]);
+    let n = 0;
+    for (const ids of groups.values()) if (ids.map((i) => state[i]).sort().join("") !== ids.map((i) => SOLVED[i]).sort().join("")) n++;
+    return n;
+  }
+  function calmCorners(state: string) {
+    let best = state, bestN = movedCorners(state), a = state;
+    for (let p = 0; p < 4; p++) {
+      let b = a;
+      for (let j = 0; j < 4; j++) { const n = movedCorners(b); if (n < bestN) { best = b; bestN = n; } b = relabelU(b); }
+      a = apply(a.split(""), "U").join("");
+    }
+    return best;
+  }
   function render() {
     pressed($("q1"), st.sh);
-    $("q2").hidden = !st.sh;
-    if (st.sh) {
+    $("q2").hidden = !st.sh || st.sh === "PLL";
+    if (st.sh && st.sh !== "PLL") {
       const groups = [...new Set(DATA.filter((c) => c.sh === st.sh).map((c) => c.g))].sort((a, b) => a - b);
       $("groups").innerHTML = groups.map((g) => {
         const rep = DATA.find((c) => c.sh === st.sh && c.g === g)!;
-        return `<button type="button" class="choice col" data-v="${g}">${llSvg(rep.st, 64, `${st.sh}${g} corners`, "corners")}<small>${NAME[st.sh!] ?? st.sh}${g}</small></button>`;
+        return `<button type="button" class="choice col" data-v="${g}">${llSvg(calmCorners(rep.st), 72, `${st.sh}${g} corners`, "corners")}<small>${NAME[st.sh!] ?? st.sh}${g}</small></button>`;
       }).join("");
       pressed($("groups"), st.g === null ? null : String(st.g));
     }
-    const list = st.sh && st.g !== null ? DATA.filter((c) => c.sh === st.sh && c.g === st.g) : [];
+    const list = st.sh === "PLL"
+      ? DATA.filter((c) => c.sh === "PLL").sort((a, b) => a.n.localeCompare(b.n))
+      : st.sh && st.g !== null ? DATA.filter((c) => c.sh === st.sh && c.g === st.g) : [];
     $("res").hidden = list.length === 0;
     $("count").textContent = String(list.length);
     $("list").innerHTML = list.map((c) => {
       const [best, ...alts] = c.a;
       return `<div class="case-row${c.i === highlight ? " hl" : ""}" id="${c.i}">${llSvg(c.st, 78, "ZBLL " + c.i)}
-        <div><div class="cid">${c.i}</div><div class="alg">${best[0]}</div>${alts.length ? `<div class="alts">${alts.map((x) => x[0]).join("<br>")}</div>` : ""}</div>
+        <div><div class="cid">${c.n ? `<span class="pname">${c.n}</span> ` : ""}${c.i}</div><div class="alg">${best[0]}</div>${alts.length ? `<div class="alts">${alts.map((x) => x[0]).join("<br>")}</div>` : ""}</div>
         <div class="mv">${best[1]} moves</div></div>`;
     }).join("");
   }
@@ -143,4 +164,6 @@ const data = zbll.map((c) => ({ i: c.id, k: c.key, sh: c.shape, g: c.group, st: 
   .rhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:30px;padding-top:14px;border-top:1px solid var(--line)}
   .rhead p{margin:0;max-width:var(--content)}
   .more{margin-top:32px}
+  .colours{margin:10px 0 4px;max-width:var(--content)}
+  .grid :global(.pname),.cases :global(.pname){display:inline-block;background:var(--surface-2);border:1px solid var(--line);border-radius:4px;padding:0 6px;margin-right:4px;font-weight:700}
 </style>

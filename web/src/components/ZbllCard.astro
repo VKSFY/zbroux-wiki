@@ -8,9 +8,12 @@ const [best, ...alts] = c.algs;
 <div class="case-row" id={c.id}>
   <Fragment set:html={llSvg(c.state, 78, `ZBLL case ${c.id}`)} />
   <div>
-    <div class="cid">{c.id}</div>
+    <div class="cid">{c.name && <span class="pname">{c.name}</span>} {c.id}</div>
     <div class="alg">{best.alg}</div>
     {alts.length > 0 && <div class="alts" set:html={alts.map((a) => a.alg).join("<br>")} />}
   </div>
   <div class="mv">{best.moves} moves</div>
 </div>
+<style>
+  .pname{display:inline-block;background:var(--surface-2);border:1px solid var(--line);border-radius:4px;padding:0 6px;margin-right:2px;font-weight:700}
+</style>

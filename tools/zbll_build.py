@@ -1,5 +1,6 @@
 import json, glob, collections
-from cube import apply, parse, SOLVED
+from cube import apply, parse, SOLVED, STICKERS
+from zbll_cases import relabel_u
 
 SOLVED_S = "".join(SOLVED)
 cases = json.load(open("_zbll_cases.json"))
@@ -36,6 +37,67 @@ def simplify(alg):
             out.append((f, q))
     return " ".join(f + {1: "", 2: "2", 3: "'"}[q] for f, q in out)
 
+LL_PIECES = {}
+for _i, (_p, _n) in enumerate(STICKERS):
+    if _p[1] == 1 and sum(1 for _c in _p if _c) >= 2:
+        LL_PIECES.setdefault(_p, []).append(_i)
+
+
+def moved_pieces(state):
+    corners = edges = 0
+    for p, ids in LL_PIECES.items():
+        if sorted(state[i] for i in ids) != sorted(SOLVED_S[i] for i in ids):
+            if sum(1 for c in p if c) == 3:
+                corners += 1
+            else:
+                edges += 1
+    return corners + edges, corners
+
+
+def calmest_view(state):
+    views = [state]
+    for _ in range(3):
+        views.append(relabel_u(views[-1]))
+    return min(views, key=lambda v: (moved_pieces(v), views.index(v)))
+
+
+PLL_ALGS = {
+    "Aa": "x L2 D2 L' U' L D2 L' U L' x'",
+    "Ab": "x' L2 D2 L U L' D2 L U' L x",
+    "E": "x' L' U L D' L' U' L D L' U' L D' L' U L D x",
+    "F": "R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R",
+    "Ga": "R2 U R' U R' U' R U' R2 U' D R' U R D'",
+    "Gb": "R' U' R U D' R2 U R' U R U' R U' R2 D",
+    "Gc": "R2 U' R U' R U R' U R2 U D' R U' R' D",
+    "Gd": "R U R' U' D R2 U' R U' R' U R' U R2 D'",
+    "H": "M2 U M2 U2 M2 U M2",
+    "Ja": "x R2 F R F' R U2 r' U r U2 x'",
+    "Jb": "R U R' F' R U R' U' R' F R2 U' R'",
+    "Na": "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'",
+    "Nb": "R' U R U' R' F' U' F R U R' F R' F' R U' R",
+    "Ra": "R U' R' U' R U R D R' U' R D' R' U2 R'",
+    "Rb": "R2 F R U R U' R' F' R U2 R' U2 R",
+    "T": "R U R' U' R' F R2 U' R' U' R U R' F'",
+    "Ua": "M2 U M U2 M' U M2",
+    "Ub": "M2 U' M U2 M' U' M2",
+    "V": "R' U R' U' y R' F' R2 U' R' U R' F R F y'",
+    "Y": "F R U' R' U' R U R' F' R U R' U' R' F R F'",
+    "Z": "M' U M2 U M2 U M' U2 M2",
+}
+
+
+def pll_names(cases):
+    names = {}
+    for name, alg in PLL_ALGS.items():
+        hits = [c["id"] for c in cases if c["shape"] == "PLL"
+                and any(solves(apply(tuple(c["state"]), pre) if pre else c["state"], alg) for pre in ["", "U", "U2", "U'"])]
+        assert len(hits) == 1, (name, hits)
+        assert hits[0] not in names, (name, hits)
+        names[hits[0]] = name
+    assert len(names) == 21
+    return names
+
+
 def solves(state, alg):
     s = apply(tuple(state), alg)
     for a in ["", "U", "U2", "U'"]:
@@ -61,6 +123,7 @@ for i, c in enumerate(cases):
     best = cand[0][1]
     k = auf_amount(split_auf(best)[0])
     disp = "".join(apply(tuple(c["state"]), AUF[k])) if k else c["state"]
+    disp = calmest_view(disp)
     algs, seen = [], set()
     for sc, a, st in cand:
         pre, body = split_auf(a)
@@ -84,6 +147,11 @@ for d in out:
     cnt[(d["shape"], g)] += 1
     d["id"] = f"{d['shape']}{g}-{cnt[(d['shape'], g)]:02d}"
     del d["corners"]
+
+names = pll_names(out)
+for d in out:
+    if d["id"] in names:
+        d["name"] = names[d["id"]]
 
 json.dump({"meta": {
     "set": "ZBLL", "cases": len(out),

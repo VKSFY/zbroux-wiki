@@ -21,7 +21,13 @@ const s = stats(list);
     <button class="btn" type="button" id="print">Print / save as PDF</button>
   </p>
   <p class="note"><b>Unvetted list.</b> Every algorithm here is correct and checked, but they were found by computer search (RU, RUD, RUF, RUL and RUr, up to 16 moves) and nobody has picked them for ergonomics yet. They're ordered by a simple rule that can't judge finger tricks or regrips, so the first one isn't always the one most people use. Try the alternatives. Moves are counted in STM, without the AUF. <a href="/about/#zbll">More about how these were made</a>.</p>
-  {groups.map((g) => {
+  {shape.key === "PLL" && (
+    <section>
+      <h2>All 21 PLLs</h2>
+      <div class="cases">{[...list].sort((x, y) => (x.name ?? "").localeCompare(y.name ?? "")).map((c) => <ZbllCard c={c} />)}</div>
+    </section>
+  )}
+  {shape.key !== "PLL" && groups.map((g) => {
     const gl = list.filter((c) => c.group === g);
     return (
       <section>

@@ -1,7 +1,7 @@
 import raw from "../../../data/zbll.json";
 
 export interface ZbllAlg { alg: string; moves: number; set: string }
-export interface ZbllCase { id: string; key: string; shape: string; group: number; state: string; algs: ZbllAlg[]; best_moves: number; candidates: number }
+export interface ZbllCase { id: string; name?: string; key: string; shape: string; group: number; state: string; algs: ZbllAlg[]; best_moves: number; candidates: number }
 const data = raw as any;
 export const meta = data.meta;
 export const zbll = data.cases as ZbllCase[];
