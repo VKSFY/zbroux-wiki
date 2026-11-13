@@ -59,7 +59,7 @@ There are two ways to quote an average, and they give different numbers:
 
 ### The 46
 
-The [ZBRoux page on the Speedsolving wiki](https://www.speedsolving.com/wiki/index.php/ZBRoux) gives EODFDB as 46 algorithms. It's in the info box at the top, under "No. Algs": "493 ZBLL, 46 EOFB or EODFDB". No list or definition has been published with it. A set of exactly 46 does come out if you set the step up intuitively first: both bottom edges on top and opposite, the top center showing your top or bottom color, the two cases that need no orienting left out, and mirror cases counted once. Without leaving those two out it's 48. That reconstruction and its list are on [the 46-case set](/algs/eodfdb/46/) page. It matches the number, but it isn't confirmed to be the set the wiki meant.
+The Speedsolving wiki's [ZBRoux infobox](https://www.speedsolving.com/wiki/index.php/ZBRoux) lists 46 for EODFDB without a source. Under "No. Algs" it reads "493-539 (493 ZBLL, 46 EOFB or EODFDB)". It's an unsourced figure, and no list or definition goes with it. A set of exactly 46 does come out if you set the step up intuitively first: both bottom edges on top and opposite, the top center showing your top or bottom color, the two cases that need no orienting left out, and mirror cases counted once. Without leaving those two out it's 48. That set is a reconstruction that matches the number, not a confirmed definition. The list, and more on where the number comes from, are on [the 46-case set](/algs/eodfdb/46/) page.
 
 ## Looking ahead to ZBLL
 

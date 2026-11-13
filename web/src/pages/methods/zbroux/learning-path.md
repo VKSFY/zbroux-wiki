@@ -45,6 +45,6 @@ The six 72-case sets are worth exactly the same per algorithm learned. H and PLL
 ## Stage 4: EODFDB algorithms
 
 - First merge steps 1 and 2 of intuitive EODFDB: orient the edges while already bringing the bottom edges up. That alone saves about one and a half moves on average.
-- Then learn the [46-case set](/algs/eodfdb/46/). It works the other way round: bring both bottom edges to the top first, opposite each other, and then one algorithm orients everything and inserts them. There's a [one-page cheat sheet](/algs/eodfdb/46-sheet/) to print.
+- Then learn the [46-case set](/algs/eodfdb/46/). It works the other way round: bring both bottom edges to the top first, opposite each other, and then one algorithm orients everything and inserts them. There's a [one-page cheat sheet](/algs/eodfdb/46-sheet/) to print. The number 46 comes from an unsourced figure on the Speedsolving wiki, and this set is a reconstruction that matches it ([details](/algs/eodfdb/46/)).
 - For the shortest solutions to everything, use the [full EODFDB case finder](/algs/eodfdb/).
 - Practice reading your ZBLL case during EODFDB, so you know it before you get there.
