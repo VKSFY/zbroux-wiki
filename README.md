@@ -64,7 +64,14 @@ npm run build    # static output in web/dist
 ```
 - `src/pages/methods/zbroux/*.md`: ZBRoux guide pages (plain Markdown, easy to edit)
 - `src/pages/algs/eodfdb/[...variant].astro`: EODFDB sheet (one page per center state, print = PDF)
-- `src/lib/site.ts`: site name (working title "AlgBase") and nav
+- `src/lib/site.ts`: site name and nav
+
+Tools on the site:
+- `/algs/eodfdb/`: EODFDB case finder (questions, or a scramble and block moves)
+- `/algs/zbll/`: ZBLL case finder (tap your colors, or a scramble and moves)
+- `/tools/trainer/`: EODFDB and ZBLL trainer
+- `/tools/breakdown/`: solve breakdown (splits a pasted ZBRoux solution into stages and looks up the cases; `node tools/verify_breakdown.mjs` checks it against the example solves)
+- `/tools/eostripe-solver/`: EOStripe solver for LEOR
 
 ## License
 

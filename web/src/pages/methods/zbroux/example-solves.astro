@@ -4,6 +4,7 @@ import LseDiagram from "../../../components/LseDiagram.astro";
 import { cases } from "../../../lib/eodfdb";
 import { zbll } from "../../../lib/zbll.ts";
 import { llSvg } from "../../../lib/ll-diagram.ts";
+import { algCubingUrl } from "../../../lib/breakdown.ts";
 import raw from "../../../../../data/solves/zbroux.json";
 
 const count = (alg: string) => alg.trim().split(/\s+/).filter(Boolean).length;
@@ -18,8 +19,7 @@ const solves = raw.solves.map((sv: any, i: number) => {
   const stepTimes = steps.every((s: any) => typeof s.time === "number");
   const time = sv.time ?? (stepTimes ? steps.reduce((a: number, s: any) => a + s.time, 0) : 0);
   const full = steps.map((s: any) => s.moves).join(" ");
-  const enc = (a: string) => encodeURIComponent(a.replace(/'/g, "-").replace(/\s+/g, "_"));
-  const viewer = `https://alg.cubing.net/?setup=${enc(sv.scramble)}&alg=${enc(full)}`;
+  const viewer = algCubingUrl(sv.scramble, full);
   return { ...sv, n: i + 1, steps, moves, time, stepTimes, full, viewer };
 });
 const timed = solves.filter((s: any) => s.time > 0);

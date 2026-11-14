@@ -78,7 +78,7 @@ const data = cases.map((c) => {
 
 <script>
   import { lseSvg, type LseSlots } from "../../../lib/lse-diagram.ts";
-  import { findEodfdb, AUF } from "../../../lib/eodfdb-engine.ts";
+  import { lookupEodfdb } from "../../../lib/case-lookup.ts";
 
   type C = { i: string; k: string; n: number; c: string; g: string; b: number; m: number; a: string[]; r: string; s: string; t: number; u: number };
   const DATA: C[] = JSON.parse(document.getElementById("eodfdb-data")!.textContent!);
@@ -144,11 +144,9 @@ const data = cases.map((c) => {
   $("reset").addEventListener("click", () => { st.c = "U"; st.g = null; st.u = null; st.b = null; highlight = null; history.replaceState(null, "", location.pathname); render(); });
   $("pf").addEventListener("submit", (e) => {
     e.preventDefault();
-    const r = findEodfdb(($("scr") as HTMLTextAreaElement).value, ($("blk") as HTMLTextAreaElement).value);
-    if (!r.ok) { $("pmsg").textContent = r.error ?? "Couldn't read that."; return; }
-    const c = byKey.get(r.key!);
-    if (!c) { $("pmsg").textContent = "That isn't an EODFDB position. Check the moves."; return; }
-    const pre = AUF[(r.turns! + c.n) % 4];
+    const r = lookupEodfdb(byKey, ($("scr") as HTMLTextAreaElement).value, ($("blk") as HTMLTextAreaElement).value);
+    if (!r.ok) { $("pmsg").textContent = r.error; return; }
+    const { c, pre } = r;
     show(c.i, `Case ${c.i}, ${c.m} moves. ${pre ? `Do ${pre} first, then the algorithm.` : "No need to turn the top first."}`);
     history.replaceState(null, "", "#" + c.i);
   });

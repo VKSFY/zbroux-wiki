@@ -68,8 +68,9 @@ const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape,
 
 <script>
   import { llSvg } from "../../../lib/ll-diagram.ts";
-  import { findZbll, preAufFor, relabelU } from "../../../lib/zbll-engine.ts";
-  import { apply, parse, SOLVED, STICKERS } from "../../../lib/cube.ts";
+  import { preAufFor, relabelU } from "../../../lib/zbll-engine.ts";
+  import { lookupZbll, withPre } from "../../../lib/case-lookup.ts";
+  import { apply, SOLVED, STICKERS } from "../../../lib/cube.ts";
 
   type C = { i: string; n: string; k: string; sh: string; g: number; st: string; a: [string, number][] };
   type M = { c: C; v: string; pre: string };
@@ -78,7 +79,6 @@ const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape,
   const byKey = new Map(DATA.map((c) => [c.k, c]));
   const NAME: Record<string, string> = { S: "Sune ", AS: "Antisune ", PLL: "Group " };
   const FACES = ["F", "R", "B", "L"];
-  const AUFS = ["", "U", "U2", "U'"];
   const $ = (id: string) => document.getElementById(id)!;
   const st: { sh: string | null; g: number | null } = { sh: null, g: null };
   let highlight: string | null = null;
@@ -101,15 +101,6 @@ const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape,
     let best = state, bestN = movedCorners(state), b = state;
     for (let j = 0; j < 4; j++) { const n = movedCorners(b); if (n < bestN) { best = b; bestN = n; } b = relabelU(b); }
     return best;
-  }
-  function withPre(pre: string, alg: string) {
-    if (!pre) return alg;
-    const q: Record<string, number> = { U: 1, U2: 2, "U'": 3 };
-    const m = parse(alg);
-    let t = q[pre];
-    while (m.length && m[0][0] === "U") t += q[m.shift()!];
-    t %= 4;
-    return [t ? AUFS[t] : "", ...m].filter(Boolean).join(" ");
   }
   const shapeCases = () => DATA.filter((c) => c.sh === st.sh);
   const pose = () => shapeCases()[0].st;
@@ -219,12 +210,9 @@ const data = zbll.map((c) => ({ i: c.id, n: c.name ?? "", k: c.key, sh: c.shape,
   $("reset").addEventListener("click", () => { st.sh = null; st.g = null; highlight = null; paint.clear(); history.replaceState(null, "", location.pathname); render(); scrollTo({ top: 0, behavior: "smooth" }); });
   $("pf").addEventListener("submit", (e) => {
     e.preventDefault();
-    const r = findZbll(($("scr") as HTMLTextAreaElement).value, ($("mv") as HTMLTextAreaElement).value);
-    if (!r.ok) { $("pmsg").textContent = r.error ?? "Couldn't read that."; return; }
-    if (r.solved) { $("pmsg").textContent = "The last layer is already solved, apart from maybe one U turn."; return; }
-    const c = byKey.get(r.key!);
-    if (!c) { $("pmsg").textContent = "Couldn't match that to a ZBLL case."; return; }
-    const pre = preAufFor(r.state!, c.st);
+    const r = lookupZbll(byKey, ($("scr") as HTMLTextAreaElement).value, ($("mv") as HTMLTextAreaElement).value);
+    if (!r.ok) { $("pmsg").textContent = r.error; return; }
+    const { c, pre } = r;
     show(c.i, `Case ${c.i}, ${c.a[0][1]} moves. ${pre ? `Do ${pre} first, then the algorithm.` : "No need to turn the top first."}`);
     history.replaceState(null, "", "#" + c.i);
   });

@@ -1,0 +1,154 @@
+---
+import Base from "../../layouts/Base.astro";
+import { cases, set46, GROUPS } from "../../lib/eodfdb";
+import { zbll, SHAPES } from "../../lib/zbll.ts";
+import solves from "../../../../data/solves/zbroux.json";
+
+const in46 = new Set(set46().kept.map((c) => c.id));
+const eod = cases.map((c) => ({ i: c.id, k: c.key, n: c.angle, g: c.group, m: c.optimal_moves, a: c.algs, f: in46.has(c.id) }));
+const zb = zbll.map((c) => ({ i: c.id, k: c.key, sh: c.shape, st: c.state, n: c.name, a: c.algs.map((x) => [x.alg, x.moves]) }));
+const labels = {
+  g: Object.fromEntries(GROUPS.map((g) => [g.key, g.label])),
+  sh: Object.fromEntries(SHAPES.map((s) => [s.key, s.name])),
+};
+const examples = solves.solves.map((sv: any) => ({ s: sv.scramble, m: sv.steps.map((x: any) => x.moves).join(" ") }));
+---
+<Base title="Solve breakdown" description="Paste a scramble and a ZBRoux solution. The solution is split into first block, second block, EODFDB and ZBLL, each stage is checked, and the EODFDB and ZBLL cases are looked up." crumbs={[{ href: "/tools/", label: "Tools" }]}>
+  <h1>Solve breakdown</h1>
+  <p class="lede">Paste a scramble and your whole ZBRoux solution. The tool splits the solution into first block, second block, EODFDB and ZBLL, checks each stage, and looks up your EODFDB and ZBLL cases. It doesn't search for moves; it only reads the ones you typed.</p>
+  <p class="bd-notation">Hold the cube so your first block ends up on the left and your bottom color is on the bottom, the same as the case finders. Any color scheme works: the colors are read from your first block. Rotations (x, y, z) and wide moves (r or Rw) are fine. Moves are counted in STM: M, r, U2 and every other turn is one move, top-layer turns included, and rotations count as zero.</p>
+
+  <form id="f">
+    <label for="scr">Scramble</label>
+    <textarea id="scr" rows="2" spellcheck="false" placeholder="D B' L D' B' D' L' ..."></textarea>
+    <label for="sol">Solution</label>
+    <textarea id="sol" rows="4" spellcheck="false" placeholder="U L B' L F D M B R U2 r U' r ..."></textarea>
+    <p class="hint">Automatic splitting takes the earliest move where each stage is finished. A U turn you think of as the end of one stage can land in the next: for example, if a ZBLL algorithm starts with U, or a block is already finished before your last U. To choose the split yourself, put a "/" between stages.</p>
+    <div class="row">
+      <button class="btn primary" type="submit">Break it down</button>
+      <button class="btn" type="button" id="ex">Load example</button>
+      <span id="msg" role="status"></span>
+    </div>
+  </form>
+
+  <section id="out" hidden>
+    <h2>Stages</h2>
+    <table class="stages">
+      <thead><tr><th>Stage</th><th>Moves</th><th class="num">STM</th><th>Check</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p id="endnote"></p>
+    <div id="eod"></div>
+    <div id="zb"></div>
+    <h2>Totals</h2>
+    <p id="totals"></p>
+    <p><a class="btn" id="viewer" target="_blank" rel="noopener">Replay on alg.cubing.net</a> <button class="btn" type="button" id="copy">Copy link to this breakdown</button></p>
+  </section>
+</Base>
+
+<script type="application/json" id="bd-data" set:html={JSON.stringify({ eod, zb, labels, examples })} />
+
+<script>
+  import { breakdown, algCubingUrl, type EodCase, type ZbCase, type Breakdown } from "../../lib/breakdown.ts";
+  import { llSvg } from "../../lib/ll-diagram.ts";
+
+  const D = JSON.parse(document.getElementById("bd-data")!.textContent!) as {
+    eod: EodCase[]; zb: ZbCase[]; labels: { g: Record<string, string>; sh: Record<string, string> }; examples: { s: string; m: string }[];
+  };
+  const eodByKey = new Map(D.eod.map((c) => [c.k, c]));
+  const zbByKey = new Map(D.zb.map((c) => [c.k, c]));
+  const $ = (id: string) => document.getElementById(id)!;
+  const scr = $("scr") as HTMLTextAreaElement, sol = $("sol") as HTMLTextAreaElement;
+  const esc = (s: string) => s.replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]!);
+  const mv = (n: number) => `${n} ${n === 1 ? "move" : "moves"}`;
+  const diff = (user: number, listed: number) =>
+    user === listed ? "the same as" : user > listed ? `${mv(user - listed)} more than` : `${mv(listed - user)} fewer than`;
+  let example = 0;
+
+  function eodHtml(r: Breakdown) {
+    if (!r.eod) return "";
+    const f = r.eod.found;
+    if (!f.ok) return `<h2>EODFDB case</h2><p>${esc(f.error)}</p>`;
+    const c = f.c, listed = r.eod.listedStm!;
+    const [best, ...alts] = c.a;
+    return `<h2>EODFDB case</h2>
+      <dl class="facts">
+        <dt>Case</dt><dd><a href="/algs/eodfdb/#${c.i}">${c.i}</a>, ${esc(D.labels.g[c.g] ?? c.g)}${c.f ? `, in the <a href="/algs/eodfdb/46/">46-case set</a>` : ", not in the 46-case set"}</dd>
+        <dt>Turn first</dt><dd>${f.pre ? `<span class="alg">${f.pre}</span> to line the case up` : "Nothing, the case is already lined up"}</dd>
+        <dt>Your moves</dt><dd>${mv(r.eod.userStm)}</dd>
+        <dt>Shortest listed</dt><dd>${mv(listed)}${f.pre ? ` (${mv(c.m)} plus the turn first)` : ""}. Yours is ${diff(r.eod.userStm, listed)} the shortest algorithm in this site's data.</dd>
+        ${best ? `<dt>Algorithms</dt><dd><div class="alg">${f.pre ? `(${f.pre}) ` : ""}${best}</div>${alts.map((a) => `<div class="alg alt">${f.pre ? `(${f.pre}) ` : ""}${a}</div>`).join("")}</dd>` : ""}
+      </dl>`;
+  }
+  function zbHtml(r: Breakdown) {
+    if (!r.zb) return "";
+    const f = r.zb.found;
+    if (!f.ok) return `<h2>ZBLL case</h2><p>${esc(f.error)}</p>`;
+    const c = f.c, listed = r.zb.listed!, shortest = r.zb.shortest!;
+    return `<h2>ZBLL case</h2>
+      <div class="zbcase">${llSvg(c.st, 96, "ZBLL " + c.i)}
+      <dl class="facts">
+        <dt>Case</dt><dd><a href="/algs/zbll/#${c.i}">${c.i}</a>${c.n ? ` (${esc(c.n)})` : ""}, ${esc(D.labels.sh[c.sh] ?? c.sh)} set</dd>
+        <dt>Pre-AUF</dt><dd>${f.pre ? `<span class="alg">${f.pre}</span>` : "None, the case is already lined up"}</dd>
+        <dt>Your moves</dt><dd>${mv(r.zb.userStm)}, including any turns of the top layer before and after</dd>
+        <dt>Shortest listed</dt><dd>${mv(shortest)}, counted the same way from your angle. Yours is ${diff(r.zb.userStm, shortest)} the shortest algorithm in this site's data.</dd>
+        <dt>Algorithms</dt><dd>${listed.map((x, j) => `<div class="alg${j ? " alt" : ""}">${x.alg}${x.finalAuf ? ` ${x.finalAuf}` : ""} <span class="muted small">${mv(x.stm)}</span></div>`).join("")}</dd>
+      </dl></div>`;
+  }
+  function render(r: Breakdown) {
+    if (!r.ok) { $("out").hidden = true; $("msg").textContent = r.error!; return; }
+    $("msg").textContent = "";
+    const rows = r.stages.map((s) => `<tr${s.done ? "" : ` class="bad"`}><th scope="row">${s.name}</th><td class="alg">${s.moves.join(" ") || "<span class=\"muted\">(none)</span>"}</td><td class="num">${s.stm}</td>
+      <td>${s.done ? "Done" : esc(s.note ?? "Not done")}</td></tr>`);
+    if (r.rest.length) rows.push(`<tr class="rest"><th scope="row">Not checked</th><td class="alg">${r.rest.join(" ")}</td><td class="num">${r.rest.filter((m) => !/^[xyz]/.test(m)).length}</td><td>${esc(r.restNote ?? "")}</td></tr>`);
+    $("rows").innerHTML = rows.join("");
+    const last = r.stages[r.stages.length - 1];
+    $("endnote").textContent = r.endAuf === "" ? "The cube ends solved." : r.endAuf ? `The cube ends solved apart from a final ${r.endAuf}.` : last && !last.done && r.stages.length < 4 ? "Stages after the first one that isn't done are not shown." : last && !last.done ? "The cube isn't solved at the end." : "";
+    $("eod").innerHTML = eodHtml(r);
+    $("zb").innerHTML = zbHtml(r);
+    const parts = r.stages.map((s) => `${s.name} ${s.stm}`).join(", ");
+    $("totals").textContent = `${parts}. Total ${mv(r.total)}.`;
+    const all = [...r.stages.flatMap((s) => s.moves), ...r.rest].join(" ");
+    ($("viewer") as HTMLAnchorElement).href = algCubingUrl(scr.value.trim(), all);
+    $("out").hidden = false;
+  }
+  function run(push = true) {
+    const r = breakdown(scr.value, sol.value, eodByKey, zbByKey);
+    render(r);
+    if (push && r.ok) history.replaceState(null, "", "#" + new URLSearchParams({ s: scr.value.trim(), m: sol.value.trim() }).toString());
+  }
+  $("f").addEventListener("submit", (e) => { e.preventDefault(); run(); });
+  $("ex").addEventListener("click", () => {
+    const x = D.examples[example++ % D.examples.length];
+    scr.value = x.s; sol.value = x.m; run();
+  });
+  $("copy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(location.href); $("msg").textContent = "Link copied."; } catch { $("msg").textContent = "Copy the address from your browser's address bar."; }
+  });
+  const h = new URLSearchParams(location.hash.slice(1));
+  if (h.get("s") || h.get("m")) { scr.value = h.get("s") ?? ""; sol.value = h.get("m") ?? ""; run(false); }
+</script>
+
+<style is:global>
+  #f{display:grid;gap:6px;max-width:var(--content);margin:8px 0 10px}
+  #f label{font-size:.9rem;font-weight:600;margin-top:6px}
+  #f .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:4px}
+  #f .hint{color:var(--mute);font-size:.88rem;margin:2px 0 0}
+  #msg{font-weight:550;color:var(--ink-2)}
+  .bd-notation{font-size:.9rem;color:var(--ink-2);max-width:var(--content);margin:-6px 0 10px}
+  #out h2{font-size:1.15rem;margin:26px 0 8px}
+  #out .stages{width:100%;border-collapse:collapse;font-size:.92rem}
+  #out .stages th,#out .stages td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+  #out .stages td.alg{font-family:var(--mono,ui-monospace,monospace);word-break:break-word}
+  #out .stages .num{text-align:right;white-space:nowrap}
+  #out .stages tr.bad td:last-child{color:var(--bad,#c0392b);font-weight:600}
+  #out .stages tr.rest{color:var(--mute)}
+  #out .facts{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:0;font-size:.93rem}
+  #out .facts dt{font-weight:600;color:var(--ink-2)}
+  #out .facts dd{margin:0}
+  #out .facts .alg{font-family:var(--mono,ui-monospace,monospace)}
+  #out .facts .alt{color:var(--ink-2);font-size:.88rem}
+  #out .zbcase{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+  #out .zbcase .facts{flex:1 1 320px}
+  @media (max-width:560px){ #out .facts{grid-template-columns:1fr} #out .facts dt{margin-top:6px} #out .stages{font-size:.85rem} }
+</style>
