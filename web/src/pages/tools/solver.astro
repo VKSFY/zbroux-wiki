@@ -1,0 +1,141 @@
+---
+import Base from "../../layouts/Base.astro";
+import { cases } from "../../lib/eodfdb";
+import { zbll } from "../../lib/zbll.ts";
+
+const eod = cases.map((c) => ({ i: c.id, k: c.key, n: c.angle, g: c.group, m: c.optimal_moves, a: c.algs, f: false }));
+const zb = zbll.map((c) => ({ i: c.id, k: c.key, sh: c.shape, st: c.state, n: c.name, a: c.algs.map((x) => [x.alg, x.moves]) }));
+---
+<Base title="Solve suggester" description="Paste a scramble and get a complete ZBRoux solve: first block, second block, EODFDB and ZBLL, each stage checked before it's shown." crumbs={[{ href: "/tools/", label: "Tools" }]}>
+  <h1>Solve suggester</h1>
+  <p class="lede">Paste a scramble and get a complete ZBRoux solve: first block, second block, EODFDB and ZBLL. Every solve is checked twice before it's shown: it has to solve the cube, and the <a href="/tools/breakdown/">solve breakdown</a> has to find all four stages done where the suggester put them.</p>
+  <p class="sv-note">This is a suggestion, not the shortest possible solve. Each stage is searched on its own: the first block is the shortest for its orientation (face turns), the second block is the shortest after that first block (R, r, M and U), and EODFDB and ZBLL use the shortest algorithm in this site's lists. A shorter total can exist. Moves are counted in STM, and rotations count as zero.</p>
+
+  <form id="f">
+    <label for="scr">Scramble</label>
+    <textarea id="scr" rows="2" spellcheck="false" placeholder="D B' L D' B' D' L' ..."></textarea>
+    <label class="check"><input type="checkbox" id="all" checked /> Try all 24 places the first block can go (any face on the left, any bottom color)</label>
+    <p class="hint">Unticked, the first block goes on the left with the bottom center's color on the bottom, holding the cube as scrambled.</p>
+    <div class="row">
+      <button class="btn primary" type="submit" id="go">Suggest a solve</button>
+      <button class="btn" type="button" id="cancel" hidden>Cancel</button>
+      <span id="msg" role="status"></span>
+    </div>
+  </form>
+
+  <section id="out" hidden>
+    <div id="placements"></div>
+    <h2>The solve</h2>
+    <table class="stages">
+      <thead><tr><th>Stage</th><th>Moves</th><th class="num">STM</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <p id="totals"></p>
+    <div id="cases"></div>
+    <div id="alts"></div>
+    <p class="links"><a class="btn" id="bd">Open in Solve breakdown</a> <a class="btn" id="viewer" target="_blank" rel="noopener">Replay on alg.cubing.net</a></p>
+    <p class="small muted" id="timing"></p>
+  </section>
+</Base>
+
+<script type="application/json" id="sv-data" set:html={JSON.stringify({ eod, zb })} />
+
+<script>
+  import { algCubingUrl } from "../../lib/breakdown.ts";
+  import { slashed, type Solve } from "../../lib/solver.ts";
+
+  const DATA = JSON.parse(document.getElementById("sv-data")!.textContent!);
+  const BUDGET = 20000;
+  const $ = (id: string) => document.getElementById(id)!;
+  const scr = $("scr") as HTMLTextAreaElement, all = $("all") as HTMLInputElement;
+  const esc = (s: string) => s.replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]!);
+  const mv = (n: number) => `${n} ${n === 1 ? "move" : "moves"}`;
+  const join = (m: string[]) => m.join(" ") || "(none)";
+  let worker: Worker | null = null;
+
+  function start() {
+    worker = new Worker(new URL("../../lib/solver.worker.ts", import.meta.url), { type: "module" });
+    worker.postMessage({ type: "init", eod: DATA.eod, zb: DATA.zb });
+    worker.onmessage = (e) => (e.data.type === "progress" ? ($("msg").textContent = e.data.text + "...") : done(e.data));
+  }
+  function busy(on: boolean) {
+    ($("go") as HTMLButtonElement).disabled = on;
+    $("cancel").hidden = !on;
+  }
+  function placementName(rot: string) { return rot ? `<span class="alg">${rot}</span>` : "As scrambled"; }
+  function done(d: any) {
+    busy(false);
+    if (d.error) { $("msg").textContent = d.error; $("out").hidden = true; return; }
+    const results: Solve[] = d.results.filter((r: Solve) => r.ok);
+    if (!results.length) { $("msg").textContent = d.firstError ?? d.results[0]?.error ?? "No solve passed the checks, so nothing is shown."; $("out").hidden = true; return; }
+    const best = results[0];
+    $("msg").textContent = "";
+    const s = scr.value.trim();
+    if (d.total > 1) {
+      const head = d.cut
+        ? `The time budget ran out after ${d.searched} of ${d.total} placements, so this is the lowest total among the ${d.searched} searched.`
+        : `Lowest total among the ${d.searched} placements searched.`;
+      const failNote = d.failed ? ` ${d.failed} ${d.failed === 1 ? "placement" : "placements"} failed the self-check and ${d.failed === 1 ? "is" : "are"} left out.` : "";
+      $("placements").innerHTML = `<h2>Placements</h2><p>${head}${failNote} The first block goes on the left after the rotation.</p>
+        <table class="stages"><thead><tr><th>Rotation</th><th class="num">First block</th><th class="num">Second block</th><th class="num">EODFDB</th><th class="num">ZBLL</th><th class="num">Total</th></tr></thead><tbody>
+        ${results.slice(0, 5).map((r, j) => `<tr${j === 0 ? ' class="pick"' : ""}><td>${placementName(r.rotation)}</td>${r.stages.map((x) => `<td class="num">${x.stm}</td>`).join("")}<td class="num"><b>${r.total}</b></td></tr>`).join("")}
+        </tbody></table>`;
+    } else $("placements").innerHTML = "";
+    $("rows").innerHTML = best.stages.map((x) => `<tr><th scope="row">${x.name}</th><td class="alg">${esc(join(x.moves))}</td><td class="num">${x.stm}</td></tr>`).join("");
+    $("totals").textContent = `${best.stages.map((x) => `${x.name} ${x.stm}`).join(", ")}. Total ${mv(best.total)}.`;
+    const fbNote = best.rotation ? `shortest for this orientation, after <span class="alg">${best.rotation}</span>` : "shortest for this orientation";
+    let cases = `<h2>Cases</h2><dl class="facts">
+      <dt>First block</dt><dd>${mv(best.stages[0].stm)}, ${fbNote}</dd>
+      <dt>Second block</dt><dd>${mv(best.stages[1].stm)}, shortest with R, r, M and U after this first block</dd>`;
+    if (best.eod) cases += `<dt>EODFDB</dt><dd><a href="/algs/eodfdb/#${best.eod.id}">${best.eod.id}</a>${best.eod.pre ? `, turn <span class="alg">${best.eod.pre}</span> first` : ""}${best.eod.alts.length ? `<div class="altlist">Other listed algorithms: ${best.eod.alts.map((a) => `<div class="alg">${a}</div>`).join("")}</div>` : ""}</dd>`;
+    else cases += `<dt>EODFDB</dt><dd>Already done after the second block</dd>`;
+    if (best.zb) cases += `<dt>ZBLL</dt><dd><a href="/algs/zbll/#${best.zb.id}">${best.zb.id}</a>${best.zb.name ? ` (${esc(best.zb.name)})` : ""}${best.zb.alts.length ? `<div class="altlist">Other listed algorithms, with their turns of the top layer: ${best.zb.alts.map((a) => `<div class="alg">${a.alg} <span class="muted small">${mv(a.stm)}</span></div>`).join("")}</div>` : ""}</dd>`;
+    else cases += `<dt>ZBLL</dt><dd>The last layer was already solved apart from a turn of the top layer</dd>`;
+    $("cases").innerHTML = cases + "</dl>";
+    const alt = (k: number, label: string) => {
+      const a = best.stages[k].alts ?? [];
+      return a.length ? `<dt>${label}</dt><dd>${a.slice(0, 3).map((m) => `<div class="alg">${esc(join(m))}</div>`).join("")}</dd>` : "";
+    };
+    const altHtml = alt(0, "First block") + alt(1, "Second block");
+    $("alts").innerHTML = altHtml ? `<h2>Other equally short blocks</h2><dl class="facts">${altHtml}</dl><p class="small muted">The second-block options are for the first block shown above.</p>` : "";
+    ($("bd") as HTMLAnchorElement).href = "/tools/breakdown/#" + new URLSearchParams({ s, m: slashed(best.stages) }).toString();
+    ($("viewer") as HTMLAnchorElement).href = algCubingUrl(s, best.stages.flatMap((x) => x.moves).join(" "));
+    const info = d.tables.info.map((t: any) => `${t.name} table ${(t.bytes / 1e6).toFixed(1)} MB, ${t.states.toLocaleString("en-US")} positions`).join("; ");
+    $("timing").textContent = `Took ${(d.ms / 1000).toFixed(1)} s, of which ${(d.tables.ms / 1000).toFixed(1)} s built the tables (${info}).`;
+    $("out").hidden = false;
+    history.replaceState(null, "", "#" + new URLSearchParams({ s, all: all.checked ? "1" : "0" }).toString());
+  }
+  function run() {
+    if (!worker) start();
+    busy(true);
+    $("msg").textContent = "Starting...";
+    worker!.postMessage({ type: "solve", scramble: scr.value, all: all.checked, budget: BUDGET });
+  }
+  $("f").addEventListener("submit", (e) => { e.preventDefault(); run(); });
+  $("cancel").addEventListener("click", () => { worker?.terminate(); worker = null; busy(false); $("msg").textContent = "Cancelled."; });
+  const h = new URLSearchParams(location.hash.slice(1));
+  if (h.get("s")) { scr.value = h.get("s")!; all.checked = h.get("all") !== "0"; run(); }
+</script>
+
+<style is:global>
+  #f{display:grid;gap:6px;max-width:var(--content);margin:8px 0 10px}
+  #f label{font-size:.9rem;font-weight:600;margin-top:6px}
+  #f label.check{font-weight:500;display:flex;gap:8px;align-items:flex-start}
+  #f label.check input{margin-top:4px}
+  #f .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:4px}
+  #f .hint{color:var(--mute);font-size:.88rem;margin:0}
+  #msg{font-weight:550;color:var(--ink-2)}
+  .sv-note{font-size:.9rem;color:var(--ink-2);max-width:var(--content);margin:-6px 0 10px}
+  #out h2{font-size:1.15rem;margin:26px 0 8px}
+  #out .stages{width:100%;border-collapse:collapse;font-size:.92rem}
+  #out .stages th,#out .stages td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+  #out .stages td.alg,#out .alg{font-family:var(--mono,ui-monospace,monospace);word-break:break-word}
+  #out .stages .num{text-align:right;white-space:nowrap}
+  #out .stages tr.pick td{font-weight:600}
+  #out .facts{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:0;font-size:.93rem}
+  #out .facts dt{font-weight:600;color:var(--ink-2)}
+  #out .facts dd{margin:0}
+  #out .altlist{color:var(--ink-2);font-size:.88rem;margin-top:4px}
+  #out .links{margin-top:20px}
+  @media (max-width:560px){ #out .facts{grid-template-columns:1fr} #out .facts dt{margin-top:6px} #out .stages{font-size:.82rem} #out .stages th,#out .stages td{padding:6px 4px} }
+</style>

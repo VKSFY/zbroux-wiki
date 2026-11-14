@@ -71,6 +71,7 @@ Tools on the site:
 - `/algs/zbll/`: ZBLL case finder (tap your colors, or a scramble and moves)
 - `/tools/trainer/`: EODFDB and ZBLL trainer
 - `/tools/breakdown/`: solve breakdown (splits a pasted ZBRoux solution into stages and looks up the cases; `node tools/verify_breakdown.mjs` checks it against the example solves)
+- `/tools/solver/`: solve suggester (first block and second block from exact distance tables built in the browser, EODFDB and ZBLL from the lists; every solve is checked with the breakdown before it's shown). `node tools/verify_solver.mjs` runs 300 seeded scrambles in fixed orientation and all 24 placements, checks 60 first-block lengths against an independent search in `tools/check_fb_optimal.py` (cube.py), and replays 30 solves with cubing.js
 - `/tools/eostripe-solver/`: EOStripe solver for LEOR
 
 ## License
