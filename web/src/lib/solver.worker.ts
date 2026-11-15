@@ -1,4 +1,4 @@
-import { solve, buildTable, BLOCKS, tableInfo, ROTATIONS, fbLength, type Solve } from "./solver.ts";
+import { solve, buildTable, BLOCKS, tableInfo, ROTATIONS, fbLength, rank, type Solve, type Side } from "./solver.ts";
 import type { EodCase, ZbCase } from "./breakdown.ts";
 import { parse } from "./cube.ts";
 
@@ -20,28 +20,27 @@ self.onmessage = (ev: MessageEvent) => {
   try {
     post({ type: "progress", text: "Building the first-block table" });
     buildTable(BLOCKS.FB);
-    post({ type: "progress", text: "Building the second-block table" });
+    post({ type: "progress", text: "Building the second-block tables" });
     buildTable(BLOCKS.SB);
+    buildTable(BLOCKS.SBL);
     const tables = { ms: performance.now() - t0, info: tableInfo() };
     if (over()) { post({ type: "done", error: "The time budget ran out while building the tables.", tables }); return; }
-    if (!msg.all) {
-      post({ type: "progress", text: "Solving" });
-      const r = solve(msg.scramble, eod, zb, "");
-      post({ type: "done", results: [r], searched: 1, total: 1, cut: false, failed: r.ok ? 0 : 1, tables, ms: performance.now() - t0 });
-      return;
+    const plan: { rot: string; side: Side }[] = [{ rot: "", side: "left" }, { rot: "", side: "right" }];
+    if (msg.rotations) {
+      plan.push(...ROTATIONS.filter(Boolean).map((rot) => ({ rot, fb: fbLength(msg.scramble, rot) }))
+        .sort((a, b) => a.fb - b.fb).map(({ rot }) => ({ rot, side: "left" as Side })));
     }
-    const order = ROTATIONS.map((rot) => ({ rot, fb: fbLength(msg.scramble, rot) })).sort((a, b) => a.fb - b.fb);
     const results: Solve[] = [];
     let searched = 0, failed = 0, cut = false, firstError: string | undefined;
-    for (const { rot } of order) {
+    for (const { rot, side } of plan) {
       if (over()) { cut = true; break; }
-      post({ type: "progress", text: `Placement ${searched + 1} of ${order.length}` });
-      const r = solve(msg.scramble, eod, zb, rot);
+      post({ type: "progress", text: plan.length > 2 ? `Placement ${searched + 1} of ${plan.length}` : `First block on the ${side}` });
+      const r = solve(msg.scramble, eod, zb, rot, side);
       searched++;
       if (r.ok) results.push(r); else { failed++; firstError ??= r.error; }
     }
-    results.sort((a, b) => a.total - b.total || a.stages[0].stm - b.stages[0].stm);
-    post({ type: "done", results, searched, total: order.length, cut, failed, tables, ms: performance.now() - t0, firstError });
+    results.sort(rank);
+    post({ type: "done", results, searched, total: plan.length, cut, failed, tables, ms: performance.now() - t0, firstError });
   } catch (e) {
     post({ type: "done", error: (e as Error).message });
   }

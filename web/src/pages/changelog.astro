@@ -5,6 +5,7 @@ const entries = [
     date: "2026-11-14",
     items: [
       "Added a solve suggester: paste a scramble and get a complete ZBRoux solve. The first block is the shortest for its orientation, the second block the shortest after it with R, r, M and U, and EODFDB and ZBLL use the shortest listed algorithms. It can try all 24 places for the first block. Every solve must solve the cube and pass the solve breakdown before it's shown. It's a suggestion, not the shortest possible solve.",
+      "Solve suggester: by default it no longer rotates the cube. It tries the first block on the left and on the right, using L, l, M and U for the second block and mirrored EODFDB and ZBLL algorithms when the first block is on the right, and shows the lower total with the other as an option. Rotations are now behind a checkbox, and a rotation is shown as its own step 0. Every result says how to hold the cube while scrambling and, after a rotation, which colors you should see on each side.",
     ],
   },
   {

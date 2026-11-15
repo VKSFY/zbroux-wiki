@@ -9,13 +9,13 @@ const zb = zbll.map((c) => ({ i: c.id, k: c.key, sh: c.shape, st: c.state, n: c.
 <Base title="Solve suggester" description="Paste a scramble and get a complete ZBRoux solve: first block, second block, EODFDB and ZBLL, each stage checked before it's shown." crumbs={[{ href: "/tools/", label: "Tools" }]}>
   <h1>Solve suggester</h1>
   <p class="lede">Paste a scramble and get a complete ZBRoux solve: first block, second block, EODFDB and ZBLL. Every solve is checked twice before it's shown: it has to solve the cube, and the <a href="/tools/breakdown/">solve breakdown</a> has to find all four stages done where the suggester put them.</p>
-  <p class="sv-note">This is a suggestion, not the shortest possible solve. Each stage is searched on its own: the first block is the shortest for its orientation (face turns), the second block is the shortest after that first block (R, r, M and U), and EODFDB and ZBLL use the shortest algorithm in this site's lists. A shorter total can exist. Moves are counted in STM, and rotations count as zero.</p>
+  <p class="sv-note">This is a suggestion, not the shortest possible solve. Each stage is searched on its own: the first block is the shortest for where it goes (face turns), the second block is the shortest after that first block (R, r, M and U, or L, l, M and U when the first block is on the right), and EODFDB and ZBLL use the shortest algorithm in this site's lists, mirrored when the first block is on the right. A shorter total can exist. Moves are counted in STM, and rotations count as zero.</p>
 
   <form id="f">
     <label for="scr">Scramble</label>
     <textarea id="scr" rows="2" spellcheck="false" placeholder="D B' L D' B' D' L' ..."></textarea>
-    <label class="check"><input type="checkbox" id="all" checked /> Try all 24 places the first block can go (any face on the left, any bottom color)</label>
-    <p class="hint">Unticked, the first block goes on the left with the bottom center's color on the bottom, holding the cube as scrambled.</p>
+    <label class="check"><input type="checkbox" id="all" /> Also allow a rotation before the first move (do it while inspecting)</label>
+    <p class="hint">Without a rotation, the suggester keeps the cube the way you held it to scramble. It tries the first block on the left and on the right, and shows the one with the lower total.</p>
     <div class="row">
       <button class="btn primary" type="submit" id="go">Suggest a solve</button>
       <button class="btn" type="button" id="cancel" hidden>Cancel</button>
@@ -26,6 +26,7 @@ const zb = zbll.map((c) => ({ i: c.id, k: c.key, sh: c.shape, st: c.state, n: c.
   <section id="out" hidden>
     <div id="placements"></div>
     <h2>The solve</h2>
+    <div id="hold"></div>
     <table class="stages">
       <thead><tr><th>Stage</th><th>Moves</th><th class="num">STM</th></tr></thead>
       <tbody id="rows"></tbody>
@@ -34,6 +35,7 @@ const zb = zbll.map((c) => ({ i: c.id, k: c.key, sh: c.shape, st: c.state, n: c.
     <div id="cases"></div>
     <div id="alts"></div>
     <p class="links"><a class="btn" id="bd">Open in Solve breakdown</a> <a class="btn" id="viewer" target="_blank" rel="noopener">Replay on alg.cubing.net</a></p>
+    <p class="small muted" id="bdnote"></p>
     <p class="small muted" id="timing"></p>
   </section>
 </Base>
@@ -42,16 +44,19 @@ const zb = zbll.map((c) => ({ i: c.id, k: c.key, sh: c.shape, st: c.state, n: c.
 
 <script>
   import { algCubingUrl } from "../../lib/breakdown.ts";
-  import { slashed, type Solve } from "../../lib/solver.ts";
+  import { slashed, centersAfter, VIEW_FACES, type Solve } from "../../lib/solver.ts";
+  import { parse } from "../../lib/cube.ts";
 
   const DATA = JSON.parse(document.getElementById("sv-data")!.textContent!);
   const BUDGET = 20000;
+  const HEX: Record<string, string> = { white: "#ffffff", yellow: "#fcd535", green: "#1aa44a", blue: "#2563eb", red: "#dc2626", orange: "#f97316" };
   const $ = (id: string) => document.getElementById(id)!;
   const scr = $("scr") as HTMLTextAreaElement, all = $("all") as HTMLInputElement;
   const esc = (s: string) => s.replace(/[&<>"]/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[ch]!);
   const mv = (n: number) => `${n} ${n === 1 ? "move" : "moves"}`;
   const join = (m: string[]) => m.join(" ") || "(none)";
-  let worker: Worker | null = null;
+  const sw = (c: string) => `<span class="sw" style="background:${HEX[c]}" aria-hidden="true"></span>${c}`;
+  let worker: Worker | null = null, shown: Solve[] = [], scramble = "";
 
   function start() {
     worker = new Worker(new URL("../../lib/solver.worker.ts", import.meta.url), { type: "module" });
@@ -62,59 +67,100 @@ const zb = zbll.map((c) => ({ i: c.id, k: c.key, sh: c.shape, st: c.state, n: c.
     ($("go") as HTMLButtonElement).disabled = on;
     $("cancel").hidden = !on;
   }
-  function placementName(rot: string) { return rot ? `<span class="alg">${rot}</span>` : "As scrambled"; }
+  const rotLen = (r: Solve) => (r.rotation ? parse(r.rotation).length : 0);
+  function optionName(r: Solve) {
+    return r.rotation ? `Rotate <span class="alg">${r.rotation}</span>, then first block on the ${r.side}` : `First block on the ${r.side}`;
+  }
+  const view = (alg: string) => { const c = centersAfter(alg); return VIEW_FACES.map((f) => `${f} ${sw(c[f])}`).join(", "); };
+  function holdHtml(r: Solve) {
+    let h = `<p class="hold">Scramble with ${sw("white")} on top and ${sw("green")} in front.</p>`;
+    const before = centersAfter(""), after = centersAfter(scramble);
+    if (r.rotation) h += `<p class="hold">After the rotation you should see: ${view(`${scramble} ${r.rotation}`)}.</p>`;
+    else if (VIEW_FACES.some((f) => after[f] !== before[f])) h += `<p class="hold">The scramble moves the centers. After it you should see: ${view(scramble)}.</p>`;
+    return h;
+  }
+  function options(d: any, results: Solve[]) {
+    const lead = d.total > 2
+      ? (d.cut
+        ? `The time budget ran out after ${d.searched} of ${d.total} placements, so this is the lowest total among the ${d.searched} searched.`
+        : `Lowest total among the ${d.searched} placements searched: 2 without a rotation and ${d.searched - 2} with one.`)
+      : "Both sides were searched without a rotation, and the lower total is shown first. Tap Show to see the other one.";
+    const failNote = d.failed ? ` ${d.failed} ${d.failed === 1 ? "placement" : "placements"} failed the self-check and ${d.failed === 1 ? "is" : "are"} left out.` : "";
+    shown = results.slice(0, 6);
+    return `<h2>Options</h2><p>${lead}${failNote}</p>
+      <table class="stages"><thead><tr><th>Option</th><th class="num">First block</th><th class="num">Second block</th><th class="num">EODFDB</th><th class="num">ZBLL</th><th class="num">Total</th><th></th></tr></thead><tbody>
+      ${shown.map((r, j) => `<tr data-j="${j}"><td>${optionName(r)}</td>${r.stages.map((x) => `<td class="num">${x.stm}</td>`).join("")}<td class="num"><b>${r.total}</b></td><td><button type="button" class="btn small show" data-j="${j}">Show</button></td></tr>`).join("")}
+      </tbody></table>`;
+  }
+  function render(r: Solve) {
+    document.querySelectorAll<HTMLTableRowElement>("#placements tr[data-j]").forEach((tr) => {
+      const on = shown[+tr.dataset.j!] === r;
+      tr.classList.toggle("pick", on);
+      const b = tr.querySelector("button")!;
+      b.textContent = on ? "Shown" : "Show";
+      b.disabled = on;
+    });
+    $("hold").innerHTML = holdHtml(r);
+    const k = rotLen(r), right = r.side === "right";
+    const step0 = r.rotation ? `<tr><th scope="row">Step 0</th><td>rotate <span class="alg">${esc(r.rotation)}</span></td><td class="num">0</td></tr>` : "";
+    $("rows").innerHTML = step0 + r.stages.map((x, i) => `<tr><th scope="row">${x.name}</th><td class="alg">${esc(join(i === 0 ? x.moves.slice(k) : x.moves))}</td><td class="num">${x.stm}</td></tr>`).join("");
+    $("totals").textContent = `${r.stages.map((x) => `${x.name} ${x.stm}`).join(", ")}. Total ${mv(r.total)}${r.rotation ? "; the rotation counts as 0" : ""}.`;
+    const mirrored = right ? ", mirrored: your cube shows the mirror image of the case on its page, so the moves above are its listed algorithm mirrored" : "";
+    let cases = `<h2>Cases</h2><dl class="facts">
+      <dt>First block</dt><dd>${mv(r.stages[0].stm)}, shortest with the first block on the ${r.side}${r.rotation ? ", after the rotation" : ""}</dd>
+      <dt>Second block</dt><dd>${mv(r.stages[1].stm)}, shortest with ${right ? "L, l" : "R, r"}, M and U after this first block</dd>`;
+    if (r.eod) cases += `<dt>EODFDB</dt><dd><a href="/algs/eodfdb/#${r.eod.id}">${r.eod.id}</a>${mirrored}${r.eod.pre ? `. Turn <span class="alg">${r.eod.pre}</span> first` : ""}${r.eod.alts.length ? `<div class="altlist">Other listed algorithms${right ? ", mirrored" : ""}: ${r.eod.alts.map((a) => `<div class="alg">${a}</div>`).join("")}</div>` : ""}</dd>`;
+    else cases += `<dt>EODFDB</dt><dd>Already done after the second block</dd>`;
+    if (r.zb) cases += `<dt>ZBLL</dt><dd><a href="/algs/zbll/#${r.zb.id}">${r.zb.id}</a>${r.zb.name ? ` (${esc(r.zb.name)})` : ""}${mirrored}${r.zb.alts.length ? `<div class="altlist">Other listed algorithms${right ? ", mirrored" : ""}, with their turns of the top layer: ${r.zb.alts.map((a) => `<div class="alg">${a.alg} <span class="muted small">${mv(a.stm)}</span></div>`).join("")}</div>` : ""}</dd>`;
+    else cases += `<dt>ZBLL</dt><dd>The last layer was already solved apart from a turn of the top layer</dd>`;
+    $("cases").innerHTML = cases + "</dl>";
+    const alt = (i: number, label: string) => {
+      const a = r.stages[i].alts ?? [];
+      return a.length ? `<dt>${label}</dt><dd>${a.slice(0, 3).map((m) => `<div class="alg">${esc(join(m))}</div>`).join("")}</dd>` : "";
+    };
+    const altHtml = alt(0, "First block") + alt(1, "Second block");
+    $("alts").innerHTML = altHtml ? `<h2>Other equally short blocks</h2><dl class="facts">${altHtml}</dl><p class="small muted">The second-block options are for the first block shown above.</p>` : "";
+    const bd = $("bd") as HTMLAnchorElement;
+    if (right && r.mirror) {
+      bd.href = "/tools/breakdown/#" + new URLSearchParams({ s: r.mirror.scramble, m: r.mirror.solution }).toString();
+      bd.textContent = "Open the mirror image in Solve breakdown";
+      $("bdnote").textContent = "The solve breakdown expects the first block on the left, so this link opens the mirror image of this solve, with the scramble and every move mirrored.";
+    } else {
+      bd.href = "/tools/breakdown/#" + new URLSearchParams({ s: scramble, m: slashed(r.stages) }).toString();
+      bd.textContent = "Open in Solve breakdown";
+      $("bdnote").textContent = "";
+    }
+    ($("viewer") as HTMLAnchorElement).href = algCubingUrl(scramble, r.stages.flatMap((x) => x.moves).join(" "));
+  }
   function done(d: any) {
     busy(false);
     if (d.error) { $("msg").textContent = d.error; $("out").hidden = true; return; }
     const results: Solve[] = d.results.filter((r: Solve) => r.ok);
     if (!results.length) { $("msg").textContent = d.firstError ?? d.results[0]?.error ?? "No solve passed the checks, so nothing is shown."; $("out").hidden = true; return; }
-    const best = results[0];
     $("msg").textContent = "";
-    const s = scr.value.trim();
-    if (d.total > 1) {
-      const head = d.cut
-        ? `The time budget ran out after ${d.searched} of ${d.total} placements, so this is the lowest total among the ${d.searched} searched.`
-        : `Lowest total among the ${d.searched} placements searched.`;
-      const failNote = d.failed ? ` ${d.failed} ${d.failed === 1 ? "placement" : "placements"} failed the self-check and ${d.failed === 1 ? "is" : "are"} left out.` : "";
-      $("placements").innerHTML = `<h2>Placements</h2><p>${head}${failNote} The first block goes on the left after the rotation.</p>
-        <table class="stages"><thead><tr><th>Rotation</th><th class="num">First block</th><th class="num">Second block</th><th class="num">EODFDB</th><th class="num">ZBLL</th><th class="num">Total</th></tr></thead><tbody>
-        ${results.slice(0, 5).map((r, j) => `<tr${j === 0 ? ' class="pick"' : ""}><td>${placementName(r.rotation)}</td>${r.stages.map((x) => `<td class="num">${x.stm}</td>`).join("")}<td class="num"><b>${r.total}</b></td></tr>`).join("")}
-        </tbody></table>`;
-    } else $("placements").innerHTML = "";
-    $("rows").innerHTML = best.stages.map((x) => `<tr><th scope="row">${x.name}</th><td class="alg">${esc(join(x.moves))}</td><td class="num">${x.stm}</td></tr>`).join("");
-    $("totals").textContent = `${best.stages.map((x) => `${x.name} ${x.stm}`).join(", ")}. Total ${mv(best.total)}.`;
-    const fbNote = best.rotation ? `shortest for this orientation, after <span class="alg">${best.rotation}</span>` : "shortest for this orientation";
-    let cases = `<h2>Cases</h2><dl class="facts">
-      <dt>First block</dt><dd>${mv(best.stages[0].stm)}, ${fbNote}</dd>
-      <dt>Second block</dt><dd>${mv(best.stages[1].stm)}, shortest with R, r, M and U after this first block</dd>`;
-    if (best.eod) cases += `<dt>EODFDB</dt><dd><a href="/algs/eodfdb/#${best.eod.id}">${best.eod.id}</a>${best.eod.pre ? `, turn <span class="alg">${best.eod.pre}</span> first` : ""}${best.eod.alts.length ? `<div class="altlist">Other listed algorithms: ${best.eod.alts.map((a) => `<div class="alg">${a}</div>`).join("")}</div>` : ""}</dd>`;
-    else cases += `<dt>EODFDB</dt><dd>Already done after the second block</dd>`;
-    if (best.zb) cases += `<dt>ZBLL</dt><dd><a href="/algs/zbll/#${best.zb.id}">${best.zb.id}</a>${best.zb.name ? ` (${esc(best.zb.name)})` : ""}${best.zb.alts.length ? `<div class="altlist">Other listed algorithms, with their turns of the top layer: ${best.zb.alts.map((a) => `<div class="alg">${a.alg} <span class="muted small">${mv(a.stm)}</span></div>`).join("")}</div>` : ""}</dd>`;
-    else cases += `<dt>ZBLL</dt><dd>The last layer was already solved apart from a turn of the top layer</dd>`;
-    $("cases").innerHTML = cases + "</dl>";
-    const alt = (k: number, label: string) => {
-      const a = best.stages[k].alts ?? [];
-      return a.length ? `<dt>${label}</dt><dd>${a.slice(0, 3).map((m) => `<div class="alg">${esc(join(m))}</div>`).join("")}</dd>` : "";
-    };
-    const altHtml = alt(0, "First block") + alt(1, "Second block");
-    $("alts").innerHTML = altHtml ? `<h2>Other equally short blocks</h2><dl class="facts">${altHtml}</dl><p class="small muted">The second-block options are for the first block shown above.</p>` : "";
-    ($("bd") as HTMLAnchorElement).href = "/tools/breakdown/#" + new URLSearchParams({ s, m: slashed(best.stages) }).toString();
-    ($("viewer") as HTMLAnchorElement).href = algCubingUrl(s, best.stages.flatMap((x) => x.moves).join(" "));
+    scramble = scr.value.trim();
+    shown = results.slice(0, 1);
+    $("placements").innerHTML = results.length > 1 ? options(d, results) : "";
+    render(results[0]);
     const info = d.tables.info.map((t: any) => `${t.name} table ${(t.bytes / 1e6).toFixed(1)} MB, ${t.states.toLocaleString("en-US")} positions`).join("; ");
     $("timing").textContent = `Took ${(d.ms / 1000).toFixed(1)} s, of which ${(d.tables.ms / 1000).toFixed(1)} s built the tables (${info}).`;
     $("out").hidden = false;
-    history.replaceState(null, "", "#" + new URLSearchParams({ s, all: all.checked ? "1" : "0" }).toString());
+    history.replaceState(null, "", "#" + new URLSearchParams({ s: scramble, rot: all.checked ? "1" : "0" }).toString());
   }
+  $("placements").addEventListener("click", (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLButtonElement>("button.show");
+    if (b) render(shown[+b.dataset.j!]);
+  });
   function run() {
     if (!worker) start();
     busy(true);
     $("msg").textContent = "Starting...";
-    worker!.postMessage({ type: "solve", scramble: scr.value, all: all.checked, budget: BUDGET });
+    worker!.postMessage({ type: "solve", scramble: scr.value, rotations: all.checked, budget: BUDGET });
   }
   $("f").addEventListener("submit", (e) => { e.preventDefault(); run(); });
   $("cancel").addEventListener("click", () => { worker?.terminate(); worker = null; busy(false); $("msg").textContent = "Cancelled."; });
   const h = new URLSearchParams(location.hash.slice(1));
-  if (h.get("s")) { scr.value = h.get("s")!; all.checked = h.get("all") !== "0"; run(); }
+  if (h.get("s")) { scr.value = h.get("s")!; all.checked = h.get("rot") === "1"; run(); }
 </script>
 
 <style is:global>
@@ -127,11 +173,14 @@ const zb = zbll.map((c) => ({ i: c.id, k: c.key, sh: c.shape, st: c.state, n: c.
   #msg{font-weight:550;color:var(--ink-2)}
   .sv-note{font-size:.9rem;color:var(--ink-2);max-width:var(--content);margin:-6px 0 10px}
   #out h2{font-size:1.15rem;margin:26px 0 8px}
+  #out .hold{margin:0 0 8px;font-size:.95rem}
+  #out .sw{display:inline-block;width:.85em;height:.85em;border:1px solid var(--ink-2);border-radius:2px;margin:0 .25em -.1em 0}
   #out .stages{width:100%;border-collapse:collapse;font-size:.92rem}
   #out .stages th,#out .stages td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
   #out .stages td.alg,#out .alg{font-family:var(--mono,ui-monospace,monospace);word-break:break-word}
   #out .stages .num{text-align:right;white-space:nowrap}
   #out .stages tr.pick td{font-weight:600}
+  #out .btn.small{padding:2px 10px;font-size:.82rem}
   #out .facts{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;margin:0;font-size:.93rem}
   #out .facts dt{font-weight:600;color:var(--ink-2)}
   #out .facts dd{margin:0}
